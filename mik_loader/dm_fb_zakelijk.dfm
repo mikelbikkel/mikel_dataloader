@@ -1,18 +1,20 @@
 object dmFBZakelijk: TdmFBZakelijk
-  Height = 354
-  Width = 664
+  Height = 337
+  Width = 601
   PixelsPerInch = 120
   object connFBZakelijk: TUniConnection
     ProviderName = 'InterBase'
     SpecificOptions.Strings = (
       'InterBase.Charset=UTF8')
+    Options.AllowImplicitConnect = False
+    Options.KeepDesignConnected = False
     ConnectDialog = uniDlgConnect
     OnLogin = connFBZakelijkLogin
-    Left = 240
+    Left = 136
     Top = 32
   end
   object provFB: TInterBaseUniProvider
-    Left = 96
+    Left = 48
     Top = 32
   end
   object FDGUIxWaitCursor1: TFDGUIxWaitCursor
@@ -21,6 +23,7 @@ object dmFBZakelijk: TdmFBZakelijk
     Top = 32
   end
   object qryImpRaboZak: TUniQuery
+    KeyFields = 'iban;valuta_code;seqno'
     Connection = connFBZakelijk
     SQL.Strings = (
       
@@ -34,8 +37,10 @@ object dmFBZakelijk: TdmFBZakelijk
         ', desc_3, reason_code'
       ', instr_bedrag, instr_valuta, koers'
       'from imp_rabo_ztx')
-    Left = 248
-    Top = 200
+    Options.SetEmptyStrToNull = True
+    IndexFieldNames = 'valuta_datum'
+    Left = 56
+    Top = 128
     object qryImpRaboZakIBAN: TStringField
       FieldName = 'IBAN'
       Required = True
@@ -141,8 +146,8 @@ object dmFBZakelijk: TdmFBZakelijk
   end
   object dsImpRaboZak: TUniDataSource
     DataSet = qryImpRaboZak
-    Left = 376
-    Top = 200
+    Left = 184
+    Top = 128
   end
   object uniDlgConnect: TUniConnectDialog
     DatabaseLabel = 'Database'
@@ -154,7 +159,137 @@ object dmFBZakelijk: TdmFBZakelijk
     ServerLabel = 'Server'
     ConnectButton = 'Connect'
     CancelButton = 'Cancel'
-    Left = 552
-    Top = 168
+    StoreLogInfo = False
+    Left = 288
+    Top = 32
+  end
+  object qryImpKnab: TUniQuery
+    KeyFields = 'iban;tx_referentie;betaalwijze'
+    SQLInsert.Strings = (
+      'INSERT INTO IMP_MK_KTX'
+      
+        '  (IBAN, TX_DATUM, VALUTA_CODE, CREDIT_DEBET, BEDRAG, TEGEN_IBAN' +
+        ', TEGEN_NAAM, VALUTA_DATUM, BETAALWIJZE, OMSCHRIJVING, TYPE_BETA' +
+        'LING, MACHTIGINGSKENMERK, INCASSANT_ID, ADRES, TX_REFERENTIE, BO' +
+        'EK_DATUM)'
+      'VALUES'
+      
+        '  (:IBAN, :TX_DATUM, :VALUTA_CODE, :CREDIT_DEBET, :BEDRAG, :TEGE' +
+        'N_IBAN, :TEGEN_NAAM, :VALUTA_DATUM, :BETAALWIJZE, :OMSCHRIJVING,' +
+        ' :TYPE_BETALING, :MACHTIGINGSKENMERK, :INCASSANT_ID, :ADRES, :TX' +
+        '_REFERENTIE, :BOEK_DATUM)')
+    SQLUpdate.Strings = (
+      'UPDATE IMP_MK_KTX'
+      'SET'
+      
+        '  IBAN = :IBAN, TX_DATUM = :TX_DATUM, VALUTA_CODE = :VALUTA_CODE' +
+        ', CREDIT_DEBET = :CREDIT_DEBET, BEDRAG = :BEDRAG, TEGEN_IBAN = :' +
+        'TEGEN_IBAN, TEGEN_NAAM = :TEGEN_NAAM, VALUTA_DATUM = :VALUTA_DAT' +
+        'UM, BETAALWIJZE = :BETAALWIJZE, OMSCHRIJVING = :OMSCHRIJVING, TY' +
+        'PE_BETALING = :TYPE_BETALING, MACHTIGINGSKENMERK = :MACHTIGINGSK' +
+        'ENMERK, INCASSANT_ID = :INCASSANT_ID, ADRES = :ADRES, TX_REFEREN' +
+        'TIE = :TX_REFERENTIE, BOEK_DATUM = :BOEK_DATUM'
+      'WHERE'
+      
+        '  IBAN = :Old_IBAN AND TX_REFERENTIE = :Old_TX_REFERENTIE AND BE' +
+        'TAALWIJZE = :Old_BETAALWIJZE')
+    SQLRefresh.Strings = (
+      
+        'SELECT IBAN, TX_DATUM, VALUTA_CODE, CREDIT_DEBET, BEDRAG, TEGEN_' +
+        'IBAN, TEGEN_NAAM, VALUTA_DATUM, BETAALWIJZE, OMSCHRIJVING, TYPE_' +
+        'BETALING, MACHTIGINGSKENMERK, INCASSANT_ID, ADRES, TX_REFERENTIE' +
+        ', BOEK_DATUM FROM IMP_MK_KTX'
+      'WHERE'
+      
+        '  IBAN = :IBAN AND TX_REFERENTIE = :TX_REFERENTIE AND BETAALWIJZ' +
+        'E = :BETAALWIJZE')
+    SQLRecCount.Strings = (
+      'SELECT COUNT(*) FROM ('
+      'SELECT 1 AS C  FROM IMP_MK_KTX'
+      ''
+      ') q')
+    Connection = connFBZakelijk
+    SQL.Strings = (
+      
+        'select iban, tx_datum, valuta_code, credit_debet, bedrag, tegen_' +
+        'iban'
+      ', tegen_naam, valuta_datum, betaalwijze, omschrijving'
+      
+        ', type_betaling, machtigingskenmerk, incassant_id, adres, tx_ref' +
+        'erentie, boek_datum'
+      'from imp_mk_ktx')
+    Options.SetEmptyStrToNull = True
+    IndexFieldNames = 'valuta_datum'
+    Left = 56
+    Top = 224
+    object qryImpKnabIBAN: TStringField
+      FieldName = 'IBAN'
+      Required = True
+      Size = 50
+    end
+    object qryImpKnabTX_DATUM: TDateField
+      FieldName = 'TX_DATUM'
+    end
+    object qryImpKnabVALUTA_CODE: TStringField
+      FieldName = 'VALUTA_CODE'
+      Size = 3
+    end
+    object qryImpKnabCREDIT_DEBET: TStringField
+      FieldName = 'CREDIT_DEBET'
+      Required = True
+      Size = 2
+    end
+    object qryImpKnabBEDRAG: TFloatField
+      FieldName = 'BEDRAG'
+      Required = True
+    end
+    object qryImpKnabTEGEN_IBAN: TStringField
+      FieldName = 'TEGEN_IBAN'
+      Size = 50
+    end
+    object qryImpKnabTEGEN_NAAM: TStringField
+      FieldName = 'TEGEN_NAAM'
+      Size = 255
+    end
+    object qryImpKnabVALUTA_DATUM: TDateField
+      FieldName = 'VALUTA_DATUM'
+    end
+    object qryImpKnabBETAALWIJZE: TStringField
+      FieldName = 'BETAALWIJZE'
+      Required = True
+      Size = 40
+    end
+    object qryImpKnabOMSCHRIJVING: TStringField
+      FieldName = 'OMSCHRIJVING'
+      Size = 255
+    end
+    object qryImpKnabTYPE_BETALING: TStringField
+      FieldName = 'TYPE_BETALING'
+      Size = 255
+    end
+    object qryImpKnabMACHTIGINGSKENMERK: TStringField
+      FieldName = 'MACHTIGINGSKENMERK'
+      Size = 255
+    end
+    object qryImpKnabINCASSANT_ID: TStringField
+      FieldName = 'INCASSANT_ID'
+      Size = 255
+    end
+    object qryImpKnabADRES: TStringField
+      FieldName = 'ADRES'
+      Size = 70
+    end
+    object qryImpKnabTX_REFERENTIE: TStringField
+      FieldName = 'TX_REFERENTIE'
+      Required = True
+    end
+    object qryImpKnabBOEK_DATUM: TDateField
+      FieldName = 'BOEK_DATUM'
+    end
+  end
+  object dsImpKnab: TUniDataSource
+    DataSet = qryImpKnab
+    Left = 184
+    Top = 224
   end
 end

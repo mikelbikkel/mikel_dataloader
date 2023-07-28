@@ -65,6 +65,7 @@ type
 var
   frmMain: TfrmMain;
 
+  { ============================================================================ }
 implementation
 
 uses dm_fb_zakelijk, file_loader;
@@ -89,6 +90,9 @@ type
     property Pop: string read getPop;
     property Speeltuin: string read getSpeelTuin;
   end;
+
+  { ============================================================================ }
+{$REGION 'TfrmMain'}
 
 procedure TfrmMain.actConnectExecute(Sender: TObject);
 begin
@@ -124,9 +128,10 @@ begin
       end;
     1:
       begin { Database load }
-        // TODO: create Knab dataset and data source.
-        ldr := TFileLoader.Create(bmLoader, vtFileData, true);
-        grdFileData.DataSource := dsFileData;
+        if not dmFBZakelijk.connected then
+          Exit;
+        ldr := TFileLoader.Create(bmLoader, dmFBZakelijk.dsetKnabImp, true);
+        grdFileData.DataSource := dmFBZakelijk.dsImpKnab;
       end;
   else
     begin
@@ -200,6 +205,8 @@ begin
       end;
     1:
       begin { Database load }
+        if not dmFBZakelijk.connected then
+          Exit;
         ldr := TFileLoader.Create(bmLoader, dmFBZakelijk.dsetImpRaboZak, false);
         grdFileData.DataSource := dmFBZakelijk.dsImpRaboZak;
       end;
@@ -269,7 +276,9 @@ begin
   dmFBZakelijk.connFBZakelijk.Database := cfg.Pop;
   dmFBZakelijk.connFBZakelijk.ProviderName := cfg.Speeltuin;
 end;
-
+{$ENDREGION}
+{ ============================================================================ }
+{$REGION 'TConfig'}
 { TConfig }
 
 constructor TConfig.Create;
@@ -319,5 +328,7 @@ function TConfig.getSpeelTuin: string;
 begin
   Result := Fcfg.Values['zkb_fb_speeltuin'];
 end;
+
+{$ENDREGION}
 
 end.

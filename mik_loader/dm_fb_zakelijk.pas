@@ -59,6 +59,24 @@ type
     qryImpRaboZakKOERS: TFloatField;
     dsImpRaboZak: TUniDataSource;
     uniDlgConnect: TUniConnectDialog;
+    qryImpKnab: TUniQuery;
+    dsImpKnab: TUniDataSource;
+    qryImpKnabIBAN: TStringField;
+    qryImpKnabTX_DATUM: TDateField;
+    qryImpKnabVALUTA_CODE: TStringField;
+    qryImpKnabCREDIT_DEBET: TStringField;
+    qryImpKnabBEDRAG: TFloatField;
+    qryImpKnabTEGEN_IBAN: TStringField;
+    qryImpKnabTEGEN_NAAM: TStringField;
+    qryImpKnabVALUTA_DATUM: TDateField;
+    qryImpKnabBETAALWIJZE: TStringField;
+    qryImpKnabOMSCHRIJVING: TStringField;
+    qryImpKnabTYPE_BETALING: TStringField;
+    qryImpKnabMACHTIGINGSKENMERK: TStringField;
+    qryImpKnabINCASSANT_ID: TStringField;
+    qryImpKnabADRES: TStringField;
+    qryImpKnabTX_REFERENTIE: TStringField;
+    qryImpKnabBOEK_DATUM: TDateField;
     procedure connFBZakelijkLogin(Connection: TCustomDAConnection;
       LoginParams: TStrings);
   strict private
@@ -66,10 +84,12 @@ type
     function GetConnected: boolean;
     procedure SetConnected(setConn: boolean);
     function GetRaboImpZak: TDataSet;
+    function GetKnabImp: TDataset;
   public
     { Public declarations }
     property connected: boolean read GetConnected write SetConnected;
     property dsetImpRaboZak: TDataSet read GetRaboImpZak;
+    property dsetKnabImp: TDataSet read GetKnabImp;
   end;
 
 var
@@ -93,6 +113,11 @@ end;
 function TdmFBZakelijk.GetConnected: boolean;
 begin
   Result := connFBZakelijk.connected;
+end;
+
+function TdmFBZakelijk.GetKnabImp: TDataset;
+begin
+  Result := qryImpKnab;
 end;
 
 function TdmFBZakelijk.GetRaboImpZak: TDataSet;
