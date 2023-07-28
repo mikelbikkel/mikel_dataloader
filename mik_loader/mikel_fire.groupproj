@@ -1,0 +1,36 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{551337B7-4F09-40A3-A0B8-1B6C6C8488E4}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="mik_loader.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="mik_loader">
+        <MSBuild Projects="mik_loader.dproj"/>
+    </Target>
+    <Target Name="mik_loader:Clean">
+        <MSBuild Projects="mik_loader.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="mik_loader:Make">
+        <MSBuild Projects="mik_loader.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="mik_loader"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="mik_loader:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="mik_loader:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
