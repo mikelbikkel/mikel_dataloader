@@ -21,7 +21,9 @@ uses
   Vcl.Forms,
   frm_main in 'frm_main.pas' {frmMain},
   dm_fb_zakelijk in 'dm_fb_zakelijk.pas' {dmFBZakelijk: TDataModule},
-  file_loader in 'file_loader.pas';
+  file_loader in 'file_loader.pas',
+  frm_log in 'frm_log.pas' {frmLog},
+  query_decorator in 'query_decorator.pas';
 
 {$R *.res}
 
@@ -31,5 +33,6 @@ begin
   Application.Title := 'Mikel Loader';
   Application.CreateForm(TfrmMain, frmMain);
   Application.CreateForm(TdmFBZakelijk, dmFBZakelijk);
+  Application.CreateForm(TfrmLog, frmLog);
   Application.Run;
 end.

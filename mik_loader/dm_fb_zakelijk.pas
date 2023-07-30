@@ -23,7 +23,7 @@ uses
   System.SysUtils, System.Classes, Data.DB, DBAccess, Uni, UniProvider,
   InterBaseUniProvider, MemDS, VirtualTable, FireDAC.Stan.Intf,
   FireDAC.Comp.BatchMove, UniDacVcl, FireDAC.UI.Intf, FireDAC.VCLUI.Wait,
-  FireDAC.Comp.UI;
+  FireDAC.Comp.UI, query_decorator;
 
 type
   TdmFBZakelijk = class(TDataModule)
@@ -77,19 +77,31 @@ type
     qryImpKnabADRES: TStringField;
     qryImpKnabTX_REFERENTIE: TStringField;
     qryImpKnabBOEK_DATUM: TDateField;
+    qryLog: TUniQuery;
+    qryLogLOG_ID: TIntegerField;
+    qryLogLOG_TS: TDateTimeField;
+    qryLogLOG_MODULE: TStringField;
+    qryLogLOG_MESSAGE: TStringField;
+    dsLog: TUniDataSource;
     procedure connFBZakelijkLogin(Connection: TCustomDAConnection;
       LoginParams: TStrings);
+    procedure DataModuleCreate(Sender: TObject);
+    procedure DataModuleDestroy(Sender: TObject);
   strict private
-    { Private declarations }
+    FAppLog: IQueryDecorator;
+
     function GetConnected: boolean;
     procedure SetConnected(setConn: boolean);
     function GetRaboImpZak: TDataSet;
-    function GetKnabImp: TDataset;
+    function GetKnabImp: TDataSet;
+
   public
-    { Public declarations }
     property connected: boolean read GetConnected write SetConnected;
     property dsetImpRaboZak: TDataSet read GetRaboImpZak;
     property dsetKnabImp: TDataSet read GetKnabImp;
+
+    property rsAppLog: IQueryDecorator read FAppLog;
+
   end;
 
 var
@@ -110,12 +122,23 @@ begin
     S := LoginParams.CommaText;
 end;
 
+procedure TdmFBZakelijk.DataModuleCreate(Sender: TObject);
+begin
+  FAppLog := CreateQueryDecorator(qryLog);
+
+end;
+
+procedure TdmFBZakelijk.DataModuleDestroy(Sender: TObject);
+begin
+  FAppLog := nil;
+end;
+
 function TdmFBZakelijk.GetConnected: boolean;
 begin
   Result := connFBZakelijk.connected;
 end;
 
-function TdmFBZakelijk.GetKnabImp: TDataset;
+function TdmFBZakelijk.GetKnabImp: TDataSet;
 begin
   Result := qryImpKnab;
 end;

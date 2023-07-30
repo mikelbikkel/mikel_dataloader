@@ -112,6 +112,11 @@
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
         <DCCReference Include="file_loader.pas"/>
+        <DCCReference Include="frm_log.pas">
+            <Form>frmLog</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="query_decorator.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

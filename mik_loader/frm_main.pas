@@ -51,10 +51,13 @@ type
     lblInsert: TLabel;
     lblErrors: TLabel;
     rgLoadType: TRadioGroup;
+    btnShowLog: TButton;
+    actShowLog: TAction;
     procedure actConnectExecute(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure actLoadRaboExecute(Sender: TObject);
     procedure actLoadKnabExecute(Sender: TObject);
+    procedure actShowLogExecute(Sender: TObject);
   private
     { Private declarations }
     procedure LoadConfig;
@@ -68,7 +71,7 @@ var
   { ============================================================================ }
 implementation
 
-uses dm_fb_zakelijk, file_loader;
+uses dm_fb_zakelijk, file_loader, frm_log;
 {$R *.dfm}
 
 type
@@ -258,6 +261,11 @@ begin
     if Assigned(ldr) then
       ldr.Free;
   end;
+end;
+
+procedure TfrmMain.actShowLogExecute(Sender: TObject);
+begin
+  frmLog.Show;
 end;
 
 procedure TfrmMain.FormClose(Sender: TObject; var Action: TCloseAction);

@@ -1,17 +1,23 @@
 object dmFBZakelijk: TdmFBZakelijk
+  OnCreate = DataModuleCreate
+  OnDestroy = DataModuleDestroy
   Height = 337
   Width = 601
   PixelsPerInch = 120
   object connFBZakelijk: TUniConnection
     ProviderName = 'InterBase'
+    Database = 'zakboek'
     SpecificOptions.Strings = (
       'InterBase.Charset=UTF8')
     Options.AllowImplicitConnect = False
     Options.KeepDesignConnected = False
+    Username = 'mikel'
+    Server = 'localhost'
     ConnectDialog = uniDlgConnect
     OnLogin = connFBZakelijkLogin
     Left = 136
     Top = 32
+    EncryptedPassword = 'B2FF96FF9CFF97FF9AFFB3FFC9FFC9FF'
   end
   object provFB: TInterBaseUniProvider
     Left = 48
@@ -291,5 +297,43 @@ object dmFBZakelijk: TdmFBZakelijk
     DataSet = qryImpKnab
     Left = 184
     Top = 224
+  end
+  object qryLog: TUniQuery
+    KeyFields = 'LOG_ID'
+    Connection = connFBZakelijk
+    SQL.Strings = (
+      'select log_id, log_ts, log_module, log_message from mikel_log')
+    ReadOnly = True
+    IndexFieldNames = 'LOG_TS DESC'
+    Left = 368
+    Top = 152
+    object qryLogLOG_ID: TIntegerField
+      DisplayLabel = 'ID'
+      FieldName = 'LOG_ID'
+      Required = True
+    end
+    object qryLogLOG_TS: TDateTimeField
+      DisplayLabel = 'Timestamp'
+      FieldName = 'LOG_TS'
+      Required = True
+    end
+    object qryLogLOG_MODULE: TStringField
+      DisplayLabel = 'Module'
+      DisplayWidth = 25
+      FieldName = 'LOG_MODULE'
+      Required = True
+      Size = 75
+    end
+    object qryLogLOG_MESSAGE: TStringField
+      DisplayLabel = 'Message'
+      FieldName = 'LOG_MESSAGE'
+      Required = True
+      Size = 200
+    end
+  end
+  object dsLog: TUniDataSource
+    DataSet = qryLog
+    Left = 448
+    Top = 152
   end
 end

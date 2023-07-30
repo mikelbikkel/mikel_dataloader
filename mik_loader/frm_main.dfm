@@ -3,7 +3,7 @@ object frmMain: TfrmMain
   Top = 0
   Caption = 'Mikel Loader'
   ClientHeight = 395
-  ClientWidth = 575
+  ClientWidth = 668
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -140,6 +140,14 @@ object frmMain: TfrmMain
       'Database load')
     TabOrder = 8
   end
+  object btnShowLog: TButton
+    Left = 536
+    Top = 48
+    Width = 75
+    Height = 41
+    Action = actShowLog
+    TabOrder = 9
+  end
   object alMain: TActionList
     Left = 256
     Top = 16
@@ -154,6 +162,10 @@ object frmMain: TfrmMain
     object actLoadRabo: TAction
       Caption = 'Load Rabo'
       OnExecute = actLoadRaboExecute
+    end
+    object actShowLog: TAction
+      Caption = 'Show Log'
+      OnExecute = actShowLogExecute
     end
   end
   object bmLoader: TFDBatchMove
