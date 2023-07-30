@@ -1,8 +1,8 @@
 object dmFBZakelijk: TdmFBZakelijk
   OnCreate = DataModuleCreate
   OnDestroy = DataModuleDestroy
-  Height = 337
-  Width = 601
+  Height = 392
+  Width = 714
   PixelsPerInch = 120
   object connFBZakelijk: TUniConnection
     ProviderName = 'InterBase'
@@ -44,6 +44,7 @@ object dmFBZakelijk: TdmFBZakelijk
         ', desc_3, reason_code'
       ', instr_bedrag, instr_valuta, koers'
       'from imp_rabo_ztx')
+    Debug = True
     Options.SetEmptyStrToNull = True
     IndexFieldNames = 'valuta_datum'
     Left = 56
@@ -304,7 +305,9 @@ object dmFBZakelijk: TdmFBZakelijk
     Connection = connFBZakelijk
     SQL.Strings = (
       'select log_id, log_ts, log_module, log_message from mikel_log')
+    Debug = True
     ReadOnly = True
+    Options.SetEmptyStrToNull = True
     IndexFieldNames = 'LOG_TS DESC'
     Left = 368
     Top = 152
@@ -345,5 +348,19 @@ object dmFBZakelijk: TdmFBZakelijk
     Left = 480
     Top = 264
     CommandStoredProcName = 'MK_PKG_RABO.IMPORT_RABO_ZTX'
+  end
+  object uniMonitor: TUniSQLMonitor
+    Options = [moDBMonitor]
+    Left = 336
+    Top = 248
+  end
+  object execLoadKnabZak: TUniStoredProc
+    StoredProcName = 'MK_PKG_KNAB.IMPORT_KNAB_ZTX'
+    SQL.Strings = (
+      'EXECUTE PROCEDURE MK_PKG_KNAB.IMPORT_KNAB_ZTX')
+    Connection = connFBZakelijk
+    Left = 528
+    Top = 192
+    CommandStoredProcName = 'MK_PKG_KNAB.IMPORT_KNAB_ZTX'
   end
 end

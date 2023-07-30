@@ -55,12 +55,15 @@ type
     actShowLog: TAction;
     actExecRaboZak: TAction;
     btnExecRaboZak: TButton;
+    actExecKnabZak: TAction;
+    btnExecKnabZak: TButton;
     procedure actConnectExecute(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure actLoadRaboExecute(Sender: TObject);
     procedure actLoadKnabExecute(Sender: TObject);
     procedure actShowLogExecute(Sender: TObject);
     procedure actExecRaboZakExecute(Sender: TObject);
+    procedure actExecKnabZakExecute(Sender: TObject);
   private
     { Private declarations }
     procedure LoadConfig;
@@ -105,6 +108,11 @@ begin
   LoadConfig;
   dmFBZakelijk.connected := true;
   lblConnected.Color := clGreen;
+end;
+
+procedure TfrmMain.actExecKnabZakExecute(Sender: TObject);
+begin
+   dmFBZakelijk.procKnabZakelijk;
 end;
 
 procedure TfrmMain.actExecRaboZakExecute(Sender: TObject);

@@ -23,7 +23,7 @@ uses
   System.SysUtils, System.Classes, Data.DB, DBAccess, Uni, UniProvider,
   InterBaseUniProvider, MemDS, VirtualTable, FireDAC.Stan.Intf,
   FireDAC.Comp.BatchMove, UniDacVcl, FireDAC.UI.Intf, FireDAC.VCLUI.Wait,
-  FireDAC.Comp.UI, query_decorator;
+  FireDAC.Comp.UI, query_decorator, DASQLMonitor, UniSQLMonitor;
 
 type
   TdmFBZakelijk = class(TDataModule)
@@ -84,6 +84,8 @@ type
     qryLogLOG_MESSAGE: TStringField;
     dsLog: TUniDataSource;
     execLoadRaboZak: TUniStoredProc;
+    uniMonitor: TUniSQLMonitor;
+    execLoadKnabZak: TUniStoredProc;
     procedure connFBZakelijkLogin(Connection: TCustomDAConnection;
       LoginParams: TStrings);
     procedure DataModuleCreate(Sender: TObject);
@@ -104,7 +106,7 @@ type
     property rsAppLog: IQueryDecorator read FAppLog;
 
     procedure procRaboZakelijk;
-
+    procedure procKnabZakelijk;
   end;
 
 var
@@ -134,6 +136,11 @@ end;
 procedure TdmFBZakelijk.DataModuleDestroy(Sender: TObject);
 begin
   FAppLog := nil;
+end;
+
+procedure TdmFBZakelijk.procKnabZakelijk;
+begin
+  execLoadKnabZak.ExecProc;
 end;
 
 procedure TdmFBZakelijk.procRaboZakelijk;

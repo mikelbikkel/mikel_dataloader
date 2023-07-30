@@ -156,6 +156,14 @@ object frmMain: TfrmMain
     Action = actExecRaboZak
     TabOrder = 10
   end
+  object btnExecKnabZak: TButton
+    Left = 616
+    Top = 8
+    Width = 129
+    Height = 33
+    Action = actExecKnabZak
+    TabOrder = 11
+  end
   object alMain: TActionList
     Left = 256
     Top = 16
@@ -178,6 +186,10 @@ object frmMain: TfrmMain
     object actExecRaboZak: TAction
       Caption = 'Import Rabo Zakelijk'
       OnExecute = actExecRaboZakExecute
+    end
+    object actExecKnabZak: TAction
+      Caption = 'Import Knab Zakelijk'
+      OnExecute = actExecKnabZakExecute
     end
   end
   object bmLoader: TFDBatchMove
