@@ -3,7 +3,7 @@ object frmMain: TfrmMain
   Top = 0
   Caption = 'Mikel Loader'
   ClientHeight = 395
-  ClientWidth = 668
+  ClientWidth = 767
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -86,7 +86,7 @@ object frmMain: TfrmMain
   object grdFileData: TDBGrid
     Left = 8
     Top = 116
-    Width = 550
+    Width = 737
     Height = 231
     DataSource = dsFileData
     TabOrder = 3
@@ -148,6 +148,14 @@ object frmMain: TfrmMain
     Action = actShowLog
     TabOrder = 9
   end
+  object btnExecRaboZak: TButton
+    Left = 617
+    Top = 48
+    Width = 128
+    Height = 41
+    Action = actExecRaboZak
+    TabOrder = 10
+  end
   object alMain: TActionList
     Left = 256
     Top = 16
@@ -166,6 +174,10 @@ object frmMain: TfrmMain
     object actShowLog: TAction
       Caption = 'Show Log'
       OnExecute = actShowLogExecute
+    end
+    object actExecRaboZak: TAction
+      Caption = 'Import Rabo Zakelijk'
+      OnExecute = actExecRaboZakExecute
     end
   end
   object bmLoader: TFDBatchMove

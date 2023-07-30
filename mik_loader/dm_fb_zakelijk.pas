@@ -83,6 +83,7 @@ type
     qryLogLOG_MODULE: TStringField;
     qryLogLOG_MESSAGE: TStringField;
     dsLog: TUniDataSource;
+    execLoadRaboZak: TUniStoredProc;
     procedure connFBZakelijkLogin(Connection: TCustomDAConnection;
       LoginParams: TStrings);
     procedure DataModuleCreate(Sender: TObject);
@@ -101,6 +102,8 @@ type
     property dsetKnabImp: TDataSet read GetKnabImp;
 
     property rsAppLog: IQueryDecorator read FAppLog;
+
+    procedure procRaboZakelijk;
 
   end;
 
@@ -131,6 +134,11 @@ end;
 procedure TdmFBZakelijk.DataModuleDestroy(Sender: TObject);
 begin
   FAppLog := nil;
+end;
+
+procedure TdmFBZakelijk.procRaboZakelijk;
+begin
+  execLoadRaboZak.ExecProc;
 end;
 
 function TdmFBZakelijk.GetConnected: boolean;

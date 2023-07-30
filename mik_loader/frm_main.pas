@@ -53,11 +53,14 @@ type
     rgLoadType: TRadioGroup;
     btnShowLog: TButton;
     actShowLog: TAction;
+    actExecRaboZak: TAction;
+    btnExecRaboZak: TButton;
     procedure actConnectExecute(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure actLoadRaboExecute(Sender: TObject);
     procedure actLoadKnabExecute(Sender: TObject);
     procedure actShowLogExecute(Sender: TObject);
+    procedure actExecRaboZakExecute(Sender: TObject);
   private
     { Private declarations }
     procedure LoadConfig;
@@ -102,6 +105,11 @@ begin
   LoadConfig;
   dmFBZakelijk.connected := true;
   lblConnected.Color := clGreen;
+end;
+
+procedure TfrmMain.actExecRaboZakExecute(Sender: TObject);
+begin
+  dmFBZakelijk.procRaboZakelijk;
 end;
 
 procedure TfrmMain.actLoadKnabExecute(Sender: TObject);

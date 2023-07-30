@@ -13,6 +13,7 @@ object dmFBZakelijk: TdmFBZakelijk
     Options.KeepDesignConnected = False
     Username = 'mikel'
     Server = 'localhost'
+    Connected = True
     ConnectDialog = uniDlgConnect
     OnLogin = connFBZakelijkLogin
     Left = 136
@@ -335,5 +336,14 @@ object dmFBZakelijk: TdmFBZakelijk
     DataSet = qryLog
     Left = 448
     Top = 152
+  end
+  object execLoadRaboZak: TUniStoredProc
+    StoredProcName = 'MK_PKG_RABO.IMPORT_RABO_ZTX'
+    SQL.Strings = (
+      'EXECUTE PROCEDURE MK_PKG_RABO.IMPORT_RABO_ZTX')
+    Connection = connFBZakelijk
+    Left = 480
+    Top = 264
+    CommandStoredProcName = 'MK_PKG_RABO.IMPORT_RABO_ZTX'
   end
 end
