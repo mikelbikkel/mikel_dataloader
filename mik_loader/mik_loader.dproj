@@ -114,7 +114,7 @@
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
         <DCCReference Include="file_loader.pas"/>
-        <DCCReference Include="frm_log.pas">
+        <DCCReference Include="frm_table.pas">
             <Form>frmLog</Form>
             <FormType>dfm</FormType>
         </DCCReference>

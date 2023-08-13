@@ -15,7 +15,7 @@
   limitations under the License.
 
   ******************************************************************************* }
-unit frm_log;
+unit frm_table;
 
 interface
 

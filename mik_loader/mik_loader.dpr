@@ -22,7 +22,7 @@ uses
   frm_main in 'frm_main.pas' {frmMain},
   dm_fb_zakelijk in 'dm_fb_zakelijk.pas' {dmFBZakelijk: TDataModule},
   file_loader in 'file_loader.pas',
-  frm_log in 'frm_log.pas' {frmLog},
+  frm_table in 'frm_table.pas' {frmLog},
   query_decorator in 'query_decorator.pas',
   dm_xaf in 'dm_xaf.pas' {dmXAF: TDataModule};
 
