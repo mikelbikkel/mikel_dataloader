@@ -1,4 +1,4 @@
-object frmLog: TfrmLog
+object frmTable: TfrmTable
   Left = 0
   Top = 0
   Caption = 'Mikel log'

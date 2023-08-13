@@ -115,7 +115,7 @@
         </DCCReference>
         <DCCReference Include="file_loader.pas"/>
         <DCCReference Include="frm_table.pas">
-            <Form>frmLog</Form>
+            <Form>frmTable</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="query_decorator.pas"/>

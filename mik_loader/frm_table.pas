@@ -23,11 +23,10 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
   System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Data.DB, Vcl.Grids, Vcl.DBGrids,
-  dm_fb_zakelijk,
-  System.Actions, Vcl.ActnList, Vcl.StdCtrls;
+  System.Actions, Vcl.ActnList, Vcl.StdCtrls, query_decorator;
 
 type
-  TfrmLog = class(TForm)
+  TfrmTable = class(TForm)
     grdLog: TDBGrid;
     btnRefresh: TButton;
     ActionList1: TActionList;
@@ -35,32 +34,40 @@ type
     procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure actRefreshExecute(Sender: TObject);
-  private
-    { Private declarations }
+    procedure setDataSource(dsrc: TDataSource);
+  strict private
+    FTableData: IQueryDecorator;
   public
     { Public declarations }
+    property TableData: IQueryDecorator write FTableData;
+    property TableSource: TDataSource write setDataSource;
   end;
 
 var
-  frmLog: TfrmLog;
+  frmTable: TfrmTable;
 
 implementation
 
 {$R *.dfm}
 
-procedure TfrmLog.actRefreshExecute(Sender: TObject);
+procedure TfrmTable.actRefreshExecute(Sender: TObject);
 begin
-  dmFBZakelijk.rsAppLog.Refresh;
+  FTableData.Refresh;
 end;
 
-procedure TfrmLog.FormClose(Sender: TObject; var Action: TCloseAction);
+procedure TfrmTable.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-  dmFBZakelijk.rsAppLog.Close;
+  FTableData.Close;
 end;
 
-procedure TfrmLog.FormShow(Sender: TObject);
+procedure TfrmTable.FormShow(Sender: TObject);
 begin
-  dmFBZakelijk.rsAppLog.Open;
+  FTableData.Open;
+end;
+
+procedure TfrmTable.setDataSource(dsrc: TDataSource);
+begin
+  grdLog.DataSource := dsrc;
 end;
 
 end.

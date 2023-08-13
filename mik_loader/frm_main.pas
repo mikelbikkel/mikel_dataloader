@@ -57,6 +57,8 @@ type
     btnExecRaboZak: TButton;
     actExecKnabZak: TAction;
     btnExecKnabZak: TButton;
+    actShowXafCustomer: TAction;
+    btnXafCustomer: TButton;
     procedure actConnectExecute(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure actLoadRaboExecute(Sender: TObject);
@@ -64,6 +66,7 @@ type
     procedure actShowLogExecute(Sender: TObject);
     procedure actExecRaboZakExecute(Sender: TObject);
     procedure actExecKnabZakExecute(Sender: TObject);
+    procedure actShowXafCustomerExecute(Sender: TObject);
   private
     { Private declarations }
     procedure LoadConfig;
@@ -77,7 +80,7 @@ var
   { ============================================================================ }
 implementation
 
-uses dm_fb_zakelijk, file_loader, frm_log;
+uses dm_fb_zakelijk, file_loader, frm_table;
 {$R *.dfm}
 
 type
@@ -281,7 +284,20 @@ end;
 
 procedure TfrmMain.actShowLogExecute(Sender: TObject);
 begin
-  frmLog.Show;
+  frmTable.TableData := dmFBZakelijk.rsAppLog;
+  frmTable.TableSource := dmFBZakelijk.dsLog;
+  frmTable.Caption := 'Mikel log blog';
+  frmTable.Show;
+end;
+
+procedure TfrmMain.actShowXafCustomerExecute(Sender: TObject);
+begin
+  // TODO: set correct properties.
+  frmTable.TableData := dmFBZakelijk.rsAppLog;
+  frmTable.TableSource := dmFBZakelijk.dsLog;
+  frmTable.Caption := 'Mikel XAF customer';
+  frmTable.Show;
+
 end;
 
 procedure TfrmMain.FormClose(Sender: TObject; var Action: TCloseAction);
