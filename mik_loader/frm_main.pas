@@ -112,7 +112,7 @@ end;
 
 procedure TfrmMain.actExecKnabZakExecute(Sender: TObject);
 begin
-   dmFBZakelijk.procKnabZakelijk;
+  dmFBZakelijk.procKnabZakelijk;
 end;
 
 procedure TfrmMain.actExecRaboZakExecute(Sender: TObject);

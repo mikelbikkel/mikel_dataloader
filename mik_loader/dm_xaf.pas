@@ -1,6 +1,6 @@
 { ******************************************************************************
 
-  Copyright (c) 2022 M van Delft.
+  Copyright (c) 2023 M van Delft.
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -15,26 +15,36 @@
   limitations under the License.
 
   ******************************************************************************* }
-program mik_loader;
+unit dm_xaf;
+
+interface
 
 uses
-  Vcl.Forms,
-  frm_main in 'frm_main.pas' {frmMain},
-  dm_fb_zakelijk in 'dm_fb_zakelijk.pas' {dmFBZakelijk: TDataModule},
-  file_loader in 'file_loader.pas',
-  frm_log in 'frm_log.pas' {frmLog},
-  query_decorator in 'query_decorator.pas',
-  dm_xaf in 'dm_xaf.pas' {dmXAF: TDataModule};
+  System.SysUtils, System.Classes, Data.DB, Datasnap.DBClient, dm_fb_zakelijk,
+  MemDS, DBAccess, Uni;
 
-{$R *.res}
+type
+  TdmXAF = class(TDataModule)
+    qryXafInfo: TUniQuery;
+    qryXafInfoAUDIT_ID: TStringField;
+    qryXafInfoCUST_ID: TStringField;
+    qryXafInfoCUST_NAME: TStringField;
+    qryXafInfoKVK_NUMBER: TStringField;
+    qryXafInfoTAX_REG_ID: TStringField;
+    qryXafInfoCUST_TYPE: TStringField;
+    dsXafInfo: TUniDataSource;
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
 
-begin
-  Application.Initialize;
-  Application.MainFormOnTaskbar := True;
-  Application.Title := 'Mikel Loader';
-  Application.CreateForm(TfrmMain, frmMain);
-  Application.CreateForm(TdmFBZakelijk, dmFBZakelijk);
-  Application.CreateForm(TfrmLog, frmLog);
-  Application.CreateForm(TdmXAF, dmXAF);
-  Application.Run;
+var
+  dmXAF: TdmXAF;
+
+implementation
+
+{%CLASSGROUP 'Vcl.Controls.TControl'}
+{$R *.dfm}
+
 end.
