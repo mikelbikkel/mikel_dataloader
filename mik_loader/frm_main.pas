@@ -80,7 +80,7 @@ var
   { ============================================================================ }
 implementation
 
-uses dm_fb_zakelijk, file_loader, frm_table;
+uses dm_fb_zakelijk, file_loader, frm_table, dm_xaf;
 {$R *.dfm}
 
 type
@@ -292,12 +292,10 @@ end;
 
 procedure TfrmMain.actShowXafCustomerExecute(Sender: TObject);
 begin
-  // TODO: set correct properties.
-  frmTable.TableData := dmFBZakelijk.rsAppLog;
-  frmTable.TableSource := dmFBZakelijk.dsLog;
+  frmTable.TableData := dmXAF.rsXafCustomer;
+  frmTable.TableSource := dmXAF.dsXafCustomer;
   frmTable.Caption := 'Mikel XAF customer';
   frmTable.Show;
-
 end;
 
 procedure TfrmMain.FormClose(Sender: TObject; var Action: TCloseAction);

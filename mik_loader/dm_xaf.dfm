@@ -1,46 +1,47 @@
 object dmXAF: TdmXAF
+  OnDestroy = DataModuleDestroy
   Height = 423
   Width = 616
   PixelsPerInch = 120
-  object qryXafInfo: TUniQuery
+  object qryXafCustomer: TUniQuery
     Connection = dmFBZakelijk.connFBZakelijk
     SQL.Strings = (
       
         'select audit_id, cust_id, cust_name, kvk_number, tax_reg_id, cus' +
         't_type'
       'from mk_xaf_customer')
-    Left = 24
+    Left = 40
     Top = 32
-    object qryXafInfoAUDIT_ID: TStringField
+    object qryXafCustomerAUDIT_ID: TStringField
       FieldName = 'AUDIT_ID'
       Required = True
       Size = 50
     end
-    object qryXafInfoCUST_ID: TStringField
+    object qryXafCustomerCUST_ID: TStringField
       FieldName = 'CUST_ID'
       Required = True
       Size = 35
     end
-    object qryXafInfoCUST_NAME: TStringField
+    object qryXafCustomerCUST_NAME: TStringField
       FieldName = 'CUST_NAME'
       Size = 50
     end
-    object qryXafInfoKVK_NUMBER: TStringField
+    object qryXafCustomerKVK_NUMBER: TStringField
       FieldName = 'KVK_NUMBER'
       Size = 30
     end
-    object qryXafInfoTAX_REG_ID: TStringField
+    object qryXafCustomerTAX_REG_ID: TStringField
       FieldName = 'TAX_REG_ID'
       Size = 30
     end
-    object qryXafInfoCUST_TYPE: TStringField
+    object qryXafCustomerCUST_TYPE: TStringField
       FieldName = 'CUST_TYPE'
       Size = 40
     end
   end
-  object dsXafInfo: TUniDataSource
-    DataSet = qryXafInfo
-    Left = 104
+  object dsXafCustomer: TUniDataSource
+    DataSet = qryXafCustomer
+    Left = 168
     Top = 32
   end
 end

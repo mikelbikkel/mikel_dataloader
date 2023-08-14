@@ -21,22 +21,24 @@ interface
 
 uses
   System.SysUtils, System.Classes, Data.DB, Datasnap.DBClient, dm_fb_zakelijk,
-  MemDS, DBAccess, Uni;
+  MemDS, DBAccess, Uni, query_decorator;
 
 type
   TdmXAF = class(TDataModule)
-    qryXafInfo: TUniQuery;
-    qryXafInfoAUDIT_ID: TStringField;
-    qryXafInfoCUST_ID: TStringField;
-    qryXafInfoCUST_NAME: TStringField;
-    qryXafInfoKVK_NUMBER: TStringField;
-    qryXafInfoTAX_REG_ID: TStringField;
-    qryXafInfoCUST_TYPE: TStringField;
-    dsXafInfo: TUniDataSource;
-  private
-    { Private declarations }
+    qryXafCustomer: TUniQuery;
+    qryXafCustomerAUDIT_ID: TStringField;
+    qryXafCustomerCUST_ID: TStringField;
+    qryXafCustomerCUST_NAME: TStringField;
+    qryXafCustomerKVK_NUMBER: TStringField;
+    qryXafCustomerTAX_REG_ID: TStringField;
+    qryXafCustomerCUST_TYPE: TStringField;
+    dsXafCustomer: TUniDataSource;
+    procedure DataModuleDestroy(Sender: TObject);
+  strict private
+    FQDCustomer: IQueryDecorator;
+    function GetQDCustomer: IQueryDecorator;
   public
-    { Public declarations }
+    property rsXafCustomer: IQueryDecorator read GetQDCustomer;
   end;
 
 var
@@ -46,5 +48,20 @@ implementation
 
 {%CLASSGROUP 'Vcl.Controls.TControl'}
 {$R *.dfm}
+{ TdmXAF }
+
+procedure TdmXAF.DataModuleDestroy(Sender: TObject);
+begin
+  FQDCustomer := nil;
+end;
+
+function TdmXAF.GetQDCustomer: IQueryDecorator;
+begin
+  if not Assigned(FQDCustomer) then
+  begin
+    FQDCustomer := CreateQueryDecorator(qryXafCustomer);
+  end;
+  Result := FQDCustomer;
+end;
 
 end.
