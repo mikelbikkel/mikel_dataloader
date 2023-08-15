@@ -1,7 +1,7 @@
 object dmFBZakelijk: TdmFBZakelijk
   OnCreate = DataModuleCreate
   OnDestroy = DataModuleDestroy
-  Height = 392
+  Height = 477
   Width = 714
   PixelsPerInch = 120
   object connFBZakelijk: TUniConnection

@@ -25,7 +25,7 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, System.Actions,
   Vcl.ActnList, Data.DB, Vcl.Grids, Vcl.DBGrids, DBAccess, Uni, MemDS,
   VirtualTable, FireDAC.Stan.Intf, FireDAC.Comp.BatchMove, FireDAC.UI.Intf,
-  FireDAC.VCLUI.Wait, FireDAC.Comp.UI, Vcl.ExtCtrls;
+  FireDAC.VCLUI.Wait, FireDAC.Comp.UI, Vcl.ExtCtrls, data_facade;
 
 type
   TfrmMain = class(TForm)
@@ -68,8 +68,7 @@ type
     procedure actExecKnabZakExecute(Sender: TObject);
     procedure actShowXafCustomerExecute(Sender: TObject);
   private
-    { Private declarations }
-    procedure LoadConfig;
+    FDataFacade: IDataFacade;
   public
     { Public declarations }
   end;
@@ -80,36 +79,17 @@ var
   { ============================================================================ }
 implementation
 
-uses dm_fb_zakelijk, file_loader, frm_table, dm_xaf;
+uses dm_fb_zakelijk, file_loader, frm_table, dm_xaf, dm_ora_zakelijk;
 {$R *.dfm}
-
-type
-
-  TConfig = class
-  strict private
-    Fcfg: TStringList;
-    function getServer: string;
-    function getHuis: string;
-    function getTuin: string;
-    function getPop: string;
-    function getSpeelTuin: string;
-  public
-    constructor Create;
-    destructor Destroy; override;
-    property Server: string read getServer;
-    property Huis: string read getHuis;
-    property Tuin: string read getTuin;
-    property Pop: string read getPop;
-    property Speeltuin: string read getSpeelTuin;
-  end;
-
-  { ============================================================================ }
+{ ============================================================================ }
 {$REGION 'TfrmMain'}
 
 procedure TfrmMain.actConnectExecute(Sender: TObject);
 begin
-  LoadConfig;
-  dmFBZakelijk.connected := true;
+  if not Assigned(FDataFacade) then
+    FDataFacade := CreateDataFacade;
+
+  FDataFacade.Connect;
   lblConnected.Color := clGreen;
 end;
 
@@ -300,71 +280,11 @@ end;
 
 procedure TfrmMain.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-  dmFBZakelijk.connected := false;
-end;
-
-procedure TfrmMain.LoadConfig;
-var
-  cfg: TConfig;
-begin
-  cfg := TConfig.Create;
-  dmFBZakelijk.connFBZakelijk.Server := cfg.Server;
-  dmFBZakelijk.connFBZakelijk.Username := cfg.Huis;
-  dmFBZakelijk.connFBZakelijk.Password := cfg.Tuin;
-  dmFBZakelijk.connFBZakelijk.Database := cfg.Pop;
-  dmFBZakelijk.connFBZakelijk.ProviderName := cfg.Speeltuin;
-end;
-{$ENDREGION}
-{ ============================================================================ }
-{$REGION 'TConfig'}
-{ TConfig }
-
-constructor TConfig.Create;
-var
-  fname: string;
-begin
-  Fcfg := TStringList.Create;
-  try
-    if ParamCount >= 1 then
-    begin
-      fname := ParamStr(1);
-      Fcfg.LoadFromFile(fname);
-    end;
-  except
-    on Exception do
-      Fcfg.Clear;
+  if Assigned(FDataFacade) then
+  begin
+    FDataFacade.Disconnect;
+    FDataFacade := nil;
   end;
-end;
-
-destructor TConfig.Destroy;
-begin
-  Fcfg.Free;
-  inherited;
-end;
-
-function TConfig.getHuis: string;
-begin
-  Result := Fcfg.Values['zkb_fb_huis'];
-end;
-
-function TConfig.getServer: string;
-begin
-  Result := Fcfg.Values['zkb_fb_stad'];
-end;
-
-function TConfig.getTuin: string;
-begin
-  Result := Fcfg.Values['zkb_fb_tuin'];
-end;
-
-function TConfig.getPop: string;
-begin
-  Result := Fcfg.Values['zkb_fb_pop'];
-end;
-
-function TConfig.getSpeelTuin: string;
-begin
-  Result := Fcfg.Values['zkb_fb_speeltuin'];
 end;
 
 {$ENDREGION}
