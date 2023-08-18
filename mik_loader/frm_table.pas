@@ -38,7 +38,6 @@ type
   strict private
     FTableData: IQueryDecorator;
   public
-    { Public declarations }
     property TableData: IQueryDecorator write FTableData;
     property TableSource: TDataSource write setDataSource;
   end;

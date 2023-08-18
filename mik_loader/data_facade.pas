@@ -19,16 +19,30 @@ unit data_facade;
 
 interface
 
+uses data.DB, query_decorator, file_loader;
+
 type
   TDataFacade = class abstract
   private
     function GetConnected: boolean; virtual; abstract;
     procedure SetConnected(c: boolean); virtual; abstract;
+    function GetZBDataSet(const name: string): TDataSet; virtual; abstract;
+    function GetZBDataSource(const name: string): TDataSource; virtual;
+      abstract;
+    function GetZBQryDecorator(const name: string): IQueryDecorator;
+      virtual; abstract;
   public
     property Connected: boolean read GetConnected write SetConnected;
+    property ZBDataSet[const name: string]: TDataSet read GetZBDataSet;
+    property ZBDataSource[const name: string]: TDataSource read GetZBDataSource;
+    property ZBQryDecorator[const name: string]: IQueryDecorator
+      read GetZBQryDecorator;
     procedure procRaboZakelijk; virtual; abstract;
     procedure procKnabZakelijk; virtual; abstract;
 
+    { TODO: implementeren and make generic. Minimize deps in frmMain. }
+    procedure ConfigLoader(const name; ldr: TFileLoader;
+      const filename: String); virtual; abstract;
   end;
 
 function CreateDataFacade: TDataFacade;
@@ -36,7 +50,7 @@ function CreateDataFacade: TDataFacade;
 { ============================================================================ }
 implementation
 
-uses System.Classes, System.SysUtils, dm_fb_zakelijk, dm_ora_zakelijk;
+uses System.Classes, System.SysUtils, dm_fb_zakelijk, dm_ora_zakelijk, dm_xaf;
 
 type
 
@@ -47,6 +61,9 @@ type
     procedure SetConnected(c: boolean); override;
     procedure Connect;
     procedure Disconnect;
+    function GetZBDataSet(const name: string): TDataSet; override;
+    function GetZBDataSource(const name: string): TDataSource; override;
+    function GetZBQryDecorator(const name: string): IQueryDecorator; override;
 
   public
     destructor Destroy; override;
@@ -142,6 +159,40 @@ begin
     Result := true
   else
     Result := false;
+end;
+
+function ZBData.GetZBDataSet(const name: string): TDataSet;
+begin
+  if name = 'RaboImp' then
+    Result := dmFBZakelijk.qryImpRaboZak
+  else if name = 'KnabImp' then
+    Result := dmFBZakelijk.qryImpKnab
+  else
+    Result := nil;
+end;
+
+function ZBData.GetZBDataSource(const name: string): TDataSource;
+begin
+  if name = 'RaboImp' then
+    Result := dmFBZakelijk.dsImpRaboZak
+  else if name = 'KnabImp' then
+    Result := dmFBZakelijk.dsImpKnab
+  else if name = 'Log' then
+    Result := dmFBZakelijk.dsLog
+  else if name = 'XafCustomer' then
+    Result := dmXAF.dsXafCustomer
+  else
+    Result := nil;
+end;
+
+function ZBData.GetZBQryDecorator(const name: string): IQueryDecorator;
+begin
+  if name = 'AppLog' then
+    Result := dmFBZakelijk.rsAppLog
+  else if name = 'XafCustomer' then
+    Result := dmXAF.rsXafCustomer
+  else
+    Result := nil;
 end;
 
 procedure ZBData.SetConnected(c: boolean);

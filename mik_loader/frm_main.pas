@@ -79,7 +79,8 @@ var
   { ============================================================================ }
 implementation
 
-uses dm_fb_zakelijk, file_loader, frm_table, dm_xaf, dm_ora_zakelijk;
+uses file_loader, frm_table;
+
 {$R *.dfm}
 { ============================================================================ }
 {$REGION 'TfrmMain'}
@@ -132,8 +133,9 @@ begin
       begin { Database load }
         if not FDataFacade.Connected then
           Exit;
-        ldr := TFileLoader.Create(bmLoader, dmFBZakelijk.dsetKnabImp, true);
-        grdFileData.DataSource := dmFBZakelijk.dsImpKnab;
+        ldr := TFileLoader.Create(bmLoader,
+          FDataFacade.ZBDataSet['KnabImp'], true);
+        grdFileData.DataSource := FDataFacade.ZBDataSource['KnabImp'];
       end;
   else
     begin
@@ -209,8 +211,9 @@ begin
       begin { Database load }
         if not FDataFacade.Connected then
           Exit;
-        ldr := TFileLoader.Create(bmLoader, dmFBZakelijk.dsetImpRaboZak, false);
-        grdFileData.DataSource := dmFBZakelijk.dsImpRaboZak;
+        ldr := TFileLoader.Create(bmLoader,
+          FDataFacade.ZBDataSet['RaboImp'], false);
+        grdFileData.DataSource := FDataFacade.ZBDataSource['RaboImp'];
       end;
   else
     begin
@@ -264,16 +267,16 @@ end;
 
 procedure TfrmMain.actShowLogExecute(Sender: TObject);
 begin
-  frmTable.TableData := dmFBZakelijk.rsAppLog;
-  frmTable.TableSource := dmFBZakelijk.dsLog;
+  frmTable.TableData := FDataFacade.ZBQryDecorator['AppLog'];
+  frmTable.TableSource := FDataFacade.ZBDataSource['Log'];
   frmTable.Caption := 'Mikel log blog';
   frmTable.Show;
 end;
 
 procedure TfrmMain.actShowXafCustomerExecute(Sender: TObject);
 begin
-  frmTable.TableData := dmXAF.rsXafCustomer;
-  frmTable.TableSource := dmXAF.dsXafCustomer;
+  frmTable.TableData := FDataFacade.ZBQryDecorator['XafCustomer'];
+  frmTable.TableSource := FDataFacade.ZBDataSource['XafCustomer'];
   frmTable.Caption := 'Mikel XAF customer';
   frmTable.Show;
 end;

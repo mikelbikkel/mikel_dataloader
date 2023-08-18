@@ -96,13 +96,7 @@ type
   strict private
     FAppLog: IQueryDecorator;
 
-    function GetRaboImpZak: TDataSet;
-    function GetKnabImp: TDataSet;
-
   public
-    property dsetImpRaboZak: TDataSet read GetRaboImpZak;
-    property dsetKnabImp: TDataSet read GetKnabImp;
-
     property rsAppLog: IQueryDecorator read FAppLog;
 
   end;
@@ -134,16 +128,6 @@ end;
 procedure TdmFBZakelijk.DataModuleDestroy(Sender: TObject);
 begin
   FAppLog := nil;
-end;
-
-function TdmFBZakelijk.GetKnabImp: TDataSet;
-begin
-  Result := qryImpKnab;
-end;
-
-function TdmFBZakelijk.GetRaboImpZak: TDataSet;
-begin
-  Result := qryImpRaboZak;
 end;
 
 end.
