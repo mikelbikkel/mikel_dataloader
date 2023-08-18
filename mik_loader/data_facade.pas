@@ -19,7 +19,7 @@ unit data_facade;
 
 interface
 
-uses data.DB, query_decorator, file_loader;
+uses data.DB, FireDac.Comp.BatchMove, query_decorator, file_loader;
 
 type
   TDataFacade = class abstract
@@ -40,9 +40,8 @@ type
     procedure procRaboZakelijk; virtual; abstract;
     procedure procKnabZakelijk; virtual; abstract;
 
-    { TODO: implementeren and make generic. Minimize deps in frmMain. }
-    procedure ConfigLoader(const name; ldr: TFileLoader;
-      const filename: String); virtual; abstract;
+    function LoadDataSetFromFile(const dsname: string; const filename: String;
+      bm: TFDBatchMove; ds: TDataSet): TLoadResult; virtual; abstract;
   end;
 
 function CreateDataFacade: TDataFacade;
@@ -64,11 +63,17 @@ type
     function GetZBDataSet(const name: string): TDataSet; override;
     function GetZBDataSource(const name: string): TDataSource; override;
     function GetZBQryDecorator(const name: string): IQueryDecorator; override;
+    function LoadRaboZakFromFile(const filename: String; bm: TFDBatchMove;
+      ds: TDataSet): TLoadResult;
+    function LoadKnabZakFromFile(const filename: String; bm: TFDBatchMove;
+      ds: TDataSet): TLoadResult;
 
   public
     destructor Destroy; override;
     procedure procRaboZakelijk; override;
     procedure procKnabZakelijk; override;
+    function LoadDataSetFromFile(const dsname: string; const filename: String;
+      bm: TFDBatchMove; ds: TDataSet): TLoadResult; override;
   end;
 
   TConfig = class
@@ -193,6 +198,111 @@ begin
     Result := dmXAF.rsXafCustomer
   else
     Result := nil;
+end;
+
+function ZBData.LoadDataSetFromFile(const dsname, filename: String;
+  bm: TFDBatchMove; ds: TDataSet): TLoadResult;
+begin
+  if dsname = 'RaboImp' then
+    Result := LoadRaboZakFromFile(filename, bm, ds)
+  else if dsname = 'KnabImp' then
+    Result := LoadKnabZakFromFile(filename, bm, ds)
+  else
+    Result := nil;
+end;
+
+function ZBData.LoadKnabZakFromFile(const filename: String; bm: TFDBatchMove;
+  ds: TDataSet): TLoadResult;
+var
+  info: TLoadInfo;
+  ldr: TFileLoader;
+begin
+  info := nil;
+  ldr := nil;
+  try
+    info := TLoadInfo.Create;
+    ldr := TFileLoader.Create(bm, ds, true);
+    info.filename := filename;
+    info.Separator := ';';
+    info.DateFormat := 'dd-mm-yyyy';
+
+    { File format: CSV, Knab zakelijk. }
+    ldr.SetFileInfo(info);
+    ldr.AddField('iban', sftString, 34);
+    ldr.AddField('tx_datum', sftDate);
+    ldr.AddField('valuta_code', sftString, 4);
+    ldr.AddField('credit_debet', sftString, 3);
+    ldr.AddField('bedrag', sftNumber);
+    ldr.AddField('tegen_iban', sftString, 34);
+    ldr.AddField('tegen_naam', sftString);
+    ldr.AddField('valuta_datum', sftDate);
+    ldr.AddField('betaalwijze', sftString);
+    ldr.AddField('omschrijving', sftString);
+    ldr.AddField('type_betaling', sftString);
+    ldr.AddField('machtigingskenmerk', sftString);
+    ldr.AddField('incassant_id', sftString);
+    ldr.AddField('adres', sftString);
+    ldr.AddField('tx_referentie', sftString);
+    ldr.AddField('boek_datum', sftDate);
+
+    Result := ldr.LoadFile;
+  finally
+    if Assigned(info) then
+      info.Free;
+    if Assigned(ldr) then
+      ldr.Free;
+  end;
+
+end;
+
+function ZBData.LoadRaboZakFromFile(const filename: String; bm: TFDBatchMove;
+  ds: TDataSet): TLoadResult;
+var
+  info: TLoadInfo;
+  ldr: TFileLoader;
+begin
+  info := nil;
+  ldr := nil;
+  try
+    info := TLoadInfo.Create;
+    ldr := TFileLoader.Create(bm, ds, true);
+    info.filename := filename;
+
+    { File format: CSV, Rabo zakelijk. }
+    ldr.SetFileInfo(info);
+    ldr.AddField('IBAN', sftString, 34);
+    ldr.AddField('VALUTA_CODE', sftString, 4);
+    ldr.AddField('BIC', sftString, 11);
+    ldr.AddField('SEQNO', sftString, 18);
+    ldr.AddField('BOEK_DATUM', sftDate);
+    ldr.AddField('VALUTA_DATUM', sftDate);
+    ldr.AddField('BEDRAG', sftNumber);
+    ldr.AddField('SALDO_NA_BOEKING', sftNumber); // empty?
+    ldr.AddField('TEGEN_IBAN', sftString, 34);
+    ldr.AddField('TEGEN_NAAM', sftString, 70);
+    ldr.AddField('ULTIMATE_NAAM', sftString, 70);
+    ldr.AddField('INIT_NAAM', sftString, 70); // empty
+    ldr.AddField('TEGEN_BIC', sftString, 15); // empty
+    ldr.AddField('TX_TYPE_CODE', sftString, 4);
+    ldr.AddField('BATCH_ID', sftString, 35);
+    ldr.AddField('TX_REF', sftString, 35);
+    ldr.AddField('MANDATE_REF', sftString, 35);
+    ldr.AddField('COLLECTOR_ID', sftString, 35);
+    ldr.AddField('PAYMENT_REF', sftString, 35);
+    ldr.AddField('DESC_1', sftString, 140);
+    ldr.AddField('DESC_2', sftString, 140);
+    ldr.AddField('DESC_3', sftString, 140);
+    ldr.AddField('REASON_CODE', sftString, 75);
+    ldr.AddField('INSTR_BEDRAG', sftNumber);
+    ldr.AddField('INSTR_VALUTA', sftString, 11);
+    ldr.AddField('KOERS', sftNumber);
+    Result := ldr.LoadFile;
+  finally
+    if Assigned(info) then
+      info.Free;
+    if Assigned(ldr) then
+      ldr.Free;
+  end;
 end;
 
 procedure ZBData.SetConnected(c: boolean);

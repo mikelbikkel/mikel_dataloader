@@ -67,8 +67,10 @@ type
     procedure actExecRaboZakExecute(Sender: TObject);
     procedure actExecKnabZakExecute(Sender: TObject);
     procedure actShowXafCustomerExecute(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
     FDataFacade: TDataFacade;
+    procedure LoadDataFromFile(const dsname: string);
   public
     { Public declarations }
   end;
@@ -87,9 +89,6 @@ uses file_loader, frm_table;
 
 procedure TfrmMain.actConnectExecute(Sender: TObject);
 begin
-  if not Assigned(FDataFacade) then
-    FDataFacade := CreateDataFacade;
-
   FDataFacade.Connected := true;
   lblConnected.Color := clGreen;
 end;
@@ -105,164 +104,13 @@ begin
 end;
 
 procedure TfrmMain.actLoadKnabExecute(Sender: TObject);
-var
-  info: TLoadInfo;
-  res: TLoadResult;
-  ldr: TFileLoader;
 begin
-  edtRead.Text := EmptyStr;
-  edtWritten.Text := EmptyStr;
-  edtInsert.Text := EmptyStr;
-  edtErrors.Text := EmptyStr;
-  res := nil;
-  info := nil;
-  ldr := nil;
-  info := TLoadInfo.Create;
-  if dlgOpen.Execute then
-    info.filename := dlgOpen.filename
-  else
-    Exit;
-
-  case rgLoadType.ItemIndex of
-    0:
-      begin { Test load }
-        ldr := TFileLoader.Create(bmLoader, vtFileData, true);
-        grdFileData.DataSource := dsFileData;
-      end;
-    1:
-      begin { Database load }
-        if not FDataFacade.Connected then
-          Exit;
-        ldr := TFileLoader.Create(bmLoader,
-          FDataFacade.ZBDataSet['KnabImp'], true);
-        grdFileData.DataSource := FDataFacade.ZBDataSource['KnabImp'];
-      end;
-  else
-    begin
-      Exit;
-    end;
-  end;
-
-  try
-    info.Separator := ';';
-    info.DateFormat := 'dd-mm-yyyy';
-
-    { File format: CSV, Knab zakelijk. }
-    ldr.SetFileInfo(info);
-    ldr.AddField('iban', sftString, 34);
-    ldr.AddField('tx_datum', sftDate);
-    ldr.AddField('valuta_code', sftString, 4);
-    ldr.AddField('credit_debet', sftString, 3);
-    ldr.AddField('bedrag', sftNumber);
-    ldr.AddField('tegen_iban', sftString, 34);
-    ldr.AddField('tegen_naam', sftString);
-    ldr.AddField('valuta_datum', sftDate);
-    ldr.AddField('betaalwijze', sftString);
-    ldr.AddField('omschrijving', sftString);
-    ldr.AddField('type_betaling', sftString);
-    ldr.AddField('machtigingskenmerk', sftString);
-    ldr.AddField('incassant_id', sftString);
-    ldr.AddField('adres', sftString);
-    ldr.AddField('tx_referentie', sftString);
-    ldr.AddField('boek_datum', sftDate);
-
-    res := ldr.LoadFile;
-    edtRead.Text := IntToStr(res.FReadCount);
-    edtWritten.Text := IntToStr(res.FWriteCount);
-    edtInsert.Text := IntToStr(res.FInsertCount);
-    edtErrors.Text := IntToStr(res.FErrorCount);
-  finally
-    if Assigned(res) then
-      res.Free;
-    if Assigned(info) then
-      info.Free;
-    if Assigned(ldr) then
-      ldr.Free;
-  end;
-
+  LoadDataFromFile('KnabImp');
 end;
 
 procedure TfrmMain.actLoadRaboExecute(Sender: TObject);
-var
-  info: TLoadInfo;
-  res: TLoadResult;
-  ldr: TFileLoader;
 begin
-  edtRead.Text := EmptyStr;
-  edtWritten.Text := EmptyStr;
-  edtInsert.Text := EmptyStr;
-  edtErrors.Text := EmptyStr;
-  res := nil;
-  info := nil;
-  ldr := nil;
-  info := TLoadInfo.Create;
-  if dlgOpen.Execute then
-    info.filename := dlgOpen.filename
-  else
-    Exit;
-
-  case rgLoadType.ItemIndex of
-    0:
-      begin { Test load }
-        ldr := TFileLoader.Create(bmLoader, vtFileData, true);
-        grdFileData.DataSource := dsFileData;
-      end;
-    1:
-      begin { Database load }
-        if not FDataFacade.Connected then
-          Exit;
-        ldr := TFileLoader.Create(bmLoader,
-          FDataFacade.ZBDataSet['RaboImp'], false);
-        grdFileData.DataSource := FDataFacade.ZBDataSource['RaboImp'];
-      end;
-  else
-    begin
-      Exit;
-    end;
-  end;
-
-  try
-    { File format: CSV, Rabo zakelijk. }
-    ldr.SetFileInfo(info);
-    ldr.AddField('IBAN', sftString, 34);
-    ldr.AddField('VALUTA_CODE', sftString, 4);
-    ldr.AddField('BIC', sftString, 11);
-    ldr.AddField('SEQNO', sftString, 18);
-    ldr.AddField('BOEK_DATUM', sftDate);
-    ldr.AddField('VALUTA_DATUM', sftDate);
-    ldr.AddField('BEDRAG', sftNumber);
-    ldr.AddField('SALDO_NA_BOEKING', sftNumber); // empty?
-    ldr.AddField('TEGEN_IBAN', sftString, 34);
-    ldr.AddField('TEGEN_NAAM', sftString, 70);
-    ldr.AddField('ULTIMATE_NAAM', sftString, 70);
-    ldr.AddField('INIT_NAAM', sftString, 70); // empty
-    ldr.AddField('TEGEN_BIC', sftString, 15); // empty
-    ldr.AddField('TX_TYPE_CODE', sftString, 4);
-    ldr.AddField('BATCH_ID', sftString, 35);
-    ldr.AddField('TX_REF', sftString, 35);
-    ldr.AddField('MANDATE_REF', sftString, 35);
-    ldr.AddField('COLLECTOR_ID', sftString, 35);
-    ldr.AddField('PAYMENT_REF', sftString, 35);
-    ldr.AddField('DESC_1', sftString, 140);
-    ldr.AddField('DESC_2', sftString, 140);
-    ldr.AddField('DESC_3', sftString, 140);
-    ldr.AddField('REASON_CODE', sftString, 75);
-    ldr.AddField('INSTR_BEDRAG', sftNumber);
-    ldr.AddField('INSTR_VALUTA', sftString, 11);
-    ldr.AddField('KOERS', sftNumber);
-    res := ldr.LoadFile;
-    edtRead.Text := IntToStr(res.FReadCount);
-    edtWritten.Text := IntToStr(res.FWriteCount);
-    edtInsert.Text := IntToStr(res.FInsertCount);
-    edtErrors.Text := IntToStr(res.FErrorCount);
-  finally
-    if Assigned(res) then
-      res.Free;
-    if Assigned(info) then
-      info.Free;
-    if Assigned(ldr) then
-      ldr.Free;
-  end;
+  LoadDataFromFile('RaboImp');
 end;
 
 procedure TfrmMain.actShowLogExecute(Sender: TObject);
@@ -288,6 +136,55 @@ begin
     FDataFacade.Connected := false;
     FDataFacade.Free;
     FDataFacade := nil;
+  end;
+end;
+
+procedure TfrmMain.FormShow(Sender: TObject);
+begin
+  if not Assigned(FDataFacade) then
+    FDataFacade := CreateDataFacade;
+end;
+
+procedure TfrmMain.LoadDataFromFile(const dsname: string);
+var
+  res: TLoadResult;
+  ds: TDataSet;
+begin
+  edtRead.Text := EmptyStr;
+  edtWritten.Text := EmptyStr;
+  edtInsert.Text := EmptyStr;
+  edtErrors.Text := EmptyStr;
+  res := nil;
+  if not dlgOpen.Execute then
+    Exit;
+
+  case rgLoadType.ItemIndex of
+    0:
+      begin { Test load }
+        ds := vtFileData;
+        grdFileData.DataSource := dsFileData;
+      end;
+    1:
+      begin { Database load }
+        if not FDataFacade.Connected then
+          Exit;
+        ds := FDataFacade.ZBDataSet[dsname];
+        grdFileData.DataSource := FDataFacade.ZBDataSource[dsname];
+      end;
+  else
+    Exit;
+  end;
+
+  try
+    res := FDataFacade.LoadDataSetFromFile(dsname, dlgOpen.filename,
+      bmLoader, ds);
+    edtRead.Text := IntToStr(res.FReadCount);
+    edtWritten.Text := IntToStr(res.FWriteCount);
+    edtInsert.Text := IntToStr(res.FInsertCount);
+    edtErrors.Text := IntToStr(res.FErrorCount);
+  finally
+    if Assigned(res) then
+      res.Free;
   end;
 end;
 
