@@ -23,7 +23,8 @@ uses
   System.SysUtils, System.Classes, Data.DB, DBAccess, Uni, UniProvider,
   InterBaseUniProvider, MemDS, VirtualTable, FireDAC.Stan.Intf,
   FireDAC.Comp.BatchMove, UniDacVcl, FireDAC.UI.Intf, FireDAC.VCLUI.Wait,
-  FireDAC.Comp.UI, query_decorator, DASQLMonitor, UniSQLMonitor;
+  FireDAC.Comp.UI, query_decorator, DASQLMonitor, UniSQLMonitor,
+  OracleUniProvider;
 
 type
   TdmFBZakelijk = class(TDataModule)
@@ -86,6 +87,8 @@ type
     execLoadRaboZak: TUniStoredProc;
     uniMonitor: TUniSQLMonitor;
     execLoadKnabZak: TUniStoredProc;
+    provOra: TOracleUniProvider;
+    connOraZakelijk: TUniConnection;
     procedure connFBZakelijkLogin(Connection: TCustomDAConnection;
       LoginParams: TStrings);
     procedure DataModuleCreate(Sender: TObject);
@@ -93,20 +96,15 @@ type
   strict private
     FAppLog: IQueryDecorator;
 
-    function GetConnected: boolean;
-    procedure SetConnected(setConn: boolean);
     function GetRaboImpZak: TDataSet;
     function GetKnabImp: TDataSet;
 
   public
-    property connected: boolean read GetConnected write SetConnected;
     property dsetImpRaboZak: TDataSet read GetRaboImpZak;
     property dsetKnabImp: TDataSet read GetKnabImp;
 
     property rsAppLog: IQueryDecorator read FAppLog;
 
-    procedure procRaboZakelijk;
-    procedure procKnabZakelijk;
   end;
 
 var
@@ -138,21 +136,6 @@ begin
   FAppLog := nil;
 end;
 
-procedure TdmFBZakelijk.procKnabZakelijk;
-begin
-  execLoadKnabZak.ExecProc;
-end;
-
-procedure TdmFBZakelijk.procRaboZakelijk;
-begin
-  execLoadRaboZak.ExecProc;
-end;
-
-function TdmFBZakelijk.GetConnected: boolean;
-begin
-  Result := connFBZakelijk.connected;
-end;
-
 function TdmFBZakelijk.GetKnabImp: TDataSet;
 begin
   Result := qryImpKnab;
@@ -161,14 +144,6 @@ end;
 function TdmFBZakelijk.GetRaboImpZak: TDataSet;
 begin
   Result := qryImpRaboZak;
-end;
-
-procedure TdmFBZakelijk.SetConnected(setConn: boolean);
-begin
-  if setConn and (not connFBZakelijk.connected) then
-    connFBZakelijk.connected := true
-  else if (not setConn) and connFBZakelijk.connected then
-    connFBZakelijk.connected := false;
 end;
 
 end.

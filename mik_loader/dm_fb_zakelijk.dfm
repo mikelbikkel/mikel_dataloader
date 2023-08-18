@@ -48,7 +48,7 @@ object dmFBZakelijk: TdmFBZakelijk
     Options.SetEmptyStrToNull = True
     IndexFieldNames = 'valuta_datum'
     Left = 56
-    Top = 128
+    Top = 232
     object qryImpRaboZakIBAN: TStringField
       FieldName = 'IBAN'
       Required = True
@@ -155,7 +155,7 @@ object dmFBZakelijk: TdmFBZakelijk
   object dsImpRaboZak: TUniDataSource
     DataSet = qryImpRaboZak
     Left = 184
-    Top = 128
+    Top = 232
   end
   object uniDlgConnect: TUniConnectDialog
     DatabaseLabel = 'Database'
@@ -229,7 +229,7 @@ object dmFBZakelijk: TdmFBZakelijk
     Options.SetEmptyStrToNull = True
     IndexFieldNames = 'valuta_datum'
     Left = 56
-    Top = 224
+    Top = 328
     object qryImpKnabIBAN: TStringField
       FieldName = 'IBAN'
       Required = True
@@ -298,7 +298,7 @@ object dmFBZakelijk: TdmFBZakelijk
   object dsImpKnab: TUniDataSource
     DataSet = qryImpKnab
     Left = 184
-    Top = 224
+    Top = 328
   end
   object qryLog: TUniQuery
     KeyFields = 'LOG_ID'
@@ -310,7 +310,7 @@ object dmFBZakelijk: TdmFBZakelijk
     Options.SetEmptyStrToNull = True
     IndexFieldNames = 'LOG_TS DESC'
     Left = 368
-    Top = 152
+    Top = 256
     object qryLogLOG_ID: TIntegerField
       DisplayLabel = 'ID'
       FieldName = 'LOG_ID'
@@ -338,7 +338,7 @@ object dmFBZakelijk: TdmFBZakelijk
   object dsLog: TUniDataSource
     DataSet = qryLog
     Left = 448
-    Top = 152
+    Top = 256
   end
   object execLoadRaboZak: TUniStoredProc
     StoredProcName = 'MK_PKG_RABO.IMPORT_RABO_ZTX'
@@ -346,13 +346,13 @@ object dmFBZakelijk: TdmFBZakelijk
       'EXECUTE PROCEDURE MK_PKG_RABO.IMPORT_RABO_ZTX')
     Connection = connFBZakelijk
     Left = 480
-    Top = 264
+    Top = 368
     CommandStoredProcName = 'MK_PKG_RABO.IMPORT_RABO_ZTX'
   end
   object uniMonitor: TUniSQLMonitor
     Options = [moDBMonitor]
     Left = 336
-    Top = 248
+    Top = 352
   end
   object execLoadKnabZak: TUniStoredProc
     StoredProcName = 'MK_PKG_KNAB.IMPORT_KNAB_ZTX'
@@ -360,7 +360,19 @@ object dmFBZakelijk: TdmFBZakelijk
       'EXECUTE PROCEDURE MK_PKG_KNAB.IMPORT_KNAB_ZTX')
     Connection = connFBZakelijk
     Left = 528
-    Top = 192
+    Top = 296
     CommandStoredProcName = 'MK_PKG_KNAB.IMPORT_KNAB_ZTX'
+  end
+  object provOra: TOracleUniProvider
+    Left = 48
+    Top = 120
+  end
+  object connOraZakelijk: TUniConnection
+    ProviderName = 'Oracle'
+    SpecificOptions.Strings = (
+      'Oracle.Direct=True')
+    LoginPrompt = False
+    Left = 144
+    Top = 120
   end
 end

@@ -20,12 +20,18 @@ unit data_facade;
 interface
 
 type
-  IDataFacade = interface
-    procedure Connect;
-    procedure Disconnect;
+  TDataFacade = class abstract
+  private
+    function GetConnected: boolean; virtual; abstract;
+    procedure SetConnected(c: boolean); virtual; abstract;
+  public
+    property Connected: boolean read GetConnected write SetConnected;
+    procedure procRaboZakelijk; virtual; abstract;
+    procedure procKnabZakelijk; virtual; abstract;
+
   end;
 
-function CreateDataFacade: IDataFacade;
+function CreateDataFacade: TDataFacade;
 
 { ============================================================================ }
 implementation
@@ -35,13 +41,17 @@ uses System.Classes, System.SysUtils, dm_fb_zakelijk, dm_ora_zakelijk;
 type
 
   { ZBData }
-  ZBData = class(TInterfacedObject, IDataFacade)
+  ZBData = class(TDataFacade)
   private
+    function GetConnected: boolean; override;
+    procedure SetConnected(c: boolean); override;
+    procedure Connect;
+    procedure Disconnect;
 
   public
     destructor Destroy; override;
-    procedure Connect;
-    procedure Disconnect;
+    procedure procRaboZakelijk; override;
+    procedure procKnabZakelijk; override;
   end;
 
   TConfig = class
@@ -73,7 +83,7 @@ type
 
   end;
 
-function CreateDataFacade: IDataFacade;
+function CreateDataFacade: TDataFacade;
 begin
   Result := ZBData.Create;
 end;
@@ -92,13 +102,13 @@ begin
     dmFBZakelijk.connFBZakelijk.Database := cfg.Pop;
     dmFBZakelijk.connFBZakelijk.ProviderName := cfg.Speeltuin;
 
-    dmOraZakelijk.connOraZakelijk.Server := cfg.OServer;
-    dmOraZakelijk.connOraZakelijk.Username := cfg.OHuis;
-    dmOraZakelijk.connOraZakelijk.Password := cfg.OTuin;
-    dmOraZakelijk.connOraZakelijk.ProviderName := cfg.OSpeeltuin;
+    dmFBZakelijk.connOraZakelijk.Server := cfg.OServer;
+    dmFBZakelijk.connOraZakelijk.Username := cfg.OHuis;
+    dmFBZakelijk.connOraZakelijk.Password := cfg.OTuin;
+    dmFBZakelijk.connOraZakelijk.ProviderName := cfg.OSpeeltuin;
 
-    dmFBZakelijk.connFBZakelijk.connected := true;
-    dmOraZakelijk.connOraZakelijk.connected := true;
+    dmFBZakelijk.connFBZakelijk.Connected := true;
+    dmFBZakelijk.connOraZakelijk.Connected := true;
   except
     on Exception do
     begin
@@ -117,10 +127,39 @@ end;
 procedure ZBData.Disconnect;
 begin
   if Assigned(dmFBZakelijk.connFBZakelijk) then
-    dmFBZakelijk.connFBZakelijk.connected := false;
+    dmFBZakelijk.connFBZakelijk.Connected := false;
 
-  if Assigned(dmOraZakelijk.connOraZakelijk) then
-    dmOraZakelijk.connOraZakelijk.connected := false;
+  if Assigned(dmFBZakelijk.connOraZakelijk) then
+    dmFBZakelijk.connOraZakelijk.Connected := false;
+end;
+
+function ZBData.GetConnected: boolean;
+begin
+  if Assigned(dmFBZakelijk.connFBZakelijk) and
+    dmFBZakelijk.connFBZakelijk.Connected and
+    Assigned(dmFBZakelijk.connOraZakelijk) and dmFBZakelijk.connOraZakelijk.Connected
+  then
+    Result := true
+  else
+    Result := false;
+end;
+
+procedure ZBData.SetConnected(c: boolean);
+begin
+  if not GetConnected and c then
+    Connect
+  else
+    Disconnect;
+end;
+
+procedure ZBData.procRaboZakelijk;
+begin
+  dmFBZakelijk.execLoadRaboZak.ExecProc;
+end;
+
+procedure ZBData.procKnabZakelijk;
+begin
+  dmFBZakelijk.execLoadKnabZak.ExecProc;
 end;
 
 { ============================================================================ }

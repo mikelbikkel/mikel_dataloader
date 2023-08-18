@@ -9,9 +9,6 @@ uses
 
 type
   TdmOraZakelijk = class(TDataModule)
-    provOra: TOracleUniProvider;
-    connOraZakelijk: TUniConnection;
-    FDGUIxWaitCursor1: TFDGUIxWaitCursor;
   private
     { Private declarations }
   public

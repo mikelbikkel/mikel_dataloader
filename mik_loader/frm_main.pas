@@ -68,7 +68,7 @@ type
     procedure actExecKnabZakExecute(Sender: TObject);
     procedure actShowXafCustomerExecute(Sender: TObject);
   private
-    FDataFacade: IDataFacade;
+    FDataFacade: TDataFacade;
   public
     { Public declarations }
   end;
@@ -89,18 +89,18 @@ begin
   if not Assigned(FDataFacade) then
     FDataFacade := CreateDataFacade;
 
-  FDataFacade.Connect;
+  FDataFacade.Connected := true;
   lblConnected.Color := clGreen;
 end;
 
 procedure TfrmMain.actExecKnabZakExecute(Sender: TObject);
 begin
-  dmFBZakelijk.procKnabZakelijk;
+  FDataFacade.procKnabZakelijk;
 end;
 
 procedure TfrmMain.actExecRaboZakExecute(Sender: TObject);
 begin
-  dmFBZakelijk.procRaboZakelijk;
+  FDataFacade.procRaboZakelijk;
 end;
 
 procedure TfrmMain.actLoadKnabExecute(Sender: TObject);
@@ -130,7 +130,7 @@ begin
       end;
     1:
       begin { Database load }
-        if not dmFBZakelijk.connected then
+        if not FDataFacade.Connected then
           Exit;
         ldr := TFileLoader.Create(bmLoader, dmFBZakelijk.dsetKnabImp, true);
         grdFileData.DataSource := dmFBZakelijk.dsImpKnab;
@@ -207,7 +207,7 @@ begin
       end;
     1:
       begin { Database load }
-        if not dmFBZakelijk.connected then
+        if not FDataFacade.Connected then
           Exit;
         ldr := TFileLoader.Create(bmLoader, dmFBZakelijk.dsetImpRaboZak, false);
         grdFileData.DataSource := dmFBZakelijk.dsImpRaboZak;
@@ -282,7 +282,8 @@ procedure TfrmMain.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   if Assigned(FDataFacade) then
   begin
-    FDataFacade.Disconnect;
+    FDataFacade.Connected := false;
+    FDataFacade.Free;
     FDataFacade := nil;
   end;
 end;
