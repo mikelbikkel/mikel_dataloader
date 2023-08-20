@@ -42,6 +42,9 @@ type
 
     function LoadDataSetFromFile(const dsname: string; const filename: String;
       bm: TFDBatchMove; ds: TDataSet): TLoadResult; virtual; abstract;
+
+    function CopyDataSet(bm: TFDBatchMove; src: TDataSet; dst: TDataSet)
+      : TLoadResult; virtual; abstract;
   end;
 
 function CreateDataFacade: TDataFacade;
@@ -49,7 +52,8 @@ function CreateDataFacade: TDataFacade;
 { ============================================================================ }
 implementation
 
-uses System.Classes, System.SysUtils, dm_fb_zakelijk, dm_ora_zakelijk, dm_xaf;
+uses System.Classes, System.SysUtils, dm_fb_zakelijk, dm_ora_zakelijk, dm_xaf,
+  FireDac.Comp.BatchMove.DataSet;
 
 type
 
@@ -74,6 +78,8 @@ type
     procedure procKnabZakelijk; override;
     function LoadDataSetFromFile(const dsname: string; const filename: String;
       bm: TFDBatchMove; ds: TDataSet): TLoadResult; override;
+    function CopyDataSet(bm: TFDBatchMove; src: TDataSet; dst: TDataSet)
+      : TLoadResult; override;
   end;
 
   TConfig = class
@@ -138,6 +144,28 @@ begin
       raise;
     end;
   end;
+end;
+
+function ZBData.CopyDataSet(bm: TFDBatchMove; src: TDataSet; dst: TDataSet)
+  : TLoadResult;
+var
+  rdr: TFDBatchMoveDataSetReader;
+  wtr: TFDBatchMoveDataSetWriter;
+begin
+  rdr := TFDBatchMoveDataSetReader.Create(bm);
+  rdr.DataSet := src;
+  src.Active := false;
+
+  wtr := TFDBatchMoveDataSetWriter(bm);
+  wtr.Optimise := false;
+  wtr.DataSet := dst;
+  dst.Active := false;
+
+  bm.Mode := dmAlwaysInsert;
+  bm.Options := [poClearDest];
+
+  bm.Execute;
+  Result := TLoadResult.Create(bm);
 end;
 
 destructor ZBData.Destroy;

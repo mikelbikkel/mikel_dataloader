@@ -62,13 +62,22 @@ type
   end;
 
   TLoadResult = class
-  public
+  strict private
     FReadCount: integer;
     FWriteCount: integer;
     FErrorCount: integer;
     FInsertCount: integer;
     FUpdateCount: integer;
     FDeleteCount: integer;
+  public
+    constructor Create(bm: TFDBatchMove);
+    property ReadCount: integer read FReadCount;
+    property WriteCount: integer read FWriteCount;
+    property ErrorCount: integer read FErrorCount;
+    property InsertCount: integer read FInsertCount;
+    property UpdateCount: integer read FUpdateCount;
+    property DeleteCount: integer read FDeleteCount;
+
   end;
 
   TFileLoader = class
@@ -123,22 +132,10 @@ begin
 end;
 
 function TFileLoader.LoadFile: TLoadResult;
-var
-  res: TLoadResult;
 begin
-  res := TLoadResult.Create;
-  try
-    FDataMover.Execute;
-    FWDataset.Dataset.Active := true;
-    res.FReadCount := FDataMover.ReadCount;
-    res.FWriteCount := FDataMover.WriteCount;
-    res.FErrorCount := FDataMover.ErrorCount;
-    res.FInsertCount := FDataMover.InsertCount;
-    res.FUpdateCount := FDataMover.UpdateCount;
-    res.FDeleteCount := FDataMover.DeleteCount;
-  finally
-    Result := res;
-  end;
+  FDataMover.Execute;
+  FWDataset.Dataset.Active := true;
+  Result := TLoadResult.Create(FDataMover);
 end;
 
 procedure TFileLoader.SetFileInfo(const info: TLoadInfo);
@@ -198,6 +195,22 @@ begin
   mi := FDataMover.Mappings.Add;
   mi.SourceFieldName := name;
   mi.DestinationFieldName := name;
+end;
+
+{ TLoadResult }
+
+constructor TLoadResult.Create(bm: TFDBatchMove);
+begin
+  if Assigned(bm) then
+  begin
+
+    FReadCount := bm.ReadCount;
+    FWriteCount := bm.WriteCount;
+    FErrorCount := bm.ErrorCount;
+    FInsertCount := bm.InsertCount;
+    FUpdateCount := bm.UpdateCount;
+    FDeleteCount := bm.DeleteCount;
+  end;
 end;
 
 end.

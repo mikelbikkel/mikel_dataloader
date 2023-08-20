@@ -178,10 +178,10 @@ begin
   try
     res := FDataFacade.LoadDataSetFromFile(dsname, dlgOpen.filename,
       bmLoader, ds);
-    edtRead.Text := IntToStr(res.FReadCount);
-    edtWritten.Text := IntToStr(res.FWriteCount);
-    edtInsert.Text := IntToStr(res.FInsertCount);
-    edtErrors.Text := IntToStr(res.FErrorCount);
+    edtRead.Text := IntToStr(res.ReadCount);
+    edtWritten.Text := IntToStr(res.WriteCount);
+    edtInsert.Text := IntToStr(res.InsertCount);
+    edtErrors.Text := IntToStr(res.ErrorCount);
   finally
     if Assigned(res) then
       res.Free;

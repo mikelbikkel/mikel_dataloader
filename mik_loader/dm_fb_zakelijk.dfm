@@ -371,8 +371,12 @@ object dmFBZakelijk: TdmFBZakelijk
     ProviderName = 'Oracle'
     SpecificOptions.Strings = (
       'Oracle.Direct=True')
-    LoginPrompt = False
+    Username = 'mikel'
+    Server = 'mikel-zen:1521/XEPDB1'
+    Connected = True
+    ConnectDialog = uniDlgConnect
     Left = 144
     Top = 120
+    EncryptedPassword = 'ADFFBEFFB9FFBBFFBFFF91FFC8FFCDFFBDFF93FF9EFF'
   end
 end

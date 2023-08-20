@@ -33,6 +33,14 @@ type
     qryXafCustomerTAX_REG_ID: TStringField;
     qryXafCustomerCUST_TYPE: TStringField;
     dsXafCustomer: TUniDataSource;
+    qryOraCustomer: TUniQuery;
+    dsOraCustomer: TUniDataSource;
+    qryOraCustomerAUDIT_ID: TStringField;
+    qryOraCustomerCUST_ID: TStringField;
+    qryOraCustomerCUST_NAME: TStringField;
+    qryOraCustomerKVK_NUMBER: TStringField;
+    qryOraCustomerTAX_REG_ID: TStringField;
+    qryOraCustomerCUST_TYPE: TStringField;
     procedure DataModuleDestroy(Sender: TObject);
   strict private
     FQDCustomer: IQueryDecorator;
