@@ -173,6 +173,22 @@ object frmMain: TfrmMain
     Action = actShowXafCustomer
     TabOrder = 12
   end
+  object btnShowOraCust: TButton
+    Left = 506
+    Top = 392
+    Width = 105
+    Height = 41
+    Action = actShowOraCustomer
+    TabOrder = 13
+  end
+  object btnCopyCustomer: TButton
+    Left = 336
+    Top = 392
+    Width = 113
+    Height = 41
+    Action = actCopyCustomer
+    TabOrder = 14
+  end
   object alMain: TActionList
     Left = 256
     Top = 16
@@ -203,6 +219,14 @@ object frmMain: TfrmMain
     object actShowXafCustomer: TAction
       Caption = 'XAF Customer'
       OnExecute = actShowXafCustomerExecute
+    end
+    object actShowOraCustomer: TAction
+      Caption = 'Ora Customer'
+      OnExecute = actShowOraCustomerExecute
+    end
+    object actCopyCustomer: TAction
+      Caption = 'Copy Customer'
+      OnExecute = actCopyCustomerExecute
     end
   end
   object bmLoader: TFDBatchMove

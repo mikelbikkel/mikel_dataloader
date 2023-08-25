@@ -59,6 +59,10 @@ type
     btnExecKnabZak: TButton;
     actShowXafCustomer: TAction;
     btnXafCustomer: TButton;
+    btnShowOraCust: TButton;
+    actShowOraCustomer: TAction;
+    btnCopyCustomer: TButton;
+    actCopyCustomer: TAction;
     procedure actConnectExecute(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure actLoadRaboExecute(Sender: TObject);
@@ -68,6 +72,8 @@ type
     procedure actExecKnabZakExecute(Sender: TObject);
     procedure actShowXafCustomerExecute(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure actShowOraCustomerExecute(Sender: TObject);
+    procedure actCopyCustomerExecute(Sender: TObject);
   private
     FDataFacade: TDataFacade;
     procedure LoadDataFromFile(const dsname: string);
@@ -81,7 +87,7 @@ var
   { ============================================================================ }
 implementation
 
-uses file_loader, frm_table;
+uses file_loader, frm_table, query_decorator;
 
 {$R *.dfm}
 { ============================================================================ }
@@ -91,6 +97,18 @@ procedure TfrmMain.actConnectExecute(Sender: TObject);
 begin
   FDataFacade.Connected := true;
   lblConnected.Color := clGreen;
+end;
+
+procedure TfrmMain.actCopyCustomerExecute(Sender: TObject);
+var
+  src: TDataSet;
+  dest: TDataSet;
+  // st: IQueryDecorator;
+begin
+  // st := FDataFacade.ZBQryDecorator['XafCustomer'];
+  src := FDataFacade.ZBDataSet['OraCustomer'];
+  dest := FDataFacade.ZBDataSet['XafCustomer'];
+  FDataFacade.CopyDataSet(bmLoader, src, dest);
 end;
 
 procedure TfrmMain.actExecKnabZakExecute(Sender: TObject);
@@ -118,6 +136,14 @@ begin
   frmTable.TableData := FDataFacade.ZBQryDecorator['AppLog'];
   frmTable.TableSource := FDataFacade.ZBDataSource['Log'];
   frmTable.Caption := 'Mikel log blog';
+  frmTable.Show;
+end;
+
+procedure TfrmMain.actShowOraCustomerExecute(Sender: TObject);
+begin
+  frmTable.TableData := FDataFacade.ZBQryDecorator['OraCustomer'];
+  frmTable.TableSource := FDataFacade.ZBDataSource['OraCustomer'];
+  frmTable.Caption := 'Mikel Ora customer';
   frmTable.Show;
 end;
 

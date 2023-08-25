@@ -41,12 +41,6 @@ type
     qryOraCustomerKVK_NUMBER: TStringField;
     qryOraCustomerTAX_REG_ID: TStringField;
     qryOraCustomerCUST_TYPE: TStringField;
-    procedure DataModuleDestroy(Sender: TObject);
-  strict private
-    FQDCustomer: IQueryDecorator;
-    function GetQDCustomer: IQueryDecorator;
-  public
-    property rsXafCustomer: IQueryDecorator read GetQDCustomer;
   end;
 
 var
@@ -57,19 +51,5 @@ implementation
 {%CLASSGROUP 'Vcl.Controls.TControl'}
 {$R *.dfm}
 { TdmXAF }
-
-procedure TdmXAF.DataModuleDestroy(Sender: TObject);
-begin
-  FQDCustomer := nil;
-end;
-
-function TdmXAF.GetQDCustomer: IQueryDecorator;
-begin
-  if not Assigned(FQDCustomer) then
-  begin
-    FQDCustomer := CreateQueryDecorator(qryXafCustomer);
-  end;
-  Result := FQDCustomer;
-end;
 
 end.

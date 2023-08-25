@@ -26,7 +26,8 @@ uses
   query_decorator in 'query_decorator.pas',
   dm_xaf in 'dm_xaf.pas' {dmXAF: TDataModule},
   dm_ora_zakelijk in 'dm_ora_zakelijk.pas' {dmOraZakelijk: TDataModule},
-  data_facade in 'data_facade.pas';
+  data_facade in 'data_facade.pas',
+  batch_decorator in 'batch_decorator.pas';
 
 {$R *.res}
 

@@ -203,7 +203,6 @@ constructor TLoadResult.Create(bm: TFDBatchMove);
 begin
   if Assigned(bm) then
   begin
-
     FReadCount := bm.ReadCount;
     FWriteCount := bm.WriteCount;
     FErrorCount := bm.ErrorCount;

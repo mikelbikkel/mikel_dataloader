@@ -22,7 +22,7 @@ interface
 uses data.DB, FireDac.Comp.BatchMove, query_decorator, file_loader;
 
 type
-  TDataFacade = class abstract
+  TDataFacade = class
   private
     function GetConnected: boolean; virtual; abstract;
     procedure SetConnected(c: boolean); virtual; abstract;
@@ -52,14 +52,17 @@ function CreateDataFacade: TDataFacade;
 { ============================================================================ }
 implementation
 
-uses System.Classes, System.SysUtils, dm_fb_zakelijk, dm_ora_zakelijk, dm_xaf,
-  FireDac.Comp.BatchMove.DataSet;
+uses System.Classes, System.SysUtils, System.Generics.Collections,
+  dm_ora_zakelijk, dm_xaf, dm_fb_zakelijk, batch_decorator,
+  FireDac.Comp.BatchMove.DataSet, Uni;
 
 type
 
   { ZBData }
   ZBData = class(TDataFacade)
-  private
+  strict private
+    FQDecs: TDictionary<string, IQueryDecorator>;
+
     function GetConnected: boolean; override;
     procedure SetConnected(c: boolean); override;
     procedure Connect;
@@ -73,6 +76,7 @@ type
       ds: TDataSet): TLoadResult;
 
   public
+    constructor Create;
     destructor Destroy; override;
     procedure procRaboZakelijk; override;
     procedure procKnabZakelijk; override;
@@ -151,26 +155,65 @@ function ZBData.CopyDataSet(bm: TFDBatchMove; src: TDataSet; dst: TDataSet)
 var
   rdr: TFDBatchMoveDataSetReader;
   wtr: TFDBatchMoveDataSetWriter;
+  mi: TFDBatchMoveMappingItem;
+  fields: TStringList;
+  res: Integer;
+  bd: TBatchDecorator;
+  uds: TCustomUniDataSet;
 begin
-  rdr := TFDBatchMoveDataSetReader.Create(bm);
-  rdr.DataSet := src;
-  src.Active := false;
+  bd := nil;
+  fields := TStringList.Create;
+  try
+    rdr := TFDBatchMoveDataSetReader.Create(bm);
+    rdr.DataSet := src;
+    src.Active := true;
 
-  wtr := TFDBatchMoveDataSetWriter(bm);
-  wtr.Optimise := false;
-  wtr.DataSet := dst;
-  dst.Active := false;
+    wtr := TFDBatchMoveDataSetWriter.Create(bm);
+    wtr.Optimise := false;
+    wtr.DataSet := dst;
+    // dst.Active := true;
+    // TODO: ugly
+    // TODO: NO QueryDecorator.
+    if (dst is TCustomUniDataSet) then
+    begin
+      uds := dst as TCustomUniDataSet;
+      bd := TBatchDecorator.Create(uds);
+    end;
+    bm.Mode := dmAlwaysInsert;
+    bm.Options := [poClearDest];
+    bm.CommitCount := 0;
 
-  bm.Mode := dmAlwaysInsert;
-  bm.Options := [poClearDest];
+    bm.Mappings.ClearAndResetID;
+    dst.GetFieldNames(fields);
+    for var i: Integer := 0 to fields.Count - 1 do
+    begin
+      mi := bm.Mappings.Add;
+      mi.SourceFieldName := fields[i];
+      mi.DestinationFieldName := fields[i];
+    end;
 
-  bm.Execute;
-  Result := TLoadResult.Create(bm);
+    bd.StartTransaction;
+    res := bm.Execute;
+    bd.Commit;
+  finally
+    if Assigned(bd) then
+      bd.Free;
+    src.Active := false;
+    dst.Active := false;
+    fields.Free;
+    Result := TLoadResult.Create(bm);
+  end;
+end;
+
+constructor ZBData.Create;
+begin
+  FQDecs := TDictionary<string, IQueryDecorator>.Create;
 end;
 
 destructor ZBData.Destroy;
 begin
   Disconnect;
+  FQDecs.Free;
   inherited;
 end;
 
@@ -200,8 +243,12 @@ begin
     Result := dmFBZakelijk.qryImpRaboZak
   else if name = 'KnabImp' then
     Result := dmFBZakelijk.qryImpKnab
+  else if name = 'XafCustomer' then
+    Result := dmXAF.qryXafCustomer
+  else if name = 'OraCustomer' then
+    Result := dmXAF.qryOraCustomer
   else
-    Result := nil;
+    raise Exception.Create('Unknown DataSet name: ' + name);
 end;
 
 function ZBData.GetZBDataSource(const name: string): TDataSource;
@@ -214,18 +261,45 @@ begin
     Result := dmFBZakelijk.dsLog
   else if name = 'XafCustomer' then
     Result := dmXAF.dsXafCustomer
+  else if name = 'OraCustomer' then
+    Result := dmXAF.dsOraCustomer
   else
-    Result := nil;
+    raise Exception.Create('Unknown DataSource name: ' + name);
 end;
 
 function ZBData.GetZBQryDecorator(const name: string): IQueryDecorator;
+var
+  res: IQueryDecorator;
 begin
+  if name = EmptyStr then
+    raise Exception.Create('Invalid decorator name.');
+
+  res := nil;
+  if FQDecs.TryGetValue(name, res) then
+  begin
+    Result := res;
+    Exit;
+  end;
+
   if name = 'AppLog' then
-    Result := dmFBZakelijk.rsAppLog
+  begin
+    res := CreateQueryDecorator(dmFBZakelijk.qryLog);
+    FQDecs.Add(name, res);
+  end
   else if name = 'XafCustomer' then
-    Result := dmXAF.rsXafCustomer
+  begin
+    res := CreateQueryDecorator(dmXAF.qryXafCustomer);
+    FQDecs.Add(name, res);
+  end
+  else if name = 'OraCustomer' then
+  begin
+    res := CreateQueryDecorator(dmXAF.qryOraCustomer);
+    FQDecs.Add(name, res);
+  end
   else
-    Result := nil;
+    raise Exception.Create('Unknown decorator name: ' + name);
+
+  Result := res;
 end;
 
 function ZBData.LoadDataSetFromFile(const dsname, filename: String;

@@ -24,7 +24,7 @@ uses Uni;
 type
 
   IQueryDecorator = interface
-    { Add child after decorator is created, but beore it's opened. }
+    { Add child after decorator is created, but before it's opened. }
     procedure AddChild(qryC: TUniQuery);
 
     { Activate the queries and populate the dataset. }
@@ -276,8 +276,8 @@ end;
 procedure TQryDecoratorFB.doCreate;
 begin
   // TODO: this fails if the qry is active in the IDE.
-  if Fqry.Transaction.Active or Assigned(Fqry.UpdateTransaction) then
-    raise Exception.Create('Transaction config error');
+  if Fqry.Transaction.Active then // or Assigned(Fqry.UpdateTransaction) then
+    Exit; // raise Exception.Create('Transaction config error');
 
   // Do NOT use the default transaction object.
   // Committing the default, will close are Queries that use this default transaction.
@@ -300,7 +300,8 @@ end;
 procedure TQryDecoratorFB.doAddChild;
 begin
   // TODO: this fails if the qry is active in the IDE.
-  if FChild.Transaction.Active or Assigned(FChild.UpdateTransaction) then
+  if FChild.Transaction.Active then
+    // or Assigned(FChild.UpdateTransaction) then
     raise Exception.Create('Transaction config error');
 
   FChild.Transaction := Fqry.Transaction;

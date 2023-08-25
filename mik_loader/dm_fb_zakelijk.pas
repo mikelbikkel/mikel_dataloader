@@ -91,14 +91,6 @@ type
     connOraZakelijk: TUniConnection;
     procedure connFBZakelijkLogin(Connection: TCustomDAConnection;
       LoginParams: TStrings);
-    procedure DataModuleCreate(Sender: TObject);
-    procedure DataModuleDestroy(Sender: TObject);
-  strict private
-    FAppLog: IQueryDecorator;
-
-  public
-    property rsAppLog: IQueryDecorator read FAppLog;
-
   end;
 
 var
@@ -117,17 +109,6 @@ var
 begin
   if Assigned(Connection) then
     S := LoginParams.CommaText;
-end;
-
-procedure TdmFBZakelijk.DataModuleCreate(Sender: TObject);
-begin
-  FAppLog := CreateQueryDecorator(qryLog);
-
-end;
-
-procedure TdmFBZakelijk.DataModuleDestroy(Sender: TObject);
-begin
-  FAppLog := nil;
 end;
 
 end.

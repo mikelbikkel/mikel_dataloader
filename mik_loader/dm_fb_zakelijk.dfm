@@ -1,10 +1,9 @@
 object dmFBZakelijk: TdmFBZakelijk
-  OnCreate = DataModuleCreate
-  OnDestroy = DataModuleDestroy
   Height = 477
   Width = 714
   PixelsPerInch = 120
   object connFBZakelijk: TUniConnection
+    AutoCommit = False
     ProviderName = 'InterBase'
     Database = 'zakboek'
     SpecificOptions.Strings = (
@@ -13,8 +12,8 @@ object dmFBZakelijk: TdmFBZakelijk
     Options.KeepDesignConnected = False
     Username = 'mikel'
     Server = 'localhost'
-    Connected = True
     ConnectDialog = uniDlgConnect
+    LoginPrompt = False
     OnLogin = connFBZakelijkLogin
     Left = 136
     Top = 32
@@ -368,15 +367,17 @@ object dmFBZakelijk: TdmFBZakelijk
     Top = 120
   end
   object connOraZakelijk: TUniConnection
+    AutoCommit = False
     ProviderName = 'Oracle'
     SpecificOptions.Strings = (
       'Oracle.Direct=True')
+    Options.AllowImplicitConnect = False
+    Options.KeepDesignConnected = False
     Username = 'mikel'
     Server = 'mikel-zen:1521/XEPDB1'
-    Connected = True
     ConnectDialog = uniDlgConnect
+    LoginPrompt = False
     Left = 144
     Top = 120
-    EncryptedPassword = 'ADFFBEFFB9FFBBFFBFFF91FFC8FFCDFFBDFF93FF9EFF'
   end
 end
