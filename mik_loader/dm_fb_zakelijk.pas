@@ -23,7 +23,7 @@ uses
   System.SysUtils, System.Classes, Data.DB, DBAccess, Uni, UniProvider,
   InterBaseUniProvider, MemDS, VirtualTable, FireDAC.Stan.Intf,
   FireDAC.Comp.BatchMove, UniDacVcl, FireDAC.UI.Intf, FireDAC.VCLUI.Wait,
-  FireDAC.Comp.UI, query_decorator, DASQLMonitor, UniSQLMonitor,
+  FireDAC.Comp.UI, DASQLMonitor, UniSQLMonitor,
   OracleUniProvider;
 
 type

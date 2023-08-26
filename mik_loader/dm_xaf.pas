@@ -21,7 +21,7 @@ interface
 
 uses
   System.SysUtils, System.Classes, Data.DB, Datasnap.DBClient, dm_fb_zakelijk,
-  MemDS, DBAccess, Uni, query_decorator;
+  MemDS, DBAccess, Uni;
 
 type
   TdmXAF = class(TDataModule)

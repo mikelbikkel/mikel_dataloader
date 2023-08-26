@@ -23,7 +23,6 @@ uses
   dm_fb_zakelijk in 'dm_fb_zakelijk.pas' {dmFBZakelijk: TDataModule},
   file_loader in 'file_loader.pas',
   frm_table in 'frm_table.pas' {frmTable},
-  query_decorator in 'query_decorator.pas',
   dm_xaf in 'dm_xaf.pas' {dmXAF: TDataModule},
   dm_ora_zakelijk in 'dm_ora_zakelijk.pas' {dmOraZakelijk: TDataModule},
   data_facade in 'data_facade.pas',

@@ -19,8 +19,7 @@ unit data_facade;
 
 interface
 
-uses data.DB, FireDac.Comp.BatchMove, query_decorator, file_loader,
-  batch_decorator;
+uses data.DB, FireDac.Comp.BatchMove, file_loader, batch_decorator;
 
 type
   TDataFacade = class

@@ -118,7 +118,6 @@
             <Form>frmTable</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="query_decorator.pas"/>
         <DCCReference Include="dm_xaf.pas">
             <Form>dmXAF</Form>
             <FormType>dfm</FormType>
