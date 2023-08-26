@@ -41,26 +41,14 @@ type
 
   end;
 
-  TBatchDecorator = class
-  strict private
-    Fdset: TCustomUniDataSet;
-  public
-    constructor Create(dset: TCustomUniDataSet);
-    destructor Destroy; override;
-
-    procedure StartTransaction;
-    procedure Commit;
-    procedure Rollback;
-  end;
-
 function CreateReadOnlyDecorator(ds: TCustomUniDataSet): IDDReadOnly;
+function CreateBatchDecorator(ds: TCustomUniDataSet): IDDBatch;
 
 implementation
 
 uses System.SysUtils, CRAccess;
 
 type
-{$REGION 'TReadOnlyDecorator'}
   TReadOnlyDecorator = class(TInterfacedObject, IDDReadOnly)
   private
     Fdata: TCustomUniDataSet;
@@ -77,7 +65,31 @@ type
     procedure Close;
   end;
 
-  { TReadOnlyDecorator }
+  TBatchDecorator = class(TInterfacedObject, IDDBatch)
+  strict private
+    Fdset: TCustomUniDataSet;
+    function IsInterbase: boolean;
+  public
+    constructor Create(dset: TCustomUniDataSet);
+    destructor Destroy; override;
+
+    procedure StartTransaction;
+    procedure Commit;
+    procedure Rollback;
+  end;
+
+function CreateReadOnlyDecorator(ds: TCustomUniDataSet): IDDReadOnly;
+begin
+  Result := TReadOnlyDecorator.Create(ds);
+end;
+
+function CreateBatchDecorator(ds: TCustomUniDataSet): IDDBatch;
+begin
+  Result := TBatchDecorator.Create(ds);
+end;
+
+{$REGION 'TReadOnlyDecorator'}
+{ TReadOnlyDecorator }
 
 constructor TReadOnlyDecorator.Create(ds: TCustomUniDataSet);
 begin
@@ -146,12 +158,6 @@ begin
 end;
 
 {$ENDREGION}
-
-function CreateReadOnlyDecorator(ds: TCustomUniDataSet): IDDReadOnly;
-begin
-  Result := TReadOnlyDecorator.Create(ds);
-end;
-
 {$REGION 'TBatchDecorator'}
 { TBatchDecorator }
 
@@ -160,29 +166,12 @@ begin
   if not Assigned(dset) then
     raise Exception.Create('qry is null');
 
-  if not Assigned(dset.Connection) then
-    raise Exception.Create('qry.Connection is null');
-
   if dset.Active then
     raise Exception.Create('qry active');
 
-  if 'InterBase' <> dset.Connection.ProviderName then
-    raise Exception.Create('For Interbase provider only');
-
-  if dset.Transaction.Active then
-    raise Exception.Create('Transaction config error');
-
   Fdset := dset;
 
-  // Do NOT use the default transaction object.
-  // Committing the default, will close are Queries that use this default transaction.
-  Fdset.Transaction := TUniTransaction.Create(Fdset.Owner);
-  Fdset.Transaction.DefaultConnection := Fdset.Connection;
-  Fdset.Transaction.IsolationLevel := ilReadCommitted;
-  Fdset.Transaction.DefaultCloseAction := taCommit;
-  Fdset.Transaction.ReadOnly := true;
-
-  if not Assigned(Fdset.UpdateTransaction) then
+  if IsInterbase and (not Assigned(Fdset.UpdateTransaction)) then
   begin
     Fdset.UpdateTransaction := TUniTransaction.Create(Fdset.Owner);
     Fdset.UpdateTransaction.DefaultConnection := Fdset.Connection;
@@ -190,46 +179,61 @@ begin
     Fdset.UpdateTransaction.DefaultCloseAction := taRollback;
     Fdset.UpdateTransaction.ReadOnly := false;
   end;
-
-  dset.Active := true;
 end;
 
 destructor TBatchDecorator.Destroy;
 begin
-  Rollback;
-  Fdset := nil;
+  if Assigned(Fdset) then
+  begin
+    Rollback;
+    Fdset := nil;
+  end;
+
   inherited;
+end;
+
+function TBatchDecorator.IsInterbase: boolean;
+begin
+  Result := ('InterBase' = Fdset.Connection.ProviderName);
 end;
 
 procedure TBatchDecorator.StartTransaction;
 begin
-  if not Assigned(Fdset.UpdateTransaction) then
-    Exit;
+  if IsInterbase then
+  begin
+    if not Assigned(Fdset.UpdateTransaction) then
+      Exit;
 
+    if not Fdset.UpdateTransaction.Active then
+      Fdset.UpdateTransaction.StartTransaction;
+  end;
   Fdset.ReadOnly := false;
-
-  if not Fdset.UpdateTransaction.Active then
-    Fdset.UpdateTransaction.StartTransaction;
 end;
 
 procedure TBatchDecorator.Commit;
 begin
-  if not Assigned(Fdset.UpdateTransaction) then
-    Exit;
+  if IsInterbase then
+  begin
+    if not Assigned(Fdset.UpdateTransaction) then
+      Exit;
 
-  if Fdset.UpdateTransaction.Active then
-    Fdset.UpdateTransaction.Commit;
+    if Fdset.UpdateTransaction.Active then
+      Fdset.UpdateTransaction.Commit;
+  end;
 
   Fdset.ReadOnly := true;
 end;
 
 procedure TBatchDecorator.Rollback;
 begin
-  if not Assigned(Fdset.UpdateTransaction) then
-    Exit;
+  if IsInterbase then
+  begin
+    if not Assigned(Fdset.UpdateTransaction) then
+      Exit;
 
-  if Fdset.UpdateTransaction.Active then
-    Fdset.UpdateTransaction.Rollback;
+    if Fdset.UpdateTransaction.Active then
+      Fdset.UpdateTransaction.Rollback;
+  end;
 
   Fdset.ReadOnly := true;
 end;

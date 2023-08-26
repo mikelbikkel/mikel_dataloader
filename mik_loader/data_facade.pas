@@ -158,9 +158,12 @@ var
   mi: TFDBatchMoveMappingItem;
   fields: TStringList;
   res: Integer;
-  bd: TBatchDecorator;
+  bd: IDDBatch;
   uds: TCustomUniDataSet;
 begin
+  if not(dst is TCustomUniDataSet) then
+    raise Exception.Create('dst must be a TCustomUniDataSet');
+
   bd := nil;
   fields := TStringList.Create;
   try
@@ -171,14 +174,11 @@ begin
     wtr := TFDBatchMoveDataSetWriter.Create(bm);
     wtr.Optimise := false;
     wtr.DataSet := dst;
-    // dst.Active := true;
-    // TODO: ugly
-    // TODO: NO QueryDecorator.
-    if (dst is TCustomUniDataSet) then
-    begin
-      uds := dst as TCustomUniDataSet;
-      bd := TBatchDecorator.Create(uds);
-    end;
+
+    uds := dst as TCustomUniDataSet;
+    bd := CreateBatchDecorator(uds);
+    dst.Active := true;
+
     bm.Mode := dmAlwaysInsert;
     bm.Options := [poClearDest];
     bm.CommitCount := 0;
@@ -196,8 +196,7 @@ begin
     res := bm.Execute;
     bd.Commit;
   finally
-    if Assigned(bd) then
-      bd.Free;
+    bd := nil;
     src.Active := false;
     dst.Active := false;
     fields.Free;
