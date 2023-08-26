@@ -19,7 +19,8 @@ unit data_facade;
 
 interface
 
-uses data.DB, FireDac.Comp.BatchMove, query_decorator, file_loader;
+uses data.DB, FireDac.Comp.BatchMove, query_decorator, file_loader,
+  batch_decorator;
 
 type
   TDataFacade = class
@@ -29,13 +30,13 @@ type
     function GetZBDataSet(const name: string): TDataSet; virtual; abstract;
     function GetZBDataSource(const name: string): TDataSource; virtual;
       abstract;
-    function GetZBQryDecorator(const name: string): IQueryDecorator;
+    function GetZBQryDecorator(const name: string): IDDReadOnly;
       virtual; abstract;
   public
     property Connected: boolean read GetConnected write SetConnected;
     property ZBDataSet[const name: string]: TDataSet read GetZBDataSet;
     property ZBDataSource[const name: string]: TDataSource read GetZBDataSource;
-    property ZBQryDecorator[const name: string]: IQueryDecorator
+    property ZBQryDecorator[const name: string]: IDDReadOnly
       read GetZBQryDecorator;
     procedure procRaboZakelijk; virtual; abstract;
     procedure procKnabZakelijk; virtual; abstract;
@@ -53,7 +54,7 @@ function CreateDataFacade: TDataFacade;
 implementation
 
 uses System.Classes, System.SysUtils, System.Generics.Collections,
-  dm_ora_zakelijk, dm_xaf, dm_fb_zakelijk, batch_decorator,
+  dm_ora_zakelijk, dm_xaf, dm_fb_zakelijk,
   FireDac.Comp.BatchMove.DataSet, Uni;
 
 type
@@ -61,7 +62,7 @@ type
   { ZBData }
   ZBData = class(TDataFacade)
   strict private
-    FQDecs: TDictionary<string, IQueryDecorator>;
+    FQDecs: TDictionary<string, IDDReadOnly>;
 
     function GetConnected: boolean; override;
     procedure SetConnected(c: boolean); override;
@@ -69,7 +70,7 @@ type
     procedure Disconnect;
     function GetZBDataSet(const name: string): TDataSet; override;
     function GetZBDataSource(const name: string): TDataSource; override;
-    function GetZBQryDecorator(const name: string): IQueryDecorator; override;
+    function GetZBQryDecorator(const name: string): IDDReadOnly; override;
     function LoadRaboZakFromFile(const filename: String; bm: TFDBatchMove;
       ds: TDataSet): TLoadResult;
     function LoadKnabZakFromFile(const filename: String; bm: TFDBatchMove;
@@ -207,7 +208,7 @@ end;
 
 constructor ZBData.Create;
 begin
-  FQDecs := TDictionary<string, IQueryDecorator>.Create;
+  FQDecs := TDictionary<string, IDDReadOnly>.Create;
 end;
 
 destructor ZBData.Destroy;
@@ -267,9 +268,9 @@ begin
     raise Exception.Create('Unknown DataSource name: ' + name);
 end;
 
-function ZBData.GetZBQryDecorator(const name: string): IQueryDecorator;
+function ZBData.GetZBQryDecorator(const name: string): IDDReadOnly;
 var
-  res: IQueryDecorator;
+  res: IDDReadOnly;
 begin
   if name = EmptyStr then
     raise Exception.Create('Invalid decorator name.');
@@ -283,17 +284,17 @@ begin
 
   if name = 'AppLog' then
   begin
-    res := CreateQueryDecorator(dmFBZakelijk.qryLog);
+    res := CreateReadOnlyDecorator(dmFBZakelijk.qryLog);
     FQDecs.Add(name, res);
   end
   else if name = 'XafCustomer' then
   begin
-    res := CreateQueryDecorator(dmXAF.qryXafCustomer);
+    res := CreateReadOnlyDecorator(dmXAF.qryXafCustomer);
     FQDecs.Add(name, res);
   end
   else if name = 'OraCustomer' then
   begin
-    res := CreateQueryDecorator(dmXAF.qryOraCustomer);
+    res := CreateReadOnlyDecorator(dmXAF.qryOraCustomer);
     FQDecs.Add(name, res);
   end
   else

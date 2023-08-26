@@ -23,7 +23,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
   System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Data.DB, Vcl.Grids, Vcl.DBGrids,
-  System.Actions, Vcl.ActnList, Vcl.StdCtrls, query_decorator;
+  System.Actions, Vcl.ActnList, Vcl.StdCtrls, batch_decorator;
 
 type
   TfrmTable = class(TForm)
@@ -36,9 +36,9 @@ type
     procedure actRefreshExecute(Sender: TObject);
     procedure setDataSource(dsrc: TDataSource);
   strict private
-    FTableData: IQueryDecorator;
+    FTableData: IDDReadOnly;
   public
-    property TableData: IQueryDecorator write FTableData;
+    property TableData: IDDReadOnly write FTableData;
     property TableSource: TDataSource write setDataSource;
   end;
 

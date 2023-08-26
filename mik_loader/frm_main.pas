@@ -87,7 +87,7 @@ var
   { ============================================================================ }
 implementation
 
-uses file_loader, frm_table, query_decorator;
+uses file_loader, frm_table;
 
 {$R *.dfm}
 { ============================================================================ }
@@ -103,9 +103,7 @@ procedure TfrmMain.actCopyCustomerExecute(Sender: TObject);
 var
   src: TDataSet;
   dest: TDataSet;
-  // st: IQueryDecorator;
 begin
-  // st := FDataFacade.ZBQryDecorator['XafCustomer'];
   src := FDataFacade.ZBDataSet['OraCustomer'];
   dest := FDataFacade.ZBDataSet['XafCustomer'];
   FDataFacade.CopyDataSet(bmLoader, src, dest);
