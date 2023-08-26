@@ -61,25 +61,6 @@ type
     s: integer;
   end;
 
-  TLoadResult = class
-  strict private
-    FReadCount: integer;
-    FWriteCount: integer;
-    FErrorCount: integer;
-    FInsertCount: integer;
-    FUpdateCount: integer;
-    FDeleteCount: integer;
-  public
-    constructor Create(bm: TFDBatchMove);
-    property ReadCount: integer read FReadCount;
-    property WriteCount: integer read FWriteCount;
-    property ErrorCount: integer read FErrorCount;
-    property InsertCount: integer read FInsertCount;
-    property UpdateCount: integer read FUpdateCount;
-    property DeleteCount: integer read FDeleteCount;
-
-  end;
-
   TFileLoader = class
   strict private
     FDataMover: TFDBatchMove;
@@ -91,7 +72,7 @@ type
     procedure SetFileInfo(const info: TLoadInfo);
     procedure AddField(const name: string; const ftype: SFieldType;
       const fsize: integer = 0);
-    function LoadFile: TLoadResult;
+    procedure LoadFile;
   end;
 
 implementation
@@ -131,11 +112,10 @@ begin
   FWDataset.Optimise := false; // Do not Optimise if dataset is attached to UI
 end;
 
-function TFileLoader.LoadFile: TLoadResult;
+procedure TFileLoader.LoadFile;
 begin
   FDataMover.Execute;
   FWDataset.Dataset.Active := true;
-  Result := TLoadResult.Create(FDataMover);
 end;
 
 procedure TFileLoader.SetFileInfo(const info: TLoadInfo);
@@ -195,21 +175,6 @@ begin
   mi := FDataMover.Mappings.Add;
   mi.SourceFieldName := name;
   mi.DestinationFieldName := name;
-end;
-
-{ TLoadResult }
-
-constructor TLoadResult.Create(bm: TFDBatchMove);
-begin
-  if Assigned(bm) then
-  begin
-    FReadCount := bm.ReadCount;
-    FWriteCount := bm.WriteCount;
-    FErrorCount := bm.ErrorCount;
-    FInsertCount := bm.InsertCount;
-    FUpdateCount := bm.UpdateCount;
-    FDeleteCount := bm.DeleteCount;
-  end;
 end;
 
 end.

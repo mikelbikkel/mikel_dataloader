@@ -23,7 +23,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
   System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Data.DB, Vcl.Grids, Vcl.DBGrids,
-  System.Actions, Vcl.ActnList, Vcl.StdCtrls, batch_decorator;
+  System.Actions, Vcl.ActnList, Vcl.StdCtrls, data_facade;
 
 type
   TfrmTable = class(TForm)

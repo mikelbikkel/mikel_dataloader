@@ -19,9 +19,22 @@ unit data_facade;
 
 interface
 
-uses data.DB, FireDac.Comp.BatchMove, file_loader, batch_decorator;
+uses data.DB, FireDac.Comp.BatchMove;
 
 type
+
+  IDDReadOnly = interface
+    { Activate the queries and populate the dataset. }
+    procedure Open;
+
+    { Refresh dataset, re-query }
+    procedure Refresh;
+
+    { Close the dataset. }
+    procedure Close;
+
+  end;
+
   TDataFacade = class
   private
     function GetConnected: boolean; virtual; abstract;
@@ -40,11 +53,11 @@ type
     procedure procRaboZakelijk; virtual; abstract;
     procedure procKnabZakelijk; virtual; abstract;
 
-    function LoadDataSetFromFile(const dsname: string; const filename: String;
-      bm: TFDBatchMove; ds: TDataSet): TLoadResult; virtual; abstract;
+    procedure LoadDataSetFromFile(const dsname: string; const filename: String;
+      bm: TFDBatchMove; ds: TDataSet); virtual; abstract;
 
-    function CopyDataSet(bm: TFDBatchMove; src: TDataSet; dst: TDataSet)
-      : TLoadResult; virtual; abstract;
+    procedure CopyDataSet(bm: TFDBatchMove; src: TDataSet; dst: TDataSet);
+      virtual; abstract;
   end;
 
 function CreateDataFacade: TDataFacade;
@@ -53,8 +66,8 @@ function CreateDataFacade: TDataFacade;
 implementation
 
 uses System.Classes, System.SysUtils, System.Generics.Collections,
-  dm_ora_zakelijk, dm_xaf, dm_fb_zakelijk,
-  FireDac.Comp.BatchMove.DataSet, Uni;
+  dm_xaf, dm_fb_zakelijk,
+  FireDac.Comp.BatchMove.DataSet, Uni, file_loader, batch_decorator;
 
 type
 
@@ -70,20 +83,20 @@ type
     function GetZBDataSet(const name: string): TDataSet; override;
     function GetZBDataSource(const name: string): TDataSource; override;
     function GetZBQryDecorator(const name: string): IDDReadOnly; override;
-    function LoadRaboZakFromFile(const filename: String; bm: TFDBatchMove;
-      ds: TDataSet): TLoadResult;
-    function LoadKnabZakFromFile(const filename: String; bm: TFDBatchMove;
-      ds: TDataSet): TLoadResult;
+    procedure LoadRaboZakFromFile(const filename: String; bm: TFDBatchMove;
+      ds: TDataSet);
+    procedure LoadKnabZakFromFile(const filename: String; bm: TFDBatchMove;
+      ds: TDataSet);
 
   public
     constructor Create;
     destructor Destroy; override;
     procedure procRaboZakelijk; override;
     procedure procKnabZakelijk; override;
-    function LoadDataSetFromFile(const dsname: string; const filename: String;
-      bm: TFDBatchMove; ds: TDataSet): TLoadResult; override;
-    function CopyDataSet(bm: TFDBatchMove; src: TDataSet; dst: TDataSet)
-      : TLoadResult; override;
+    procedure LoadDataSetFromFile(const dsname: string; const filename: String;
+      bm: TFDBatchMove; ds: TDataSet); override;
+    procedure CopyDataSet(bm: TFDBatchMove; src: TDataSet;
+      dst: TDataSet); override;
   end;
 
   TConfig = class
@@ -150,14 +163,13 @@ begin
   end;
 end;
 
-function ZBData.CopyDataSet(bm: TFDBatchMove; src: TDataSet; dst: TDataSet)
-  : TLoadResult;
+procedure ZBData.CopyDataSet(bm: TFDBatchMove; src: TDataSet; dst: TDataSet);
 var
   rdr: TFDBatchMoveDataSetReader;
   wtr: TFDBatchMoveDataSetWriter;
   mi: TFDBatchMoveMappingItem;
   fields: TStringList;
-  res: Integer;
+  res: integer;
   bd: IDDBatch;
   uds: TCustomUniDataSet;
 begin
@@ -185,7 +197,7 @@ begin
 
     bm.Mappings.ClearAndResetID;
     dst.GetFieldNames(fields);
-    for var i: Integer := 0 to fields.Count - 1 do
+    for var i: integer := 0 to fields.Count - 1 do
     begin
       mi := bm.Mappings.Add;
       mi.SourceFieldName := fields[i];
@@ -200,7 +212,6 @@ begin
     src.Active := false;
     dst.Active := false;
     fields.Free;
-    Result := TLoadResult.Create(bm);
   end;
 end;
 
@@ -301,19 +312,17 @@ begin
   Result := res;
 end;
 
-function ZBData.LoadDataSetFromFile(const dsname, filename: String;
-  bm: TFDBatchMove; ds: TDataSet): TLoadResult;
+procedure ZBData.LoadDataSetFromFile(const dsname, filename: String;
+  bm: TFDBatchMove; ds: TDataSet);
 begin
   if dsname = 'RaboImp' then
-    Result := LoadRaboZakFromFile(filename, bm, ds)
+    LoadRaboZakFromFile(filename, bm, ds)
   else if dsname = 'KnabImp' then
-    Result := LoadKnabZakFromFile(filename, bm, ds)
-  else
-    Result := nil;
+    LoadKnabZakFromFile(filename, bm, ds)
 end;
 
-function ZBData.LoadKnabZakFromFile(const filename: String; bm: TFDBatchMove;
-  ds: TDataSet): TLoadResult;
+procedure ZBData.LoadKnabZakFromFile(const filename: String; bm: TFDBatchMove;
+  ds: TDataSet);
 var
   info: TLoadInfo;
   ldr: TFileLoader;
@@ -346,7 +355,7 @@ begin
     ldr.AddField('tx_referentie', sftString);
     ldr.AddField('boek_datum', sftDate);
 
-    Result := ldr.LoadFile;
+    ldr.LoadFile;
   finally
     if Assigned(info) then
       info.Free;
@@ -356,8 +365,8 @@ begin
 
 end;
 
-function ZBData.LoadRaboZakFromFile(const filename: String; bm: TFDBatchMove;
-  ds: TDataSet): TLoadResult;
+procedure ZBData.LoadRaboZakFromFile(const filename: String; bm: TFDBatchMove;
+  ds: TDataSet);
 var
   info: TLoadInfo;
   ldr: TFileLoader;
@@ -397,7 +406,8 @@ begin
     ldr.AddField('INSTR_BEDRAG', sftNumber);
     ldr.AddField('INSTR_VALUTA', sftString, 11);
     ldr.AddField('KOERS', sftNumber);
-    Result := ldr.LoadFile;
+
+    ldr.LoadFile;
   finally
     if Assigned(info) then
       info.Free;

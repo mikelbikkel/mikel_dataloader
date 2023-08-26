@@ -19,7 +19,7 @@ unit batch_decorator;
 
 interface
 
-uses Uni;
+uses Uni, data_facade;
 
 type
   { IDD = Interface Data Decorator }
@@ -27,18 +27,6 @@ type
     procedure StartTransaction;
     procedure Commit;
     procedure Rollback;
-  end;
-
-  IDDReadOnly = interface
-    { Activate the queries and populate the dataset. }
-    procedure Open;
-
-    { Refresh dataset, re-query }
-    procedure Refresh;
-
-    { Close the dataset. }
-    procedure Close;
-
   end;
 
 function CreateReadOnlyDecorator(ds: TCustomUniDataSet): IDDReadOnly;

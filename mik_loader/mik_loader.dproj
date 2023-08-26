@@ -123,11 +123,6 @@
             <FormType>dfm</FormType>
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
-        <DCCReference Include="dm_ora_zakelijk.pas">
-            <Form>dmOraZakelijk</Form>
-            <FormType>dfm</FormType>
-            <DesignClass>TDataModule</DesignClass>
-        </DCCReference>
         <DCCReference Include="data_facade.pas"/>
         <DCCReference Include="batch_decorator.pas"/>
         <BuildConfiguration Include="Base">

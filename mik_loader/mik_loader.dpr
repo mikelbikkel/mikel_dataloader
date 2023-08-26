@@ -24,7 +24,6 @@ uses
   file_loader in 'file_loader.pas',
   frm_table in 'frm_table.pas' {frmTable},
   dm_xaf in 'dm_xaf.pas' {dmXAF: TDataModule},
-  dm_ora_zakelijk in 'dm_ora_zakelijk.pas' {dmOraZakelijk: TDataModule},
   data_facade in 'data_facade.pas',
   batch_decorator in 'batch_decorator.pas';
 
@@ -38,6 +37,5 @@ begin
   Application.CreateForm(TdmFBZakelijk, dmFBZakelijk);
   Application.CreateForm(TfrmTable, frmTable);
   Application.CreateForm(TdmXAF, dmXAF);
-  Application.CreateForm(TdmOraZakelijk, dmOraZakelijk);
   Application.Run;
 end.

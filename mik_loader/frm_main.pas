@@ -74,9 +74,11 @@ type
     procedure FormShow(Sender: TObject);
     procedure actShowOraCustomerExecute(Sender: TObject);
     procedure actCopyCustomerExecute(Sender: TObject);
-  private
+  strict private
     FDataFacade: TDataFacade;
     procedure LoadDataFromFile(const dsname: string);
+    procedure resetCounters;
+    procedure showCounters;
   public
     { Public declarations }
   end;
@@ -87,7 +89,7 @@ var
   { ============================================================================ }
 implementation
 
-uses file_loader, frm_table;
+uses frm_table;
 
 {$R *.dfm}
 { ============================================================================ }
@@ -104,9 +106,14 @@ var
   src: TDataSet;
   dest: TDataSet;
 begin
+  resetCounters;
   src := FDataFacade.ZBDataSet['OraCustomer'];
   dest := FDataFacade.ZBDataSet['XafCustomer'];
   FDataFacade.CopyDataSet(bmLoader, src, dest);
+
+  dest.Active := true;
+  grdFileData.DataSource := FDataFacade.ZBDataSource['XafCustomer'];
+  showCounters;
 end;
 
 procedure TfrmMain.actExecKnabZakExecute(Sender: TObject);
@@ -171,17 +178,12 @@ end;
 
 procedure TfrmMain.LoadDataFromFile(const dsname: string);
 var
-  res: TLoadResult;
   ds: TDataSet;
 begin
-  edtRead.Text := EmptyStr;
-  edtWritten.Text := EmptyStr;
-  edtInsert.Text := EmptyStr;
-  edtErrors.Text := EmptyStr;
-  res := nil;
   if not dlgOpen.Execute then
     Exit;
 
+  resetCounters;
   case rgLoadType.ItemIndex of
     0:
       begin { Test load }
@@ -199,17 +201,25 @@ begin
     Exit;
   end;
 
-  try
-    res := FDataFacade.LoadDataSetFromFile(dsname, dlgOpen.filename,
-      bmLoader, ds);
-    edtRead.Text := IntToStr(res.ReadCount);
-    edtWritten.Text := IntToStr(res.WriteCount);
-    edtInsert.Text := IntToStr(res.InsertCount);
-    edtErrors.Text := IntToStr(res.ErrorCount);
-  finally
-    if Assigned(res) then
-      res.Free;
-  end;
+  FDataFacade.LoadDataSetFromFile(dsname, dlgOpen.filename, bmLoader, ds);
+  showCounters;
+end;
+
+procedure TfrmMain.resetCounters;
+begin
+  edtRead.Text := EmptyStr;
+  edtWritten.Text := EmptyStr;
+  edtInsert.Text := EmptyStr;
+  edtErrors.Text := EmptyStr;
+end;
+
+procedure TfrmMain.showCounters;
+begin
+  edtRead.Text := IntToStr(bmLoader.ReadCount);
+  edtWritten.Text := IntToStr(bmLoader.WriteCount);
+  edtInsert.Text := IntToStr(bmLoader.InsertCount);
+  edtErrors.Text := IntToStr(bmLoader.ErrorCount);
+
 end;
 
 {$ENDREGION}
