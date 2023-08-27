@@ -98,9 +98,6 @@ end;
 constructor TFileLoader.Create(bm: TFDBatchMove; ds: TDataSet;
   DsAddFields: Boolean);
 begin
-  if not(ds is TCustomUniDataSet) then
-    raise Exception.Create('ds must be a TCustomUniDataSet');
-
   bm.Mappings.ClearAndResetID;
   if DsAddFields then
     ds.FieldDefs.ClearAndResetID;
@@ -120,12 +117,9 @@ end;
 
 procedure TFileLoader.LoadFile;
 var
-  uds: TCustomUniDataSet;
   bd: IDDBatch;
 begin
-  uds := FWDataset.Dataset as TCustomUniDataSet;
-  bd := CreateBatchDecorator(uds);
-
+  bd := CreateBatchDecorator(FWDataset.Dataset);
   try
     bd.StartTransaction;
     FDataMover.Execute;
@@ -133,7 +127,6 @@ begin
   except
     bd.Rollback;
   end;
-  // FWDataset.Dataset.Active := true;
 end;
 
 procedure TFileLoader.SetFileInfo(const info: TLoadInfo);

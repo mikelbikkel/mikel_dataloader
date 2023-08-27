@@ -18,7 +18,7 @@ object frmTable: TfrmTable
     Top = 24
     Width = 577
     Height = 168
-    DataSource = dmFBZakelijk.dsLog
+    DataSource = dsrcTable
     TabOrder = 0
     TitleFont.Charset = DEFAULT_CHARSET
     TitleFont.Color = clWindowText
@@ -36,10 +36,14 @@ object frmTable: TfrmTable
   end
   object ActionList1: TActionList
     Left = 272
-    Top = 224
+    Top = 208
     object actRefresh: TAction
       Caption = 'Refresh'
       OnExecute = actRefreshExecute
     end
+  end
+  object dsrcTable: TUniDataSource
+    Left = 136
+    Top = 208
   end
 end

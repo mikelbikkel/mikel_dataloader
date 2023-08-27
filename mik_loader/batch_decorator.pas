@@ -19,7 +19,7 @@ unit batch_decorator;
 
 interface
 
-uses Uni, data_facade;
+uses Data.DB, data_facade;
 
 type
   { IDD = Interface Data Decorator }
@@ -29,20 +29,20 @@ type
     procedure Rollback;
   end;
 
-function CreateReadOnlyDecorator(ds: TCustomUniDataSet): IDDReadOnly;
-function CreateBatchDecorator(ds: TCustomUniDataSet): IDDBatch;
+function CreateReadOnlyDecorator(ds: TDataSet): IDDReadOnly;
+function CreateBatchDecorator(ds: TDataSet): IDDBatch;
 
 implementation
 
-uses System.SysUtils, CRAccess;
+uses System.SysUtils, CRAccess, Uni;
 
 type
   TReadOnlyDecorator = class(TInterfacedObject, IDDReadOnly)
   private
-    Fdata: TCustomUniDataSet;
+    Fdata: TDataSet;
     function IsInterbase: boolean;
   public
-    constructor Create(ds: TCustomUniDataSet);
+    constructor Create(ds: TDataSet);
 
     destructor Destroy; override;
 
@@ -51,14 +51,17 @@ type
     procedure Refresh;
 
     procedure Close;
+
+    function GetDataSet: TDataSet;
+
   end;
 
   TBatchDecorator = class(TInterfacedObject, IDDBatch)
   strict private
-    Fdset: TCustomUniDataSet;
+    Fdata: TDataSet;
     function IsInterbase: boolean;
   public
-    constructor Create(dset: TCustomUniDataSet);
+    constructor Create(const ds: TDataSet);
     destructor Destroy; override;
 
     procedure StartTransaction;
@@ -66,12 +69,12 @@ type
     procedure Rollback;
   end;
 
-function CreateReadOnlyDecorator(ds: TCustomUniDataSet): IDDReadOnly;
+function CreateReadOnlyDecorator(ds: TDataSet): IDDReadOnly;
 begin
   Result := TReadOnlyDecorator.Create(ds);
 end;
 
-function CreateBatchDecorator(ds: TCustomUniDataSet): IDDBatch;
+function CreateBatchDecorator(ds: TDataSet): IDDBatch;
 begin
   Result := TBatchDecorator.Create(ds);
 end;
@@ -79,28 +82,33 @@ end;
 {$REGION 'TReadOnlyDecorator'}
 { TReadOnlyDecorator }
 
-constructor TReadOnlyDecorator.Create(ds: TCustomUniDataSet);
+constructor TReadOnlyDecorator.Create(ds: TDataSet);
 begin
   if not Assigned(ds) then
     raise Exception.Create('ds: nil');
 
   Fdata := ds;
 
-  if IsInterbase then
+  { Only use transactions with a TCustomUniDataSet descendant.
+    If the dataset is, for example, a virtual table... skip the transaction management. }
+  if (Fdata is TCustomUniDataSet) then
   begin
-    if not Fdata.Transaction.Active then
+    var
+    uds := Fdata as TCustomUniDataSet;
+
+    if IsInterbase and (not uds.Transaction.Active) then
     begin
       // Do NOT use the default transaction object.
       // Committing the default, will close all Queries that use this default transaction.
-      Fdata.Transaction := TUniTransaction.Create(Fdata.Owner);
-      Fdata.Transaction.DefaultConnection := Fdata.Connection;
-      Fdata.Transaction.IsolationLevel := ilReadCommitted;
-      Fdata.Transaction.DefaultCloseAction := taCommit;
-      Fdata.Transaction.ReadOnly := true;
+      uds.Transaction := TUniTransaction.Create(Fdata.Owner);
+      uds.Transaction.DefaultConnection := uds.Connection;
+      uds.Transaction.IsolationLevel := ilReadCommitted;
+      uds.Transaction.DefaultCloseAction := taCommit;
+      uds.Transaction.ReadOnly := true;
     end;
-  end;
 
-  Fdata.ReadOnly := true;
+    uds.ReadOnly := true;
+  end;
 end;
 
 destructor TReadOnlyDecorator.Destroy;
@@ -110,71 +118,100 @@ begin
   inherited;
 end;
 
+function TReadOnlyDecorator.GetDataSet: TDataSet;
+begin
+  Result := Fdata;
+end;
+
 function TReadOnlyDecorator.IsInterbase: boolean;
 begin
-  Result := ('InterBase' = Fdata.Connection.ProviderName);
+  if (Fdata is TCustomUniDataSet) then
+  begin
+    var
+    uds := Fdata as TCustomUniDataSet;
+    Result := Assigned(uds.Connection) and
+      ('InterBase' = uds.Connection.ProviderName);
+  end
+  else
+    Result := false;
 end;
 
 procedure TReadOnlyDecorator.Open;
 begin
-  if Fdata.Connection.Connected then
+  if not Fdata.Active then
+    Fdata.Active := true;
+
+  if (Fdata is TCustomUniDataSet) then
   begin
-    if not Fdata.Active then
-      Fdata.Active := true;
-    if IsInterbase then
-      if not Fdata.Transaction.Active then
-        Fdata.Transaction.StartTransaction;
+    var
+    uds := Fdata as TCustomUniDataSet;
+    if uds.Connection.Connected and IsInterbase then
+      if not uds.Transaction.Active then
+        uds.Transaction.StartTransaction;
   end;
 end;
 
 procedure TReadOnlyDecorator.Refresh;
 begin
-  if Fdata.Connection.Connected and Fdata.Active then
-    Fdata.Refresh;
+  if (Fdata is TCustomUniDataSet) then
+  begin
+    var
+    uds := Fdata as TCustomUniDataSet;
+    if uds.Connection.Connected and Fdata.Active then
+      uds.Refresh;
+  end;
 end;
 
 procedure TReadOnlyDecorator.Close;
 begin
-  if Fdata.Connection.Connected then
+  if (Fdata is TCustomUniDataSet) then
   begin
-    if IsInterbase then
-      if Fdata.Transaction.Active then
-        Fdata.Transaction.Commit;
-    if Fdata.Active then
-      Fdata.Active := false;
+    var
+    uds := Fdata as TCustomUniDataSet;
+    if uds.Connection.Connected and IsInterbase then
+      if uds.Transaction.Active then
+        uds.Transaction.Commit;
   end;
+  if Fdata.Active then
+    Fdata.Active := false;
 end;
 
 {$ENDREGION}
 {$REGION 'TBatchDecorator'}
 { TBatchDecorator }
 
-constructor TBatchDecorator.Create(dset: TCustomUniDataSet);
+constructor TBatchDecorator.Create(const ds: TDataSet);
 begin
-  if not Assigned(dset) then
+  if not Assigned(ds) then
     raise Exception.Create('qry is null');
 
-  if dset.Active then
+  if ds.Active then
     raise Exception.Create('qry active');
 
-  Fdset := dset;
-
-  if IsInterbase and (not Assigned(Fdset.UpdateTransaction)) then
+  Fdata := ds;
+  { Only use transactions with a TCustomUniDataSet descendant.
+    If the dataset is, for example, a virtual table... skip the transaction management. }
+  if (Fdata is TCustomUniDataSet) then
   begin
-    Fdset.UpdateTransaction := TUniTransaction.Create(Fdset.Owner);
-    Fdset.UpdateTransaction.DefaultConnection := Fdset.Connection;
-    Fdset.UpdateTransaction.IsolationLevel := ilReadCommitted;
-    Fdset.UpdateTransaction.DefaultCloseAction := taRollback;
-    Fdset.UpdateTransaction.ReadOnly := false;
+    var
+    uds := Fdata as TCustomUniDataSet;
+    if IsInterbase and (not Assigned(uds.UpdateTransaction)) then
+    begin
+      uds.UpdateTransaction := TUniTransaction.Create(uds.Owner);
+      uds.UpdateTransaction.DefaultConnection := uds.Connection;
+      uds.UpdateTransaction.IsolationLevel := ilReadCommitted;
+      uds.UpdateTransaction.DefaultCloseAction := taRollback;
+      uds.UpdateTransaction.ReadOnly := false;
+    end;
   end;
 end;
 
 destructor TBatchDecorator.Destroy;
 begin
-  if Assigned(Fdset) then
+  if Assigned(Fdata) then
   begin
     Rollback;
-    Fdset := nil;
+    Fdata := nil;
   end;
 
   inherited;
@@ -182,48 +219,54 @@ end;
 
 function TBatchDecorator.IsInterbase: boolean;
 begin
-  Result := ('InterBase' = Fdset.Connection.ProviderName);
+  if (Fdata is TCustomUniDataSet) then
+  begin
+    var
+    uds := Fdata as TCustomUniDataSet;
+    Result := Assigned(uds.Connection) and
+      ('InterBase' = uds.Connection.ProviderName);
+  end
+  else
+    Result := false;
 end;
 
 procedure TBatchDecorator.StartTransaction;
 begin
-  if IsInterbase then
+  if (Fdata is TCustomUniDataSet) then
   begin
-    if not Assigned(Fdset.UpdateTransaction) then
-      Exit;
-
-    if not Fdset.UpdateTransaction.Active then
-      Fdset.UpdateTransaction.StartTransaction;
+    var
+    uds := Fdata as TCustomUniDataSet;
+    if IsInterbase and Assigned(uds.UpdateTransaction) then
+      if not uds.UpdateTransaction.Active then
+        uds.UpdateTransaction.StartTransaction;
+    uds.ReadOnly := false;
   end;
-  Fdset.ReadOnly := false;
 end;
 
 procedure TBatchDecorator.Commit;
 begin
-  if IsInterbase then
+  if (Fdata is TCustomUniDataSet) then
   begin
-    if not Assigned(Fdset.UpdateTransaction) then
-      Exit;
-
-    if Fdset.UpdateTransaction.Active then
-      Fdset.UpdateTransaction.Commit;
+    var
+    uds := Fdata as TCustomUniDataSet;
+    if IsInterbase and Assigned(uds.UpdateTransaction) then
+      if uds.UpdateTransaction.Active then
+        uds.UpdateTransaction.Commit;
+    uds.ReadOnly := true;
   end;
-
-  Fdset.ReadOnly := true;
 end;
 
 procedure TBatchDecorator.Rollback;
 begin
-  if IsInterbase then
+  if (Fdata is TCustomUniDataSet) then
   begin
-    if not Assigned(Fdset.UpdateTransaction) then
-      Exit;
-
-    if Fdset.UpdateTransaction.Active then
-      Fdset.UpdateTransaction.Rollback;
+    var
+    uds := Fdata as TCustomUniDataSet;
+    if IsInterbase and Assigned(uds.UpdateTransaction) then
+      if uds.UpdateTransaction.Active then
+        uds.UpdateTransaction.Rollback;
+    uds.ReadOnly := true;
   end;
-
-  Fdset.ReadOnly := true;
 end;
 {$ENDREGION}
 

@@ -23,7 +23,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
   System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Data.DB, Vcl.Grids, Vcl.DBGrids,
-  System.Actions, Vcl.ActnList, Vcl.StdCtrls, data_facade;
+  System.Actions, Vcl.ActnList, Vcl.StdCtrls, data_facade, DBAccess, Uni;
 
 type
   TfrmTable = class(TForm)
@@ -31,15 +31,15 @@ type
     btnRefresh: TButton;
     ActionList1: TActionList;
     actRefresh: TAction;
+    dsrcTable: TUniDataSource;
     procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure actRefreshExecute(Sender: TObject);
-    procedure setDataSource(dsrc: TDataSource);
+    procedure SetTableData(Data: IDDReadOnly);
   strict private
     FTableData: IDDReadOnly;
   public
-    property TableData: IDDReadOnly write FTableData;
-    property TableSource: TDataSource write setDataSource;
+    property TableData: IDDReadOnly write SetTableData;
   end;
 
 var
@@ -64,9 +64,10 @@ begin
   FTableData.Open;
 end;
 
-procedure TfrmTable.setDataSource(dsrc: TDataSource);
+procedure TfrmTable.SetTableData(Data: IDDReadOnly);
 begin
-  grdLog.DataSource := dsrc;
+  FTableData := Data;
+  dsrcTable.DataSet := FTableData.GetDataSet;
 end;
 
 end.

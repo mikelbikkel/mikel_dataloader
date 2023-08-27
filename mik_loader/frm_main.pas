@@ -112,7 +112,8 @@ begin
   FDataFacade.CopyDataSet(bmLoader, src, dest);
 
   dest.Active := true;
-  grdFileData.DataSource := FDataFacade.ZBDataSource['XafCustomer'];
+  dsFileData.DataSet := dest;
+  // grdFileData.DataSource := FDataFacade.ZBDataSource['XafCustomer'];
   showCounters;
 end;
 
@@ -139,7 +140,6 @@ end;
 procedure TfrmMain.actShowLogExecute(Sender: TObject);
 begin
   frmTable.TableData := FDataFacade.ZBQryDecorator['AppLog'];
-  frmTable.TableSource := FDataFacade.ZBDataSource['Log'];
   frmTable.Caption := 'Mikel log blog';
   frmTable.Show;
 end;
@@ -147,7 +147,6 @@ end;
 procedure TfrmMain.actShowOraCustomerExecute(Sender: TObject);
 begin
   frmTable.TableData := FDataFacade.ZBQryDecorator['OraCustomer'];
-  frmTable.TableSource := FDataFacade.ZBDataSource['OraCustomer'];
   frmTable.Caption := 'Mikel Ora customer';
   frmTable.Show;
 end;
@@ -155,7 +154,6 @@ end;
 procedure TfrmMain.actShowXafCustomerExecute(Sender: TObject);
 begin
   frmTable.TableData := FDataFacade.ZBQryDecorator['XafCustomer'];
-  frmTable.TableSource := FDataFacade.ZBDataSource['XafCustomer'];
   frmTable.Caption := 'Mikel XAF customer';
   frmTable.Show;
 end;
@@ -190,14 +188,12 @@ begin
     0:
       begin { Test load }
         ds := vtFileData;
-        grdFileData.DataSource := dsFileData;
       end;
     1:
       begin { Database load }
         if not FDataFacade.Connected then
           Exit;
         ds := FDataFacade.ZBDataSet[dsname];
-        grdFileData.DataSource := FDataFacade.ZBDataSource[dsname];
       end;
   else
     Exit;
@@ -205,6 +201,8 @@ begin
   System.Assert(Assigned(ds));
 
   ds.Active := false;
+  dsFileData.DataSet := ds;
+
   FDataFacade.LoadDataSetFromFile(dsname, dlgOpen.filename, bmLoader, ds);
   ds.Active := true;
   showCounters;

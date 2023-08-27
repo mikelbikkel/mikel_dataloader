@@ -33,6 +33,9 @@ type
     { Close the dataset. }
     procedure Close;
 
+    { Returns the wrapped Datasource component. }
+    function GetDataSet: TDataSet;
+
   end;
 
   TDataFacade = class
@@ -314,9 +317,6 @@ end;
 procedure ZBData.LoadDataSetFromFile(const dsname, filename: String;
   bm: TFDBatchMove; ds: TDataSet);
 begin
-  if not(ds is TCustomUniDataSet) then
-    raise Exception.Create('ds must be a TCustomUniDataSet');
-
   if dsname = 'RaboImp' then
     LoadRaboZakFromFile(filename, bm, ds)
   else if dsname = 'KnabImp' then
