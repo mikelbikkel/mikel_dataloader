@@ -183,7 +183,9 @@ begin
   if not dlgOpen.Execute then
     Exit;
 
+  ds := nil;
   resetCounters;
+
   case rgLoadType.ItemIndex of
     0:
       begin { Test load }
@@ -200,8 +202,11 @@ begin
   else
     Exit;
   end;
+  System.Assert(Assigned(ds));
 
+  ds.Active := false;
   FDataFacade.LoadDataSetFromFile(dsname, dlgOpen.filename, bmLoader, ds);
+  ds.Active := true;
   showCounters;
 end;
 

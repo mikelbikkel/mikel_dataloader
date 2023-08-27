@@ -169,7 +169,6 @@ var
   wtr: TFDBatchMoveDataSetWriter;
   mi: TFDBatchMoveMappingItem;
   fields: TStringList;
-  res: integer;
   bd: IDDBatch;
   uds: TCustomUniDataSet;
 begin
@@ -205,7 +204,7 @@ begin
     end;
 
     bd.StartTransaction;
-    res := bm.Execute;
+    bm.Execute;
     bd.Commit;
   finally
     bd := nil;
@@ -315,6 +314,9 @@ end;
 procedure ZBData.LoadDataSetFromFile(const dsname, filename: String;
   bm: TFDBatchMove; ds: TDataSet);
 begin
+  if not(ds is TCustomUniDataSet) then
+    raise Exception.Create('ds must be a TCustomUniDataSet');
+
   if dsname = 'RaboImp' then
     LoadRaboZakFromFile(filename, bm, ds)
   else if dsname = 'KnabImp' then

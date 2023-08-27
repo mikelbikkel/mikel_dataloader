@@ -77,6 +77,8 @@ type
 
 implementation
 
+uses System.SysUtils, Uni, batch_decorator;
+
 { TLoadInfo }
 
 constructor TLoadInfo.Create;
@@ -96,6 +98,9 @@ end;
 constructor TFileLoader.Create(bm: TFDBatchMove; ds: TDataSet;
   DsAddFields: Boolean);
 begin
+  if not(ds is TCustomUniDataSet) then
+    raise Exception.Create('ds must be a TCustomUniDataSet');
+
   bm.Mappings.ClearAndResetID;
   if DsAddFields then
     ds.FieldDefs.ClearAndResetID;
@@ -104,6 +109,7 @@ begin
   FDataMover := bm;
   FDataMover.Mode := dmAlwaysInsert;
   FDataMover.Options := [poClearDest];
+  FDataMover.CommitCount := 0;
 
   FRText := TFDBatchMoveTextReader.Create(FDataMover);
   FWDataset := TFDBatchMoveDataSetWriter.Create(FDataMover);
@@ -113,9 +119,21 @@ begin
 end;
 
 procedure TFileLoader.LoadFile;
+var
+  uds: TCustomUniDataSet;
+  bd: IDDBatch;
 begin
-  FDataMover.Execute;
-  FWDataset.Dataset.Active := true;
+  uds := FWDataset.Dataset as TCustomUniDataSet;
+  bd := CreateBatchDecorator(uds);
+
+  try
+    bd.StartTransaction;
+    FDataMover.Execute;
+    bd.Commit;
+  except
+    bd.Rollback;
+  end;
+  // FWDataset.Dataset.Active := true;
 end;
 
 procedure TFileLoader.SetFileInfo(const info: TLoadInfo);
