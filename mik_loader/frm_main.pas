@@ -113,7 +113,6 @@ begin
 
   dest.Active := true;
   dsFileData.DataSet := dest;
-  // grdFileData.DataSource := FDataFacade.ZBDataSource['XafCustomer'];
   showCounters;
 end;
 
@@ -222,7 +221,6 @@ begin
   edtWritten.Text := IntToStr(bmLoader.WriteCount);
   edtInsert.Text := IntToStr(bmLoader.InsertCount);
   edtErrors.Text := IntToStr(bmLoader.ErrorCount);
-
 end;
 
 {$ENDREGION}

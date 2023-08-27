@@ -151,11 +151,6 @@ object dmFBZakelijk: TdmFBZakelijk
       FieldName = 'KOERS'
     end
   end
-  object dsImpRaboZak: TUniDataSource
-    DataSet = qryImpRaboZak
-    Left = 184
-    Top = 232
-  end
   object uniDlgConnect: TUniConnectDialog
     DatabaseLabel = 'Database'
     PortLabel = 'Port'
@@ -294,11 +289,6 @@ object dmFBZakelijk: TdmFBZakelijk
       FieldName = 'BOEK_DATUM'
     end
   end
-  object dsImpKnab: TUniDataSource
-    DataSet = qryImpKnab
-    Left = 184
-    Top = 328
-  end
   object qryLog: TUniQuery
     KeyFields = 'LOG_ID'
     Connection = connFBZakelijk
@@ -308,8 +298,8 @@ object dmFBZakelijk: TdmFBZakelijk
     ReadOnly = True
     Options.SetEmptyStrToNull = True
     IndexFieldNames = 'LOG_TS DESC'
-    Left = 368
-    Top = 256
+    Left = 48
+    Top = 408
     object qryLogLOG_ID: TIntegerField
       DisplayLabel = 'ID'
       FieldName = 'LOG_ID'
@@ -333,11 +323,6 @@ object dmFBZakelijk: TdmFBZakelijk
       Required = True
       Size = 200
     end
-  end
-  object dsLog: TUniDataSource
-    DataSet = qryLog
-    Left = 448
-    Top = 256
   end
   object execLoadRaboZak: TUniStoredProc
     StoredProcName = 'MK_PKG_RABO.IMPORT_RABO_ZTX'

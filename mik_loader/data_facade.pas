@@ -24,18 +24,12 @@ uses data.DB, FireDac.Comp.BatchMove;
 type
 
   IDDReadOnly = interface
-    { Activate the queries and populate the dataset. }
     procedure Open;
-
-    { Refresh dataset, re-query }
     procedure Refresh;
-
-    { Close the dataset. }
     procedure Close;
 
     { Returns the wrapped Datasource component. }
     function GetDataSet: TDataSet;
-
   end;
 
   TDataFacade = class
@@ -43,14 +37,11 @@ type
     function GetConnected: boolean; virtual; abstract;
     procedure SetConnected(c: boolean); virtual; abstract;
     function GetZBDataSet(const name: string): TDataSet; virtual; abstract;
-    function GetZBDataSource(const name: string): TDataSource; virtual;
-      abstract;
     function GetZBQryDecorator(const name: string): IDDReadOnly;
       virtual; abstract;
   public
     property Connected: boolean read GetConnected write SetConnected;
     property ZBDataSet[const name: string]: TDataSet read GetZBDataSet;
-    property ZBDataSource[const name: string]: TDataSource read GetZBDataSource;
     property ZBQryDecorator[const name: string]: IDDReadOnly
       read GetZBQryDecorator;
     procedure procRaboZakelijk; virtual; abstract;
@@ -84,7 +75,6 @@ type
     procedure Connect;
     procedure Disconnect;
     function GetZBDataSet(const name: string): TDataSet; override;
-    function GetZBDataSource(const name: string): TDataSource; override;
     function GetZBQryDecorator(const name: string): IDDReadOnly; override;
     procedure LoadRaboZakFromFile(const filename: String; bm: TFDBatchMove;
       ds: TDataSet);
@@ -261,22 +251,6 @@ begin
     Result := dmXAF.qryOraCustomer
   else
     raise Exception.Create('Unknown DataSet name: ' + name);
-end;
-
-function ZBData.GetZBDataSource(const name: string): TDataSource;
-begin
-  if name = 'RaboImp' then
-    Result := dmFBZakelijk.dsImpRaboZak
-  else if name = 'KnabImp' then
-    Result := dmFBZakelijk.dsImpKnab
-  else if name = 'Log' then
-    Result := dmFBZakelijk.dsLog
-  else if name = 'XafCustomer' then
-    Result := dmXAF.dsXafCustomer
-  else if name = 'OraCustomer' then
-    Result := dmXAF.dsOraCustomer
-  else
-    raise Exception.Create('Unknown DataSource name: ' + name);
 end;
 
 function ZBData.GetZBQryDecorator(const name: string): IDDReadOnly;

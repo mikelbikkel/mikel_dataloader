@@ -78,11 +78,6 @@ object dmXAF: TdmXAF
       Size = 40
     end
   end
-  object dsXafCustomer: TUniDataSource
-    DataSet = qryXafCustomer
-    Left = 168
-    Top = 32
-  end
   object qryOraCustomer: TUniQuery
     Connection = dmFBZakelijk.connOraZakelijk
     SQL.Strings = (
@@ -91,8 +86,8 @@ object dmXAF: TdmXAF
         't_type'
       'from mk_xml_customer;')
     ReadOnly = True
-    Left = 304
-    Top = 40
+    Left = 176
+    Top = 32
     object qryOraCustomerAUDIT_ID: TStringField
       FieldName = 'AUDIT_ID'
       Required = True
@@ -118,10 +113,5 @@ object dmXAF: TdmXAF
       FieldName = 'CUST_TYPE'
       Size = 200
     end
-  end
-  object dsOraCustomer: TUniDataSource
-    DataSet = qryOraCustomer
-    Left = 440
-    Top = 40
   end
 end

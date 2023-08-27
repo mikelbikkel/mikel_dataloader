@@ -58,10 +58,8 @@ type
     qryImpRaboZakINSTR_BEDRAG: TFloatField;
     qryImpRaboZakINSTR_VALUTA: TStringField;
     qryImpRaboZakKOERS: TFloatField;
-    dsImpRaboZak: TUniDataSource;
     uniDlgConnect: TUniConnectDialog;
     qryImpKnab: TUniQuery;
-    dsImpKnab: TUniDataSource;
     qryImpKnabIBAN: TStringField;
     qryImpKnabTX_DATUM: TDateField;
     qryImpKnabVALUTA_CODE: TStringField;
@@ -83,7 +81,6 @@ type
     qryLogLOG_TS: TDateTimeField;
     qryLogLOG_MODULE: TStringField;
     qryLogLOG_MESSAGE: TStringField;
-    dsLog: TUniDataSource;
     execLoadRaboZak: TUniStoredProc;
     uniMonitor: TUniSQLMonitor;
     execLoadKnabZak: TUniStoredProc;

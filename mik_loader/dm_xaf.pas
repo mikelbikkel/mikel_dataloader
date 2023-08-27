@@ -32,9 +32,7 @@ type
     qryXafCustomerKVK_NUMBER: TStringField;
     qryXafCustomerTAX_REG_ID: TStringField;
     qryXafCustomerCUST_TYPE: TStringField;
-    dsXafCustomer: TUniDataSource;
     qryOraCustomer: TUniQuery;
-    dsOraCustomer: TUniDataSource;
     qryOraCustomerAUDIT_ID: TStringField;
     qryOraCustomerCUST_ID: TStringField;
     qryOraCustomerCUST_NAME: TStringField;
