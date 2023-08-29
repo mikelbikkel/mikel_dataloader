@@ -71,6 +71,38 @@ type
     qryXafPeriodPERIOD_DESC: TStringField;
     qryXafPeriodSTARTDATE: TDateField;
     qryXafPeriodENDDATE: TDateField;
+    qryOraInfo: TUniQuery;
+    qryOraInfoAUDIT_ID: TStringField;
+    qryOraInfoCOMPANYIDENT: TStringField;
+    qryOraInfoCOMPANYNAME: TStringField;
+    qryOraInfoTAX_REG_COUNTRY: TStringField;
+    qryOraInfoTAX_REG_ID: TStringField;
+    qryOraInfoFISCALYEAR: TStringField;
+    qryOraInfoSTARTDATE: TDateTimeField;
+    qryOraInfoENDDATE: TDateTimeField;
+    qryOraInfoCURCODE: TStringField;
+    qryOraInfoDATECREATED: TDateTimeField;
+    qryOraInfoSOFTWARE_DESC: TStringField;
+    qryOraInfoSOFTWARE_VERSION: TStringField;
+    qryOraVatCode: TUniQuery;
+    qryOraVatCodeAUDIT_ID: TStringField;
+    qryOraVatCodeVAT_ID: TStringField;
+    qryOraVatCodeVAT_DESC: TStringField;
+    qryOraVatCodePAY_ACC_ID: TStringField;
+    qryOraVatCodeCLAIM_ACC_ID: TStringField;
+    qryOraPeriod: TUniQuery;
+    qryOraPeriodAUDIT_ID: TStringField;
+    qryOraPeriodPERIOD_ID: TSmallintField;
+    qryOraPeriodPERIOD_DESC: TStringField;
+    qryOraPeriodSTARTDATE: TDateTimeField;
+    qryOraPeriodENDDATE: TDateTimeField;
+    qryOraAccount: TUniQuery;
+    qryOraAccountAUDIT_ID: TStringField;
+    qryOraAccountACC_ID: TStringField;
+    qryOraAccountACC_DESC: TStringField;
+    qryOraAccountACC_TYPE: TStringField;
+    qryOraAccountLEAD_CODE: TStringField;
+    qryOraAccountLEAD_DESC: TStringField;
   end;
 
 var

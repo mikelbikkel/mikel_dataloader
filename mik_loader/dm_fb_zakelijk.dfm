@@ -12,6 +12,7 @@ object dmFBZakelijk: TdmFBZakelijk
     Options.KeepDesignConnected = False
     Username = 'mikel'
     Server = 'localhost'
+    Connected = True
     ConnectDialog = uniDlgConnect
     LoginPrompt = False
     OnLogin = connFBZakelijkLogin
@@ -364,5 +365,6 @@ object dmFBZakelijk: TdmFBZakelijk
     LoginPrompt = False
     Left = 144
     Top = 120
+    EncryptedPassword = 'ADFFBEFFB9FFBBFFBFFF91FFC8FFCDFFBDFF93FF9EFF'
   end
 end
