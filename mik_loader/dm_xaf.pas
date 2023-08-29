@@ -39,6 +39,38 @@ type
     qryOraCustomerKVK_NUMBER: TStringField;
     qryOraCustomerTAX_REG_ID: TStringField;
     qryOraCustomerCUST_TYPE: TStringField;
+    qryXafInfo: TUniQuery;
+    qryXafInfoAUDIT_ID: TStringField;
+    qryXafInfoCOMPANYIDENT: TStringField;
+    qryXafInfoCOMPANYNAME: TStringField;
+    qryXafInfoTAX_REG_COUNTRY: TStringField;
+    qryXafInfoTAX_REG_ID: TStringField;
+    qryXafInfoFISCALYEAR: TStringField;
+    qryXafInfoSTARTDATE: TDateField;
+    qryXafInfoENDDATE: TDateField;
+    qryXafInfoCURCODE: TStringField;
+    qryXafInfoDATECREATED: TDateField;
+    qryXafInfoSOFTWARE_DESC: TStringField;
+    qryXafInfoSOFTWARE_VERSION: TStringField;
+    qryXafVatCode: TUniQuery;
+    qryXafVatCodeAUDIT_ID: TStringField;
+    qryXafVatCodeVAT_ID: TStringField;
+    qryXafVatCodeVAT_DESC: TStringField;
+    qryXafVatCodePAY_ACC_ID: TStringField;
+    qryXafVatCodeCLAIM_ACC_ID: TStringField;
+    qryXafPeriod: TUniQuery;
+    qryXafAccount: TUniQuery;
+    qryXafAccountAUDIT_ID: TStringField;
+    qryXafAccountACC_ID: TStringField;
+    qryXafAccountACC_DESC: TStringField;
+    qryXafAccountACC_TYPE: TStringField;
+    qryXafAccountLEAD_CODE: TStringField;
+    qryXafAccountLEAD_DESC: TStringField;
+    qryXafPeriodAUDIT_ID: TStringField;
+    qryXafPeriodPERIOD_ID: TIntegerField;
+    qryXafPeriodPERIOD_DESC: TStringField;
+    qryXafPeriodSTARTDATE: TDateField;
+    qryXafPeriodENDDATE: TDateField;
   end;
 
 var
