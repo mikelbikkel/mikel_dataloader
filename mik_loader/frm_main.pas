@@ -61,8 +61,9 @@ type
     btnXafCustomer: TButton;
     btnShowOraCust: TButton;
     actShowOraCustomer: TAction;
-    btnCopyCustomer: TButton;
-    actCopyCustomer: TAction;
+    btnCopyXAF: TButton;
+    actCopyXAF: TAction;
+    lstLog: TListBox;
     procedure actConnectExecute(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure actLoadRaboExecute(Sender: TObject);
@@ -73,7 +74,7 @@ type
     procedure actShowXafCustomerExecute(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure actShowOraCustomerExecute(Sender: TObject);
-    procedure actCopyCustomerExecute(Sender: TObject);
+    procedure actCopyXAFExecute(Sender: TObject);
   strict private
     FDataFacade: TDataFacade;
     procedure LoadDataFromFile(const dsname: string);
@@ -81,6 +82,7 @@ type
     procedure showCounters;
   public
     { Public declarations }
+    procedure XafMessage(msg: string);
   end;
 
 var
@@ -101,16 +103,14 @@ begin
   lblConnected.Color := clGreen;
 end;
 
-procedure TfrmMain.actCopyCustomerExecute(Sender: TObject);
+procedure TfrmMain.actCopyXAFExecute(Sender: TObject);
 var
-  src: TDataSet;
   dest: TDataSet;
 begin
   resetCounters;
-  src := FDataFacade.ZBDataSet['OraCustomer'];
-  dest := FDataFacade.ZBDataSet['XafCustomer'];
-  FDataFacade.CopyDataSet(bmLoader, src, dest);
+  FDataFacade.CopyXaf(bmLoader);
 
+  dest := FDataFacade.ZBDataSet['XafCustomer'];
   dest.Active := true;
   dsFileData.DataSet := dest;
   showCounters;
@@ -170,7 +170,10 @@ end;
 procedure TfrmMain.FormShow(Sender: TObject);
 begin
   if not Assigned(FDataFacade) then
+  begin
     FDataFacade := CreateDataFacade;
+    FDataFacade.OnXafCopy := XafMessage;
+  end;
 end;
 
 procedure TfrmMain.LoadDataFromFile(const dsname: string);
@@ -221,6 +224,11 @@ begin
   edtWritten.Text := IntToStr(bmLoader.WriteCount);
   edtInsert.Text := IntToStr(bmLoader.InsertCount);
   edtErrors.Text := IntToStr(bmLoader.ErrorCount);
+end;
+
+procedure TfrmMain.XafMessage(msg: string);
+begin
+  lstLog.Items.Append(msg);
 end;
 
 {$ENDREGION}

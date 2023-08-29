@@ -32,6 +32,8 @@ type
     function GetDataSet: TDataSet;
   end;
 
+  TXafCopyEvent = procedure(msg: string) of object;
+
   TDataFacade = class
   private
     function GetConnected: boolean; virtual; abstract;
@@ -39,7 +41,12 @@ type
     function GetZBDataSet(const name: string): TDataSet; virtual; abstract;
     function GetZBQryDecorator(const name: string): IDDReadOnly;
       virtual; abstract;
+  protected
+    FXafEvent: TXafCopyEvent;
+    procedure TriggerXEvent(msg: string); dynamic;
   public
+    property OnXafCopy: TXafCopyEvent read FXafEvent write FXafEvent;
+
     property Connected: boolean read GetConnected write SetConnected;
     property ZBDataSet[const name: string]: TDataSet read GetZBDataSet;
     property ZBQryDecorator[const name: string]: IDDReadOnly
@@ -50,8 +57,10 @@ type
     procedure LoadDataSetFromFile(const dsname: string; const filename: String;
       bm: TFDBatchMove; ds: TDataSet); virtual; abstract;
 
-    procedure CopyDataSet(bm: TFDBatchMove; src: TDataSet; dst: TDataSet);
-      virtual; abstract;
+    function CopyDataSet(bm: TFDBatchMove; src: TDataSet; dst: TDataSet)
+      : integer; virtual; abstract;
+
+    procedure CopyXaf(bm: TFDBatchMove); virtual; abstract;
   end;
 
 function CreateDataFacade: TDataFacade;
@@ -88,8 +97,10 @@ type
     procedure procKnabZakelijk; override;
     procedure LoadDataSetFromFile(const dsname: string; const filename: String;
       bm: TFDBatchMove; ds: TDataSet); override;
-    procedure CopyDataSet(bm: TFDBatchMove; src: TDataSet;
-      dst: TDataSet); override;
+    function CopyDataSet(bm: TFDBatchMove; src: TDataSet; dst: TDataSet)
+      : integer; override;
+
+    procedure CopyXaf(bm: TFDBatchMove); override;
   end;
 
   TConfig = class
@@ -156,7 +167,8 @@ begin
   end;
 end;
 
-procedure ZBData.CopyDataSet(bm: TFDBatchMove; src: TDataSet; dst: TDataSet);
+function ZBData.CopyDataSet(bm: TFDBatchMove; src: TDataSet;
+  dst: TDataSet): integer;
 var
   rdr: TFDBatchMoveDataSetReader;
   wtr: TFDBatchMoveDataSetWriter;
@@ -168,6 +180,7 @@ begin
   if not(dst is TCustomUniDataSet) then
     raise Exception.Create('dst must be a TCustomUniDataSet');
 
+  Result := -1;
   bd := nil;
   fields := TStringList.Create;
   try
@@ -197,7 +210,7 @@ begin
     end;
 
     bd.StartTransaction;
-    bm.Execute;
+    Result := bm.Execute;
     bd.Commit;
   finally
     bd := nil;
@@ -205,6 +218,26 @@ begin
     dst.Active := false;
     fields.Free;
   end;
+end;
+
+procedure ZBData.CopyXaf(bm: TFDBatchMove);
+var
+  cnt: integer;
+begin
+  cnt := CopyDataSet(bm, dmXAF.qryOraInfo, dmXAF.qryXafInfo);
+  TriggerXEvent('Info: OK. [' + IntToStr(cnt) + ']');
+
+  cnt := CopyDataSet(bm, dmXAF.qryOraCustomer, dmXAF.qryXafCustomer);
+  TriggerXEvent('Customer: OK. [' + IntToStr(cnt) + ']');
+
+  cnt := CopyDataSet(bm, dmXAF.qryOraVatCode, dmXAF.qryXafVatCode);
+  TriggerXEvent('VatCode: OK. [' + IntToStr(cnt) + ']');
+
+  cnt := CopyDataSet(bm, dmXAF.qryOraPeriod, dmXAF.qryXafPeriod);
+  TriggerXEvent('Period: OK. [' + IntToStr(cnt) + ']');
+
+  cnt := CopyDataSet(bm, dmXAF.qryOraAccount, dmXAF.qryXafAccount);
+  TriggerXEvent('Account: OK. [' + IntToStr(cnt) + ']');
 end;
 
 constructor ZBData.Create;
@@ -249,6 +282,10 @@ begin
     Result := dmXAF.qryXafCustomer
   else if name = 'OraCustomer' then
     Result := dmXAF.qryOraCustomer
+  else if name = 'XafInfo' then
+    Result := dmXAF.qryXafInfo
+  else if name = 'OraInfo' then
+    Result := dmXAF.qryOraInfo
   else
     raise Exception.Create('Unknown DataSet name: ' + name);
 end;
@@ -489,5 +526,12 @@ begin
 end;
 
 {$ENDREGION}
+{ TDataFacade }
+
+procedure TDataFacade.TriggerXEvent(msg: string);
+begin
+  if Assigned(FXafEvent) then
+    FXafEvent(msg);
+end;
 
 end.

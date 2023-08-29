@@ -2,7 +2,7 @@ object frmMain: TfrmMain
   Left = 0
   Top = 0
   Caption = 'Mikel Loader'
-  ClientHeight = 451
+  ClientHeight = 534
   ClientWidth = 837
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -181,13 +181,21 @@ object frmMain: TfrmMain
     Action = actShowOraCustomer
     TabOrder = 13
   end
-  object btnCopyCustomer: TButton
+  object btnCopyXAF: TButton
     Left = 336
     Top = 392
     Width = 113
     Height = 41
-    Action = actCopyCustomer
+    Action = actCopyXAF
     TabOrder = 14
+  end
+  object lstLog: TListBox
+    Left = 40
+    Top = 392
+    Width = 257
+    Height = 129
+    ItemHeight = 15
+    TabOrder = 15
   end
   object alMain: TActionList
     Left = 256
@@ -224,9 +232,9 @@ object frmMain: TfrmMain
       Caption = 'Ora Customer'
       OnExecute = actShowOraCustomerExecute
     end
-    object actCopyCustomer: TAction
-      Caption = 'Copy Customer'
-      OnExecute = actCopyCustomerExecute
+    object actCopyXAF: TAction
+      Caption = 'Copy XAF data'
+      OnExecute = actCopyXAFExecute
     end
   end
   object bmLoader: TFDBatchMove
