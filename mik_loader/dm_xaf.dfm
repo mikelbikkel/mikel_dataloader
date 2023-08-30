@@ -1,6 +1,6 @@
 object dmXAF: TdmXAF
   Height = 504
-  Width = 616
+  Width = 770
   PixelsPerInch = 120
   object qryXafCustomer: TUniQuery
     SQLInsert.Strings = (
@@ -500,7 +500,7 @@ object dmXAF: TdmXAF
     Options.SetEmptyStrToNull = True
     IndexFieldNames = 'audit_id'
     Left = 248
-    Top = 16
+    Top = 24
     object qryOraInfoAUDIT_ID: TStringField
       FieldName = 'AUDIT_ID'
       Required = True
@@ -720,6 +720,452 @@ object dmXAF: TdmXAF
     object qryOraAccountLEAD_DESC: TStringField
       FieldName = 'LEAD_DESC'
       Size = 200
+    end
+  end
+  object qryXafOpBalance: TUniQuery
+    KeyFields = 'audit_id'
+    SQLInsert.Strings = (
+      'INSERT INTO MK_XAF_OPENING_BALANCE'
+      
+        '  (AUDIT_ID, OB_DATE, OB_DESC, LINES_COUNT, TOTAL_DEBIT, TOTAL_C' +
+        'REDIT)'
+      'VALUES'
+      
+        '  (:AUDIT_ID, :OB_DATE, :OB_DESC, :LINES_COUNT, :TOTAL_DEBIT, :T' +
+        'OTAL_CREDIT)')
+    SQLDelete.Strings = (
+      'DELETE FROM MK_XAF_OPENING_BALANCE'
+      'WHERE'
+      '  AUDIT_ID = :Old_AUDIT_ID')
+    SQLUpdate.Strings = (
+      'UPDATE MK_XAF_OPENING_BALANCE'
+      'SET'
+      
+        '  AUDIT_ID = :AUDIT_ID, OB_DATE = :OB_DATE, OB_DESC = :OB_DESC, ' +
+        'LINES_COUNT = :LINES_COUNT, TOTAL_DEBIT = :TOTAL_DEBIT, TOTAL_CR' +
+        'EDIT = :TOTAL_CREDIT'
+      'WHERE'
+      '  AUDIT_ID = :Old_AUDIT_ID')
+    SQLLock.Strings = (
+      'SELECT NULL FROM MK_XAF_OPENING_BALANCE'
+      'WHERE'
+      'AUDIT_ID = :Old_AUDIT_ID'
+      'FOR UPDATE WITH LOCK')
+    SQLRefresh.Strings = (
+      
+        'SELECT AUDIT_ID, OB_DATE, OB_DESC, LINES_COUNT, TOTAL_DEBIT, TOT' +
+        'AL_CREDIT FROM MK_XAF_OPENING_BALANCE'
+      'WHERE'
+      '  AUDIT_ID = :AUDIT_ID')
+    SQLRecCount.Strings = (
+      'SELECT COUNT(*) FROM ('
+      'SELECT 1 AS C  FROM MK_XAF_OPENING_BALANCE'
+      ''
+      ') q')
+    Connection = dmFBZakelijk.connFBZakelijk
+    SQL.Strings = (
+      
+        'select audit_id, ob_date, ob_desc, lines_count, total_debit, tot' +
+        'al_credit'
+      'from mk_xaf_opening_balance')
+    Options.SetEmptyStrToNull = True
+    IndexFieldNames = 'audit_id'
+    Left = 432
+    Top = 80
+    object qryXafOpBalanceAUDIT_ID: TStringField
+      FieldName = 'AUDIT_ID'
+      Required = True
+      Size = 50
+    end
+    object qryXafOpBalanceOB_DATE: TDateField
+      FieldName = 'OB_DATE'
+    end
+    object qryXafOpBalanceOB_DESC: TStringField
+      FieldName = 'OB_DESC'
+      Size = 200
+    end
+    object qryXafOpBalanceLINES_COUNT: TIntegerField
+      FieldName = 'LINES_COUNT'
+    end
+    object qryXafOpBalanceTOTAL_DEBIT: TFloatField
+      FieldName = 'TOTAL_DEBIT'
+    end
+    object qryXafOpBalanceTOTAL_CREDIT: TFloatField
+      FieldName = 'TOTAL_CREDIT'
+    end
+  end
+  object qryXafOpLine: TUniQuery
+    KeyFields = 'audit_id;obline_nr'
+    SQLInsert.Strings = (
+      'INSERT INTO MK_XAF_OPENING_LINE'
+      
+        '  (AUDIT_ID, OBLINE_NR, OBLINE_ACC_ID, AMNT_STRING, OBLINE_AMOUN' +
+        'T, OBLINE_TYPE)'
+      'VALUES'
+      
+        '  (:AUDIT_ID, :OBLINE_NR, :OBLINE_ACC_ID, :AMNT_STRING, :OBLINE_' +
+        'AMOUNT, :OBLINE_TYPE)')
+    SQLDelete.Strings = (
+      'DELETE FROM MK_XAF_OPENING_LINE'
+      'WHERE'
+      '  AUDIT_ID = :Old_AUDIT_ID AND OBLINE_NR = :Old_OBLINE_NR')
+    SQLUpdate.Strings = (
+      'UPDATE MK_XAF_OPENING_LINE'
+      'SET'
+      
+        '  AUDIT_ID = :AUDIT_ID, OBLINE_NR = :OBLINE_NR, OBLINE_ACC_ID = ' +
+        ':OBLINE_ACC_ID, AMNT_STRING = :AMNT_STRING, OBLINE_AMOUNT = :OBL' +
+        'INE_AMOUNT, OBLINE_TYPE = :OBLINE_TYPE'
+      'WHERE'
+      '  AUDIT_ID = :Old_AUDIT_ID AND OBLINE_NR = :Old_OBLINE_NR')
+    SQLLock.Strings = (
+      'SELECT NULL FROM MK_XAF_OPENING_LINE'
+      'WHERE'
+      'AUDIT_ID = :Old_AUDIT_ID AND OBLINE_NR = :Old_OBLINE_NR'
+      'FOR UPDATE WITH LOCK')
+    SQLRefresh.Strings = (
+      
+        'SELECT AUDIT_ID, OBLINE_NR, OBLINE_ACC_ID, AMNT_STRING, OBLINE_A' +
+        'MOUNT, OBLINE_TYPE FROM MK_XAF_OPENING_LINE'
+      'WHERE'
+      '  AUDIT_ID = :AUDIT_ID AND OBLINE_NR = :OBLINE_NR')
+    SQLRecCount.Strings = (
+      'SELECT COUNT(*) FROM ('
+      'SELECT 1 AS C  FROM MK_XAF_OPENING_LINE'
+      ''
+      ') q')
+    Connection = dmFBZakelijk.connFBZakelijk
+    SQL.Strings = (
+      
+        'select audit_id, obline_nr, obline_acc_id, amnt_string, obline_a' +
+        'mount'
+      ', obline_type'
+      'from mk_xaf_opening_line')
+    Options.SetEmptyStrToNull = True
+    IndexFieldNames = 'audit_id;obline_nr'
+    Left = 432
+    Top = 160
+    object qryXafOpLineAUDIT_ID: TStringField
+      FieldName = 'AUDIT_ID'
+      Required = True
+      Size = 50
+    end
+    object qryXafOpLineOBLINE_NR: TStringField
+      FieldName = 'OBLINE_NR'
+      Required = True
+      Size = 50
+    end
+    object qryXafOpLineOBLINE_ACC_ID: TStringField
+      FieldName = 'OBLINE_ACC_ID'
+      Size = 35
+    end
+    object qryXafOpLineAMNT_STRING: TStringField
+      FieldName = 'AMNT_STRING'
+      Size = 50
+    end
+    object qryXafOpLineOBLINE_AMOUNT: TFloatField
+      FieldName = 'OBLINE_AMOUNT'
+    end
+    object qryXafOpLineOBLINE_TYPE: TStringField
+      FieldName = 'OBLINE_TYPE'
+      Size = 5
+    end
+  end
+  object qryXafTransaction: TUniQuery
+    KeyFields = 'tx_nr'
+    SQLInsert.Strings = (
+      'INSERT INTO MK_XAF_TRANSACTION'
+      
+        '  (AUDIT_ID, JRN_ID, JRN_DESC, JRN_TYPE, TX_NR, TX_DESC, TX_PERI' +
+        'OD_ID, TX_DATE, TX_AMOUNT, TX_AMOUNT_TYPE, TX_SOURCE_ID, TX_USER' +
+        '_ID)'
+      'VALUES'
+      
+        '  (:AUDIT_ID, :JRN_ID, :JRN_DESC, :JRN_TYPE, :TX_NR, :TX_DESC, :' +
+        'TX_PERIOD_ID, :TX_DATE, :TX_AMOUNT, :TX_AMOUNT_TYPE, :TX_SOURCE_' +
+        'ID, :TX_USER_ID)')
+    SQLDelete.Strings = (
+      'DELETE FROM MK_XAF_TRANSACTION'
+      'WHERE'
+      '  TX_NR = :Old_TX_NR')
+    SQLUpdate.Strings = (
+      'UPDATE MK_XAF_TRANSACTION'
+      'SET'
+      
+        '  AUDIT_ID = :AUDIT_ID, JRN_ID = :JRN_ID, JRN_DESC = :JRN_DESC, ' +
+        'JRN_TYPE = :JRN_TYPE, TX_NR = :TX_NR, TX_DESC = :TX_DESC, TX_PER' +
+        'IOD_ID = :TX_PERIOD_ID, TX_DATE = :TX_DATE, TX_AMOUNT = :TX_AMOU' +
+        'NT, TX_AMOUNT_TYPE = :TX_AMOUNT_TYPE, TX_SOURCE_ID = :TX_SOURCE_' +
+        'ID, TX_USER_ID = :TX_USER_ID'
+      'WHERE'
+      '  TX_NR = :Old_TX_NR')
+    SQLLock.Strings = (
+      'SELECT NULL FROM MK_XAF_TRANSACTION'
+      'WHERE'
+      'TX_NR = :Old_TX_NR'
+      'FOR UPDATE WITH LOCK')
+    SQLRefresh.Strings = (
+      
+        'SELECT AUDIT_ID, JRN_ID, JRN_DESC, JRN_TYPE, TX_NR, TX_DESC, TX_' +
+        'PERIOD_ID, TX_DATE, TX_AMOUNT, TX_AMOUNT_TYPE, TX_SOURCE_ID, TX_' +
+        'USER_ID FROM MK_XAF_TRANSACTION'
+      'WHERE'
+      '  TX_NR = :TX_NR')
+    SQLRecCount.Strings = (
+      'SELECT COUNT(*) FROM ('
+      'SELECT 1 AS C  FROM MK_XAF_TRANSACTION'
+      ''
+      ') q')
+    Connection = dmFBZakelijk.connFBZakelijk
+    SQL.Strings = (
+      
+        'select audit_id, jrn_id, jrn_desc, jrn_type, tx_nr, tx_desc, tx_' +
+        'period_id'
+      ', tx_date, tx_amount, tx_amount_type, tx_source_id, tx_user_id'
+      'from mk_xaf_transaction')
+    Options.ReturnParams = True
+    Active = True
+    IndexFieldNames = 'tx_nr'
+    Left = 432
+    Top = 256
+    object qryXafTransactionAUDIT_ID: TStringField
+      FieldName = 'AUDIT_ID'
+      Size = 50
+    end
+    object qryXafTransactionJRN_ID: TStringField
+      FieldName = 'JRN_ID'
+      Size = 35
+    end
+    object qryXafTransactionJRN_DESC: TStringField
+      FieldName = 'JRN_DESC'
+      Size = 35
+    end
+    object qryXafTransactionJRN_TYPE: TStringField
+      FieldName = 'JRN_TYPE'
+      Size = 2
+    end
+    object qryXafTransactionTX_NR: TStringField
+      FieldName = 'TX_NR'
+      Required = True
+      Size = 35
+    end
+    object qryXafTransactionTX_DESC: TStringField
+      FieldName = 'TX_DESC'
+      Size = 100
+    end
+    object qryXafTransactionTX_PERIOD_ID: TIntegerField
+      FieldName = 'TX_PERIOD_ID'
+    end
+    object qryXafTransactionTX_DATE: TDateField
+      FieldName = 'TX_DATE'
+    end
+    object qryXafTransactionTX_AMOUNT: TFloatField
+      FieldName = 'TX_AMOUNT'
+    end
+    object qryXafTransactionTX_AMOUNT_TYPE: TStringField
+      FieldName = 'TX_AMOUNT_TYPE'
+      Size = 35
+    end
+    object qryXafTransactionTX_SOURCE_ID: TStringField
+      FieldName = 'TX_SOURCE_ID'
+      Size = 35
+    end
+    object qryXafTransactionTX_USER_ID: TStringField
+      FieldName = 'TX_USER_ID'
+      Size = 35
+    end
+  end
+  object qryXafTransactionLine: TUniQuery
+    KeyFields = 'txline_nr'
+    SQLInsert.Strings = (
+      'INSERT INTO MK_XAF_TRANSACTION_LINE'
+      
+        '  (AUDIT_ID, TX_NR, TXLINE_NR, ACC_ID, DOC_REF, EFF_DATE, TXLINE' +
+        '_DESC, AMOUNT, AMOUNT_TYPE, CUSTOMER_ID, COST_ID, PRODUCT_ID, PR' +
+        'OJECT_ID, CUR_CODE, CUR_AMOUNT)'
+      'VALUES'
+      
+        '  (:AUDIT_ID, :TX_NR, :TXLINE_NR, :ACC_ID, :DOC_REF, :EFF_DATE, ' +
+        ':TXLINE_DESC, :AMOUNT, :AMOUNT_TYPE, :CUSTOMER_ID, :COST_ID, :PR' +
+        'ODUCT_ID, :PROJECT_ID, :CUR_CODE, :CUR_AMOUNT)')
+    SQLDelete.Strings = (
+      'DELETE FROM MK_XAF_TRANSACTION_LINE'
+      'WHERE'
+      '  TXLINE_NR = :Old_TXLINE_NR')
+    SQLUpdate.Strings = (
+      'UPDATE MK_XAF_TRANSACTION_LINE'
+      'SET'
+      
+        '  AUDIT_ID = :AUDIT_ID, TX_NR = :TX_NR, TXLINE_NR = :TXLINE_NR, ' +
+        'ACC_ID = :ACC_ID, DOC_REF = :DOC_REF, EFF_DATE = :EFF_DATE, TXLI' +
+        'NE_DESC = :TXLINE_DESC, AMOUNT = :AMOUNT, AMOUNT_TYPE = :AMOUNT_' +
+        'TYPE, CUSTOMER_ID = :CUSTOMER_ID, COST_ID = :COST_ID, PRODUCT_ID' +
+        ' = :PRODUCT_ID, PROJECT_ID = :PROJECT_ID, CUR_CODE = :CUR_CODE, ' +
+        'CUR_AMOUNT = :CUR_AMOUNT'
+      'WHERE'
+      '  TXLINE_NR = :Old_TXLINE_NR')
+    SQLLock.Strings = (
+      'SELECT NULL FROM MK_XAF_TRANSACTION_LINE'
+      'WHERE'
+      'TXLINE_NR = :Old_TXLINE_NR'
+      'FOR UPDATE WITH LOCK')
+    SQLRefresh.Strings = (
+      
+        'SELECT AUDIT_ID, TX_NR, TXLINE_NR, ACC_ID, DOC_REF, EFF_DATE, TX' +
+        'LINE_DESC, AMOUNT, AMOUNT_TYPE, CUSTOMER_ID, COST_ID, PRODUCT_ID' +
+        ', PROJECT_ID, CUR_CODE, CUR_AMOUNT FROM MK_XAF_TRANSACTION_LINE'
+      'WHERE'
+      '  TXLINE_NR = :TXLINE_NR')
+    SQLRecCount.Strings = (
+      'SELECT COUNT(*) FROM ('
+      'SELECT 1 AS C  FROM MK_XAF_TRANSACTION_LINE'
+      ''
+      ') q')
+    Connection = dmFBZakelijk.connFBZakelijk
+    SQL.Strings = (
+      'select audit_id, tx_nr, txline_nr, acc_id, doc_ref, eff_date'
+      
+        ', txline_desc, amount, amount_type, customer_id, cost_id, produc' +
+        't_id'
+      ', project_id, cur_code, cur_amount'
+      'from mk_xaf_transaction_line')
+    Options.SetEmptyStrToNull = True
+    IndexFieldNames = 'txline_nr'
+    Left = 432
+    Top = 344
+    object qryXafTransactionLineAUDIT_ID: TStringField
+      FieldName = 'AUDIT_ID'
+      Size = 50
+    end
+    object qryXafTransactionLineTX_NR: TStringField
+      FieldName = 'TX_NR'
+      Size = 35
+    end
+    object qryXafTransactionLineTXLINE_NR: TIntegerField
+      FieldName = 'TXLINE_NR'
+      Required = True
+    end
+    object qryXafTransactionLineACC_ID: TStringField
+      FieldName = 'ACC_ID'
+      Size = 35
+    end
+    object qryXafTransactionLineDOC_REF: TStringField
+      FieldName = 'DOC_REF'
+      Size = 100
+    end
+    object qryXafTransactionLineEFF_DATE: TDateField
+      FieldName = 'EFF_DATE'
+    end
+    object qryXafTransactionLineTXLINE_DESC: TStringField
+      FieldName = 'TXLINE_DESC'
+      Size = 100
+    end
+    object qryXafTransactionLineAMOUNT: TFloatField
+      FieldName = 'AMOUNT'
+    end
+    object qryXafTransactionLineAMOUNT_TYPE: TStringField
+      FieldName = 'AMOUNT_TYPE'
+      Size = 2
+    end
+    object qryXafTransactionLineCUSTOMER_ID: TStringField
+      FieldName = 'CUSTOMER_ID'
+      Size = 35
+    end
+    object qryXafTransactionLineCOST_ID: TStringField
+      FieldName = 'COST_ID'
+      Size = 35
+    end
+    object qryXafTransactionLinePRODUCT_ID: TStringField
+      FieldName = 'PRODUCT_ID'
+      Size = 35
+    end
+    object qryXafTransactionLinePROJECT_ID: TStringField
+      FieldName = 'PROJECT_ID'
+      Size = 35
+    end
+    object qryXafTransactionLineCUR_CODE: TStringField
+      FieldName = 'CUR_CODE'
+      Size = 5
+    end
+    object qryXafTransactionLineCUR_AMOUNT: TFloatField
+      FieldName = 'CUR_AMOUNT'
+    end
+  end
+  object qryXafVatLine: TUniQuery
+    KeyFields = 'txline_nr'
+    SQLInsert.Strings = (
+      'INSERT INTO MK_XAF_VAT_LINE'
+      
+        '  (AUDIT_ID, TX_NR, TXLINE_NR, VAT_ID, VAT_PERC, AMOUNT, AMOUNT_' +
+        'TYPE)'
+      'VALUES'
+      
+        '  (:AUDIT_ID, :TX_NR, :TXLINE_NR, :VAT_ID, :VAT_PERC, :AMOUNT, :' +
+        'AMOUNT_TYPE)')
+    SQLDelete.Strings = (
+      'DELETE FROM MK_XAF_VAT_LINE'
+      'WHERE'
+      '  TXLINE_NR = :Old_TXLINE_NR')
+    SQLUpdate.Strings = (
+      'UPDATE MK_XAF_VAT_LINE'
+      'SET'
+      
+        '  AUDIT_ID = :AUDIT_ID, TX_NR = :TX_NR, TXLINE_NR = :TXLINE_NR, ' +
+        'VAT_ID = :VAT_ID, VAT_PERC = :VAT_PERC, AMOUNT = :AMOUNT, AMOUNT' +
+        '_TYPE = :AMOUNT_TYPE'
+      'WHERE'
+      '  TXLINE_NR = :Old_TXLINE_NR')
+    SQLLock.Strings = (
+      'SELECT NULL FROM MK_XAF_VAT_LINE'
+      'WHERE'
+      'TXLINE_NR = :Old_TXLINE_NR'
+      'FOR UPDATE WITH LOCK')
+    SQLRefresh.Strings = (
+      
+        'SELECT AUDIT_ID, TX_NR, TXLINE_NR, VAT_ID, VAT_PERC, AMOUNT, AMO' +
+        'UNT_TYPE FROM MK_XAF_VAT_LINE'
+      'WHERE'
+      '  TXLINE_NR = :TXLINE_NR')
+    SQLRecCount.Strings = (
+      'SELECT COUNT(*) FROM ('
+      'SELECT 1 AS C  FROM MK_XAF_VAT_LINE'
+      ''
+      ') q')
+    Connection = dmFBZakelijk.connFBZakelijk
+    SQL.Strings = (
+      
+        'select audit_id, tx_nr, txline_nr, vat_id, vat_perc, amount, amo' +
+        'unt_type'
+      'from mk_xaf_vat_line')
+    Options.SetEmptyStrToNull = True
+    IndexFieldNames = 'txline_nr'
+    Left = 424
+    Top = 424
+    object qryXafVatLineAUDIT_ID: TStringField
+      FieldName = 'AUDIT_ID'
+      Size = 50
+    end
+    object qryXafVatLineTX_NR: TStringField
+      FieldName = 'TX_NR'
+      Size = 35
+    end
+    object qryXafVatLineTXLINE_NR: TIntegerField
+      FieldName = 'TXLINE_NR'
+      Required = True
+    end
+    object qryXafVatLineVAT_ID: TStringField
+      FieldName = 'VAT_ID'
+      Size = 35
+    end
+    object qryXafVatLineVAT_PERC: TFloatField
+      FieldName = 'VAT_PERC'
+    end
+    object qryXafVatLineAMOUNT: TFloatField
+      FieldName = 'AMOUNT'
+    end
+    object qryXafVatLineAMOUNT_TYPE: TStringField
+      FieldName = 'AMOUNT_TYPE'
+      Size = 2
     end
   end
 end

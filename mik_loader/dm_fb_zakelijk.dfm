@@ -12,7 +12,6 @@ object dmFBZakelijk: TdmFBZakelijk
     Options.KeepDesignConnected = False
     Username = 'mikel'
     Server = 'localhost'
-    Connected = True
     ConnectDialog = uniDlgConnect
     LoginPrompt = False
     OnLogin = connFBZakelijkLogin
