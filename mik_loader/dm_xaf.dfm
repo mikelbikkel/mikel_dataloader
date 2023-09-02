@@ -924,7 +924,6 @@ object dmXAF: TdmXAF
       ', tx_date, tx_amount, tx_amount_type, tx_source_id, tx_user_id'
       'from mk_xaf_transaction')
     Options.ReturnParams = True
-    Active = True
     IndexFieldNames = 'tx_nr'
     Left = 432
     Top = 256
@@ -1041,9 +1040,10 @@ object dmXAF: TdmXAF
       FieldName = 'TX_NR'
       Size = 35
     end
-    object qryXafTransactionLineTXLINE_NR: TIntegerField
+    object qryXafTransactionLineTXLINE_NR: TStringField
       FieldName = 'TXLINE_NR'
       Required = True
+      Size = 35
     end
     object qryXafTransactionLineACC_ID: TStringField
       FieldName = 'ACC_ID'
@@ -1149,9 +1149,10 @@ object dmXAF: TdmXAF
       FieldName = 'TX_NR'
       Size = 35
     end
-    object qryXafVatLineTXLINE_NR: TIntegerField
+    object qryXafVatLineTXLINE_NR: TStringField
       FieldName = 'TXLINE_NR'
       Required = True
+      Size = 35
     end
     object qryXafVatLineVAT_ID: TStringField
       FieldName = 'VAT_ID'
@@ -1166,6 +1167,270 @@ object dmXAF: TdmXAF
     object qryXafVatLineAMOUNT_TYPE: TStringField
       FieldName = 'AMOUNT_TYPE'
       Size = 2
+    end
+  end
+  object qryOraOpBalance: TUniQuery
+    KeyFields = 'audit_id'
+    SQLRefresh.Strings = (
+      
+        'SELECT AUDIT_ID, OB_DATE, OB_DESC, LINES_COUNT, TOTAL_DEBIT, TOT' +
+        'AL_CREDIT FROM MK_XML_OPENING_BALANCE'
+      'WHERE'
+      '  AUDIT_ID = :AUDIT_ID')
+    SQLRecCount.Strings = (
+      'SELECT Count(*) FROM ('
+      'SELECT * FROM MK_XML_OPENING_BALANCE'
+      ''
+      ')')
+    Connection = dmFBZakelijk.connOraZakelijk
+    SQL.Strings = (
+      
+        'select audit_id, ob_date, ob_desc, lines_count, total_debit, tot' +
+        'al_credit'
+      'from mk_xml_opening_balance')
+    Options.SetEmptyStrToNull = True
+    IndexFieldNames = 'audit_id'
+    Left = 584
+    Top = 80
+    object qryOraOpBalanceAUDIT_ID: TStringField
+      FieldName = 'AUDIT_ID'
+      Required = True
+      Size = 50
+    end
+    object qryOraOpBalanceOB_DATE: TDateTimeField
+      FieldName = 'OB_DATE'
+    end
+    object qryOraOpBalanceOB_DESC: TStringField
+      FieldName = 'OB_DESC'
+      Size = 200
+    end
+    object qryOraOpBalanceLINES_COUNT: TFloatField
+      FieldName = 'LINES_COUNT'
+    end
+    object qryOraOpBalanceTOTAL_DEBIT: TFloatField
+      FieldName = 'TOTAL_DEBIT'
+    end
+    object qryOraOpBalanceTOTAL_CREDIT: TFloatField
+      FieldName = 'TOTAL_CREDIT'
+    end
+  end
+  object qryOraOpLine: TUniQuery
+    KeyFields = 'audit_id;obline_nr'
+    Connection = dmFBZakelijk.connOraZakelijk
+    SQL.Strings = (
+      
+        'select audit_id, obline_nr, obline_acc_id, amnt_string, obline_a' +
+        'mount, obline_type'
+      'from mk_xml_opening_line')
+    Options.SetEmptyStrToNull = True
+    IndexFieldNames = 'audit_id;obline_nr'
+    Left = 568
+    Top = 168
+    object qryOraOpLineAUDIT_ID: TStringField
+      FieldName = 'AUDIT_ID'
+      Required = True
+      Size = 50
+    end
+    object qryOraOpLineOBLINE_NR: TStringField
+      FieldName = 'OBLINE_NR'
+      Size = 200
+    end
+    object qryOraOpLineOBLINE_ACC_ID: TStringField
+      FieldName = 'OBLINE_ACC_ID'
+      Size = 200
+    end
+    object qryOraOpLineAMNT_STRING: TStringField
+      FieldName = 'AMNT_STRING'
+      Size = 200
+    end
+    object qryOraOpLineOBLINE_AMOUNT: TFloatField
+      FieldName = 'OBLINE_AMOUNT'
+    end
+    object qryOraOpLineOBLINE_TYPE: TStringField
+      FieldName = 'OBLINE_TYPE'
+      Size = 200
+    end
+  end
+  object qryOraTransaction: TUniQuery
+    KeyFields = 'tx_nr'
+    SQLRefresh.Strings = (
+      
+        'SELECT AUDIT_ID, JRN_ID, JRN_DESC, JRN_TYPE, TX_NR, TX_DESC, TX_' +
+        'PERIOD_ID, TX_DATE, TX_AMOUNT, TX_AMOUNT_TYPE, TX_SOURCE_ID, TX_' +
+        'USER_ID FROM MK_XML_TRANSACTION'
+      'WHERE'
+      '  TX_NR = :TX_NR')
+    SQLRecCount.Strings = (
+      'SELECT Count(*) FROM ('
+      'SELECT * FROM MK_XML_TRANSACTION'
+      ''
+      ')')
+    Connection = dmFBZakelijk.connOraZakelijk
+    SQL.Strings = (
+      
+        'select audit_id, jrn_id, jrn_desc, jrn_type, tx_nr, tx_desc, tx_' +
+        'period_id'
+      ', tx_date, tx_amount, tx_amount_type, tx_source_id, tx_user_id'
+      'from mk_xml_transaction')
+    Options.SetEmptyStrToNull = True
+    IndexFieldNames = 'audit_id;tx_nr'
+    Left = 592
+    Top = 256
+    object qryOraTransactionAUDIT_ID: TStringField
+      FieldName = 'AUDIT_ID'
+      Required = True
+      Size = 50
+    end
+    object qryOraTransactionJRN_ID: TStringField
+      FieldName = 'JRN_ID'
+      Size = 200
+    end
+    object qryOraTransactionJRN_DESC: TStringField
+      FieldName = 'JRN_DESC'
+      Size = 200
+    end
+    object qryOraTransactionJRN_TYPE: TStringField
+      FieldName = 'JRN_TYPE'
+      Size = 200
+    end
+    object qryOraTransactionTX_NR: TIntegerField
+      FieldName = 'TX_NR'
+    end
+    object qryOraTransactionTX_DESC: TStringField
+      FieldName = 'TX_DESC'
+      Size = 200
+    end
+    object qryOraTransactionTX_PERIOD_ID: TSmallintField
+      FieldName = 'TX_PERIOD_ID'
+    end
+    object qryOraTransactionTX_DATE: TDateTimeField
+      FieldName = 'TX_DATE'
+    end
+    object qryOraTransactionTX_AMOUNT: TFloatField
+      FieldName = 'TX_AMOUNT'
+    end
+    object qryOraTransactionTX_AMOUNT_TYPE: TStringField
+      FieldName = 'TX_AMOUNT_TYPE'
+      Size = 200
+    end
+    object qryOraTransactionTX_SOURCE_ID: TStringField
+      FieldName = 'TX_SOURCE_ID'
+      Size = 200
+    end
+    object qryOraTransactionTX_USER_ID: TStringField
+      FieldName = 'TX_USER_ID'
+      Size = 200
+    end
+  end
+  object qryOraTransactionLine: TUniQuery
+    KeyFields = 'txline_nr'
+    Connection = dmFBZakelijk.connOraZakelijk
+    SQL.Strings = (
+      'select audit_id, tx_nr, txline_nr, acc_id, doc_ref, eff_date'
+      
+        ', txline_desc, amount, amount_type, customer_id, cost_id, produc' +
+        't_id'
+      ', project_id, cur_code, cur_amount'
+      'from mk_xml_transaction_line')
+    Options.SetEmptyStrToNull = True
+    IndexFieldNames = 'audit_id;txline_nr'
+    Left = 592
+    Top = 344
+    object qryOraTransactionLineAUDIT_ID: TStringField
+      FieldName = 'AUDIT_ID'
+      Required = True
+      Size = 50
+    end
+    object qryOraTransactionLineTX_NR: TIntegerField
+      FieldName = 'TX_NR'
+    end
+    object qryOraTransactionLineTXLINE_NR: TStringField
+      FieldName = 'TXLINE_NR'
+      Size = 200
+    end
+    object qryOraTransactionLineACC_ID: TStringField
+      FieldName = 'ACC_ID'
+      Size = 200
+    end
+    object qryOraTransactionLineDOC_REF: TStringField
+      FieldName = 'DOC_REF'
+      Size = 200
+    end
+    object qryOraTransactionLineEFF_DATE: TDateTimeField
+      FieldName = 'EFF_DATE'
+    end
+    object qryOraTransactionLineTXLINE_DESC: TStringField
+      FieldName = 'TXLINE_DESC'
+      Size = 200
+    end
+    object qryOraTransactionLineAMOUNT: TFloatField
+      FieldName = 'AMOUNT'
+    end
+    object qryOraTransactionLineAMOUNT_TYPE: TStringField
+      FieldName = 'AMOUNT_TYPE'
+      Size = 200
+    end
+    object qryOraTransactionLineCUSTOMER_ID: TStringField
+      FieldName = 'CUSTOMER_ID'
+      Size = 200
+    end
+    object qryOraTransactionLineCOST_ID: TStringField
+      FieldName = 'COST_ID'
+      Size = 200
+    end
+    object qryOraTransactionLinePRODUCT_ID: TStringField
+      FieldName = 'PRODUCT_ID'
+      Size = 200
+    end
+    object qryOraTransactionLinePROJECT_ID: TStringField
+      FieldName = 'PROJECT_ID'
+      Size = 200
+    end
+    object qryOraTransactionLineCUR_CODE: TStringField
+      FieldName = 'CUR_CODE'
+      Size = 200
+    end
+    object qryOraTransactionLineCUR_AMOUNT: TFloatField
+      FieldName = 'CUR_AMOUNT'
+    end
+  end
+  object qryOraVatLine: TUniQuery
+    KeyFields = 'txline_nr'
+    Connection = dmFBZakelijk.connOraZakelijk
+    SQL.Strings = (
+      
+        'select audit_id, tx_nr, txline_nr, vat_id, vat_perc, amount, amo' +
+        'unt_type'
+      'from mk_xml_vat_line')
+    Options.SetEmptyStrToNull = True
+    IndexFieldNames = 'audit_id;txline_nr'
+    Left = 592
+    Top = 424
+    object qryOraVatLineAUDIT_ID: TStringField
+      FieldName = 'AUDIT_ID'
+      Required = True
+      Size = 50
+    end
+    object qryOraVatLineTX_NR: TIntegerField
+      FieldName = 'TX_NR'
+    end
+    object qryOraVatLineTXLINE_NR: TStringField
+      FieldName = 'TXLINE_NR'
+      Size = 200
+    end
+    object qryOraVatLineVAT_ID: TStringField
+      FieldName = 'VAT_ID'
+      Size = 200
+    end
+    object qryOraVatLineVAT_PERC: TFloatField
+      FieldName = 'VAT_PERC'
+    end
+    object qryOraVatLineAMOUNT: TFloatField
+      FieldName = 'AMOUNT'
+    end
+    object qryOraVatLineAMOUNT_TYPE: TStringField
+      FieldName = 'AMOUNT_TYPE'
+      Size = 200
     end
   end
 end

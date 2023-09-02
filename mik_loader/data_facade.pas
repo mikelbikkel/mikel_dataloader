@@ -238,6 +238,22 @@ begin
 
   cnt := CopyDataSet(bm, dmXAF.qryOraAccount, dmXAF.qryXafAccount);
   TriggerXEvent('Account: OK. [' + IntToStr(cnt) + ']');
+
+  cnt := CopyDataSet(bm, dmXAF.qryOraOpBalance, dmXAF.qryXafOpBalance);
+  TriggerXEvent('Opening balance: OK. [' + IntToStr(cnt) + ']');
+
+  cnt := CopyDataSet(bm, dmXAF.qryOraOpLine, dmXAF.qryXafOpLine);
+  TriggerXEvent('Opening balance line: OK. [' + IntToStr(cnt) + ']');
+
+  cnt := CopyDataSet(bm, dmXAF.qryOraTransaction, dmXAF.qryXafTransaction);
+  TriggerXEvent('Transaction: OK. [' + IntToStr(cnt) + ']');
+
+  cnt := CopyDataSet(bm, dmXAF.qryOraTransactionLine,
+    dmXAF.qryXafTransactionLine);
+  TriggerXEvent('Transaction line: OK. [' + IntToStr(cnt) + ']');
+
+  cnt := CopyDataSet(bm, dmXAF.qryOraVatLine, dmXAF.qryXafVatLine);
+  TriggerXEvent('VAT line: OK. [' + IntToStr(cnt) + ']');
 end;
 
 constructor ZBData.Create;
