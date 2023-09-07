@@ -105,7 +105,7 @@ begin
   FDsAddFields := DsAddFields;
   FDataMover := bm;
   FDataMover.Mode := dmAlwaysInsert;
-  FDataMover.Options := [poClearDest];
+  FDataMover.Options := [];
   FDataMover.CommitCount := 0;
 
   FRText := TFDBatchMoveTextReader.Create(FDataMover);
@@ -119,7 +119,7 @@ procedure TFileLoader.LoadFile;
 var
   bd: IDDBatch;
 begin
-  bd := CreateBatchDecorator(FWDataset.Dataset);
+  bd := CreateBatchDecorator(FWDataset.Dataset, true);
   try
     bd.StartTransaction;
     FDataMover.Execute;

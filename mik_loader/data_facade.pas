@@ -22,6 +22,10 @@ interface
 uses data.DB, FireDac.Comp.BatchMove;
 
 type
+  // append: insert if PK does not exist.
+  // add_replace:  insert if PK does not exist. delete + insert if PK exists.
+  // replace: truncate table and insert
+  TBatchMode = (append, add_replace, replace);
 
   IDDReadOnly = interface
     procedure Open;
@@ -79,6 +83,7 @@ type
   strict private
     FQDecs: TDictionary<string, IDDReadOnly>;
 
+    procedure ExecSQL(sql: string; tx: TUniTransaction);
     function GetConnected: boolean; override;
     procedure SetConnected(c: boolean); override;
     procedure Connect;
@@ -275,6 +280,11 @@ begin
 
   if Assigned(dmFBZakelijk.connOraZakelijk) then
     dmFBZakelijk.connOraZakelijk.Connected := false;
+end;
+
+procedure ZBData.ExecSQL(sql: string; tx: TUniTransaction);
+begin
+
 end;
 
 function ZBData.GetConnected: boolean;

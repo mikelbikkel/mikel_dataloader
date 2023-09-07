@@ -29,6 +29,7 @@ object dmFBZakelijk: TdmFBZakelijk
     Top = 32
   end
   object qryImpRaboZak: TUniQuery
+    UpdatingTable = 'imp_rabo_ztx'
     KeyFields = 'iban;valuta_code;seqno'
     Connection = connFBZakelijk
     SQL.Strings = (
@@ -166,6 +167,7 @@ object dmFBZakelijk: TdmFBZakelijk
     Top = 32
   end
   object qryImpKnab: TUniQuery
+    UpdatingTable = 'imp_mk_ktx'
     KeyFields = 'iban;tx_referentie;betaalwijze'
     SQLInsert.Strings = (
       'INSERT INTO IMP_MK_KTX'
@@ -223,7 +225,7 @@ object dmFBZakelijk: TdmFBZakelijk
     Options.SetEmptyStrToNull = True
     IndexFieldNames = 'valuta_datum'
     Left = 56
-    Top = 328
+    Top = 304
     object qryImpKnabIBAN: TStringField
       FieldName = 'IBAN'
       Required = True
@@ -298,8 +300,8 @@ object dmFBZakelijk: TdmFBZakelijk
     ReadOnly = True
     Options.SetEmptyStrToNull = True
     IndexFieldNames = 'LOG_TS DESC'
-    Left = 48
-    Top = 408
+    Left = 56
+    Top = 376
     object qryLogLOG_ID: TIntegerField
       DisplayLabel = 'ID'
       FieldName = 'LOG_ID'

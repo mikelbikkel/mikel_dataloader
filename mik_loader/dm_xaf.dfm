@@ -3,6 +3,7 @@ object dmXAF: TdmXAF
   Width = 770
   PixelsPerInch = 120
   object qryXafCustomer: TUniQuery
+    UpdatingTable = 'mk_xaf_customer'
     SQLInsert.Strings = (
       'INSERT INTO MK_XAF_CUSTOMER'
       
@@ -145,6 +146,7 @@ object dmXAF: TdmXAF
     end
   end
   object qryXafInfo: TUniQuery
+    UpdatingTable = 'mk_xaf_info'
     KeyFields = 'audit_id'
     SQLInsert.Strings = (
       'INSERT INTO MK_XAF_INFO'
@@ -249,6 +251,7 @@ object dmXAF: TdmXAF
     end
   end
   object qryXafVatCode: TUniQuery
+    UpdatingTable = 'mk_xaf_vat_code'
     KeyFields = 'audit_id;vat_id'
     SQLInsert.Strings = (
       'INSERT INTO MK_XAF_VAT_CODE'
@@ -315,6 +318,7 @@ object dmXAF: TdmXAF
     end
   end
   object qryXafPeriod: TUniQuery
+    UpdatingTable = 'mk_xaf_period'
     KeyFields = 'audit_id;period_id'
     SQLInsert.Strings = (
       'INSERT INTO MK_XAF_PERIOD'
@@ -378,6 +382,7 @@ object dmXAF: TdmXAF
     end
   end
   object qryXafAccount: TUniQuery
+    UpdatingTable = 'mk_xaf_account'
     KeyFields = 'audit_id;acc_id'
     SQLInsert.Strings = (
       'INSERT INTO MK_XAF_ACCOUNT'
@@ -723,6 +728,7 @@ object dmXAF: TdmXAF
     end
   end
   object qryXafOpBalance: TUniQuery
+    UpdatingTable = 'mk_xaf_opening_balance'
     KeyFields = 'audit_id'
     SQLInsert.Strings = (
       'INSERT INTO MK_XAF_OPENING_BALANCE'
@@ -795,6 +801,7 @@ object dmXAF: TdmXAF
     end
   end
   object qryXafOpLine: TUniQuery
+    UpdatingTable = 'mk_xaf_opening_line'
     KeyFields = 'audit_id;obline_nr'
     SQLInsert.Strings = (
       'INSERT INTO MK_XAF_OPENING_LINE'
@@ -872,6 +879,7 @@ object dmXAF: TdmXAF
     end
   end
   object qryXafTransaction: TUniQuery
+    UpdatingTable = 'mk_xaf_transaction'
     KeyFields = 'tx_nr'
     SQLInsert.Strings = (
       'INSERT INTO MK_XAF_TRANSACTION'
@@ -975,6 +983,7 @@ object dmXAF: TdmXAF
     end
   end
   object qryXafTransactionLine: TUniQuery
+    UpdatingTable = 'mk_xaf_transaction_line'
     KeyFields = 'txline_nr'
     SQLInsert.Strings = (
       'INSERT INTO MK_XAF_TRANSACTION_LINE'
@@ -1092,6 +1101,7 @@ object dmXAF: TdmXAF
     end
   end
   object qryXafVatLine: TUniQuery
+    UpdatingTable = 'mk_xaf_vat_line'
     KeyFields = 'txline_nr'
     SQLInsert.Strings = (
       'INSERT INTO MK_XAF_VAT_LINE'
