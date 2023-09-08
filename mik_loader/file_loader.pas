@@ -20,7 +20,7 @@ unit file_loader;
 interface
 
 uses FireDAC.Stan.Intf, FireDAC.Comp.BatchMove, FireDAC.Comp.BatchMove.Text,
-  FireDAC.Comp.BatchMove.Dataset, Data.DB;
+  FireDAC.Comp.BatchMove.Dataset, Data.DB, data_facade;
 
 type
 
@@ -67,8 +67,10 @@ type
     FRText: TFDBatchMoveTextReader;
     FWDataset: TFDBatchMoveDataSetWriter;
     FDsAddFields: Boolean;
+    FTruncate: Boolean;
   public
-    constructor Create(bm: TFDBatchMove; ds: TDataSet; DsAddFields: Boolean);
+    constructor Create(bm: TFDBatchMove; ds: TDataSet; DsAddFields: Boolean;
+      tm: TTargetMode);
     procedure SetFileInfo(const info: TLoadInfo);
     procedure AddField(const name: string; const ftype: SFieldType;
       const fsize: integer = 0);
@@ -77,7 +79,7 @@ type
 
 implementation
 
-uses System.SysUtils, Uni, batch_decorator;
+uses System.SysUtils, System.Classes, batch_decorator;
 
 { TLoadInfo }
 
@@ -96,7 +98,7 @@ end;
 { TFileLoader }
 
 constructor TFileLoader.Create(bm: TFDBatchMove; ds: TDataSet;
-  DsAddFields: Boolean);
+  DsAddFields: Boolean; tm: TTargetMode);
 begin
   bm.Mappings.ClearAndResetID;
   if DsAddFields then
@@ -104,7 +106,21 @@ begin
 
   FDsAddFields := DsAddFields;
   FDataMover := bm;
-  FDataMover.Mode := dmAlwaysInsert;
+
+  case tm of
+    tmReplace:
+      begin
+        FTruncate := true;
+        FDataMover.Mode := dmAlwaysInsert;
+      end;
+    tmAppend:
+      begin
+        FTruncate := false;
+        FDataMover.Mode := dmAppend;
+      end;
+  else
+    raise Exception.Create('unknown tmMode');
+  end;
   FDataMover.Options := [];
   FDataMover.CommitCount := 0;
 
@@ -119,7 +135,7 @@ procedure TFileLoader.LoadFile;
 var
   bd: IDDBatch;
 begin
-  bd := CreateBatchDecorator(FWDataset.Dataset, true);
+  bd := CreateBatchDecorator(FWDataset.Dataset, FTruncate);
   try
     bd.StartTransaction;
     FDataMover.Execute;

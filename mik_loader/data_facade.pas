@@ -22,10 +22,9 @@ interface
 uses data.DB, FireDac.Comp.BatchMove;
 
 type
-  // append: insert if PK does not exist.
-  // add_replace:  insert if PK does not exist. delete + insert if PK exists.
-  // replace: truncate table and insert
-  TBatchMode = (append, add_replace, replace);
+  // tmAppend: insert if PK does not exist. Do nothing if PK exists.
+  // tmReplace:  truncate first, then insert all.
+  TTargetMode = (tmAppend, tmReplace);
 
   IDDReadOnly = interface
     procedure Open;
@@ -61,8 +60,8 @@ type
     procedure LoadDataSetFromFile(const dsname: string; const filename: String;
       bm: TFDBatchMove; ds: TDataSet); virtual; abstract;
 
-    function CopyDataSet(bm: TFDBatchMove; src: TDataSet; dst: TDataSet)
-      : integer; virtual; abstract;
+    function CopyDataSet(bm: TFDBatchMove; src: TDataSet; dst: TDataSet;
+      tmMode: TTargetMode): integer; virtual; abstract;
 
     procedure CopyXaf(bm: TFDBatchMove); virtual; abstract;
   end;
@@ -83,7 +82,6 @@ type
   strict private
     FQDecs: TDictionary<string, IDDReadOnly>;
 
-    procedure ExecSQL(sql: string; tx: TUniTransaction);
     function GetConnected: boolean; override;
     procedure SetConnected(c: boolean); override;
     procedure Connect;
@@ -102,8 +100,8 @@ type
     procedure procKnabZakelijk; override;
     procedure LoadDataSetFromFile(const dsname: string; const filename: String;
       bm: TFDBatchMove; ds: TDataSet); override;
-    function CopyDataSet(bm: TFDBatchMove; src: TDataSet; dst: TDataSet)
-      : integer; override;
+    function CopyDataSet(bm: TFDBatchMove; src: TDataSet; dst: TDataSet;
+      tmMode: TTargetMode): integer; override;
 
     procedure CopyXaf(bm: TFDBatchMove); override;
   end;
@@ -172,8 +170,8 @@ begin
   end;
 end;
 
-function ZBData.CopyDataSet(bm: TFDBatchMove; src: TDataSet;
-  dst: TDataSet): integer;
+function ZBData.CopyDataSet(bm: TFDBatchMove; src: TDataSet; dst: TDataSet;
+  tmMode: TTargetMode): integer;
 var
   rdr: TFDBatchMoveDataSetReader;
   wtr: TFDBatchMoveDataSetWriter;
@@ -181,6 +179,7 @@ var
   fields: TStringList;
   bd: IDDBatch;
   uds: TCustomUniDataSet;
+  bTruncate: boolean;
 begin
   if not(dst is TCustomUniDataSet) then
     raise Exception.Create('dst must be a TCustomUniDataSet');
@@ -198,12 +197,25 @@ begin
     wtr.DataSet := dst;
 
     uds := dst as TCustomUniDataSet;
-    bd := CreateBatchDecorator(uds);
-    dst.Active := true;
-
-    bm.Mode := dmAlwaysInsert;
-    bm.Options := [poClearDest];
+    case tmMode of
+      tmReplace:
+        begin
+          bTruncate := true;
+          bm.Mode := dmAlwaysInsert;
+        end;
+      tmAppend:
+        begin
+          bTruncate := false;
+          bm.Mode := dmAppend;
+        end;
+    else
+      raise Exception.Create('unknown tmMode');
+    end;
+    bm.Options := [];
     bm.CommitCount := 0;
+
+    bd := CreateBatchDecorator(uds, bTruncate);
+    dst.Active := true;
 
     bm.Mappings.ClearAndResetID;
     dst.GetFieldNames(fields);
@@ -229,35 +241,37 @@ procedure ZBData.CopyXaf(bm: TFDBatchMove);
 var
   cnt: integer;
 begin
-  cnt := CopyDataSet(bm, dmXAF.qryOraInfo, dmXAF.qryXafInfo);
+  cnt := CopyDataSet(bm, dmXAF.qryOraInfo, dmXAF.qryXafInfo, tmReplace);
   TriggerXEvent('Info: OK. [' + IntToStr(cnt) + ']');
 
-  cnt := CopyDataSet(bm, dmXAF.qryOraCustomer, dmXAF.qryXafCustomer);
+  cnt := CopyDataSet(bm, dmXAF.qryOraCustomer, dmXAF.qryXafCustomer, tmReplace);
   TriggerXEvent('Customer: OK. [' + IntToStr(cnt) + ']');
 
-  cnt := CopyDataSet(bm, dmXAF.qryOraVatCode, dmXAF.qryXafVatCode);
+  cnt := CopyDataSet(bm, dmXAF.qryOraVatCode, dmXAF.qryXafVatCode, tmReplace);
   TriggerXEvent('VatCode: OK. [' + IntToStr(cnt) + ']');
 
-  cnt := CopyDataSet(bm, dmXAF.qryOraPeriod, dmXAF.qryXafPeriod);
+  cnt := CopyDataSet(bm, dmXAF.qryOraPeriod, dmXAF.qryXafPeriod, tmReplace);
   TriggerXEvent('Period: OK. [' + IntToStr(cnt) + ']');
 
-  cnt := CopyDataSet(bm, dmXAF.qryOraAccount, dmXAF.qryXafAccount);
+  cnt := CopyDataSet(bm, dmXAF.qryOraAccount, dmXAF.qryXafAccount, tmReplace);
   TriggerXEvent('Account: OK. [' + IntToStr(cnt) + ']');
 
-  cnt := CopyDataSet(bm, dmXAF.qryOraOpBalance, dmXAF.qryXafOpBalance);
+  cnt := CopyDataSet(bm, dmXAF.qryOraOpBalance, dmXAF.qryXafOpBalance,
+    tmReplace);
   TriggerXEvent('Opening balance: OK. [' + IntToStr(cnt) + ']');
 
-  cnt := CopyDataSet(bm, dmXAF.qryOraOpLine, dmXAF.qryXafOpLine);
+  cnt := CopyDataSet(bm, dmXAF.qryOraOpLine, dmXAF.qryXafOpLine, tmReplace);
   TriggerXEvent('Opening balance line: OK. [' + IntToStr(cnt) + ']');
 
-  cnt := CopyDataSet(bm, dmXAF.qryOraTransaction, dmXAF.qryXafTransaction);
+  cnt := CopyDataSet(bm, dmXAF.qryOraTransaction, dmXAF.qryXafTransaction,
+    tmReplace);
   TriggerXEvent('Transaction: OK. [' + IntToStr(cnt) + ']');
 
   cnt := CopyDataSet(bm, dmXAF.qryOraTransactionLine,
-    dmXAF.qryXafTransactionLine);
+    dmXAF.qryXafTransactionLine, tmReplace);
   TriggerXEvent('Transaction line: OK. [' + IntToStr(cnt) + ']');
 
-  cnt := CopyDataSet(bm, dmXAF.qryOraVatLine, dmXAF.qryXafVatLine);
+  cnt := CopyDataSet(bm, dmXAF.qryOraVatLine, dmXAF.qryXafVatLine, tmReplace);
   TriggerXEvent('VAT line: OK. [' + IntToStr(cnt) + ']');
 end;
 
@@ -280,11 +294,6 @@ begin
 
   if Assigned(dmFBZakelijk.connOraZakelijk) then
     dmFBZakelijk.connOraZakelijk.Connected := false;
-end;
-
-procedure ZBData.ExecSQL(sql: string; tx: TUniTransaction);
-begin
-
 end;
 
 function ZBData.GetConnected: boolean;
@@ -370,7 +379,7 @@ begin
   ldr := nil;
   try
     info := TLoadInfo.Create;
-    ldr := TFileLoader.Create(bm, ds, true);
+    ldr := TFileLoader.Create(bm, ds, true, tmReplace);
     info.filename := filename;
     info.Separator := ';';
     info.DateFormat := 'dd-mm-yyyy';
@@ -414,7 +423,7 @@ begin
   ldr := nil;
   try
     info := TLoadInfo.Create;
-    ldr := TFileLoader.Create(bm, ds, true);
+    ldr := TFileLoader.Create(bm, ds, true, tmReplace);
     info.filename := filename;
 
     { File format: CSV, Rabo zakelijk. }
