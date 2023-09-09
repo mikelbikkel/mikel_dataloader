@@ -1,5 +1,5 @@
 object dmXAF: TdmXAF
-  Height = 504
+  Height = 649
   Width = 770
   PixelsPerInch = 120
   object qryXafCustomer: TUniQuery
@@ -1200,7 +1200,7 @@ object dmXAF: TdmXAF
       'from mk_xml_opening_balance')
     Options.SetEmptyStrToNull = True
     IndexFieldNames = 'audit_id'
-    Left = 584
+    Left = 560
     Top = 80
     object qryOraOpBalanceAUDIT_ID: TStringField
       FieldName = 'AUDIT_ID'
@@ -1234,8 +1234,8 @@ object dmXAF: TdmXAF
       'from mk_xml_opening_line')
     Options.SetEmptyStrToNull = True
     IndexFieldNames = 'audit_id;obline_nr'
-    Left = 568
-    Top = 168
+    Left = 536
+    Top = 160
     object qryOraOpLineAUDIT_ID: TStringField
       FieldName = 'AUDIT_ID'
       Required = True
@@ -1284,7 +1284,7 @@ object dmXAF: TdmXAF
       'from mk_xml_transaction')
     Options.SetEmptyStrToNull = True
     IndexFieldNames = 'audit_id;tx_nr'
-    Left = 592
+    Left = 568
     Top = 256
     object qryOraTransactionAUDIT_ID: TStringField
       FieldName = 'AUDIT_ID'
@@ -1414,7 +1414,7 @@ object dmXAF: TdmXAF
       'from mk_xml_vat_line')
     Options.SetEmptyStrToNull = True
     IndexFieldNames = 'audit_id;txline_nr'
-    Left = 592
+    Left = 544
     Top = 424
     object qryOraVatLineAUDIT_ID: TStringField
       FieldName = 'AUDIT_ID'
@@ -1442,5 +1442,532 @@ object dmXAF: TdmXAF
       FieldName = 'AMOUNT_TYPE'
       Size = 200
     end
+  end
+  object qryKnabTx: TUniQuery
+    UpdatingTable = 'mk_ktx'
+    KeyFields = 'mikel_tx_id'
+    SQLInsert.Strings = (
+      'INSERT INTO MK_KTX'
+      
+        '  (IBAN, TX_DATUM, VALUTA_CODE, CREDIT_DEBET, BEDRAG, TEGEN_IBAN' +
+        ', TEGEN_NAAM, VALUTA_DATUM, BETAALWIJZE, OMSCHRIJVING, TYPE_BETA' +
+        'LING, MACHTIGINGSKENMERK, INCASSANT_ID, ADRES, TX_REFERENTIE, BO' +
+        'EK_DATUM, MIKEL_TX_ID)'
+      'VALUES'
+      
+        '  (:IBAN, :TX_DATUM, :VALUTA_CODE, :CREDIT_DEBET, :BEDRAG, :TEGE' +
+        'N_IBAN, :TEGEN_NAAM, :VALUTA_DATUM, :BETAALWIJZE, :OMSCHRIJVING,' +
+        ' :TYPE_BETALING, :MACHTIGINGSKENMERK, :INCASSANT_ID, :ADRES, :TX' +
+        '_REFERENTIE, :BOEK_DATUM, :MIKEL_TX_ID)')
+    SQLDelete.Strings = (
+      'DELETE FROM MK_KTX'
+      'WHERE'
+      '  MIKEL_TX_ID = :Old_MIKEL_TX_ID')
+    SQLUpdate.Strings = (
+      'UPDATE MK_KTX'
+      'SET'
+      
+        '  IBAN = :IBAN, TX_DATUM = :TX_DATUM, VALUTA_CODE = :VALUTA_CODE' +
+        ', CREDIT_DEBET = :CREDIT_DEBET, BEDRAG = :BEDRAG, TEGEN_IBAN = :' +
+        'TEGEN_IBAN, TEGEN_NAAM = :TEGEN_NAAM, VALUTA_DATUM = :VALUTA_DAT' +
+        'UM, BETAALWIJZE = :BETAALWIJZE, OMSCHRIJVING = :OMSCHRIJVING, TY' +
+        'PE_BETALING = :TYPE_BETALING, MACHTIGINGSKENMERK = :MACHTIGINGSK' +
+        'ENMERK, INCASSANT_ID = :INCASSANT_ID, ADRES = :ADRES, TX_REFEREN' +
+        'TIE = :TX_REFERENTIE, BOEK_DATUM = :BOEK_DATUM, MIKEL_TX_ID = :M' +
+        'IKEL_TX_ID'
+      'WHERE'
+      '  MIKEL_TX_ID = :Old_MIKEL_TX_ID')
+    SQLLock.Strings = (
+      'SELECT NULL FROM MK_KTX'
+      'WHERE'
+      'MIKEL_TX_ID = :Old_MIKEL_TX_ID'
+      'FOR UPDATE WITH LOCK')
+    SQLRefresh.Strings = (
+      
+        'SELECT IBAN, TX_DATUM, VALUTA_CODE, CREDIT_DEBET, BEDRAG, TEGEN_' +
+        'IBAN, TEGEN_NAAM, VALUTA_DATUM, BETAALWIJZE, OMSCHRIJVING, TYPE_' +
+        'BETALING, MACHTIGINGSKENMERK, INCASSANT_ID, ADRES, TX_REFERENTIE' +
+        ', BOEK_DATUM, MIKEL_TX_ID FROM MK_KTX'
+      'WHERE'
+      '  MIKEL_TX_ID = :MIKEL_TX_ID')
+    SQLRecCount.Strings = (
+      'SELECT COUNT(*) FROM ('
+      'SELECT 1 AS C  FROM MK_KTX'
+      ''
+      ') q')
+    Connection = dmFBZakelijk.connFBZakelijk
+    SQL.Strings = (
+      
+        'select iban, tx_datum, valuta_code, credit_debet, bedrag, tegen_' +
+        'iban'
+      
+        ', tegen_naam, valuta_datum, betaalwijze, omschrijving, type_beta' +
+        'ling'
+      
+        ', machtigingskenmerk, incassant_id, adres, tx_referentie, boek_d' +
+        'atum'
+      ', mikel_tx_id'
+      'from mk_ktx')
+    Options.SetEmptyStrToNull = True
+    IndexFieldNames = 'boek_datum'
+    Left = 48
+    Top = 520
+    object qryKnabTxIBAN: TStringField
+      FieldName = 'IBAN'
+      Required = True
+      Size = 50
+    end
+    object qryKnabTxTX_DATUM: TDateField
+      FieldName = 'TX_DATUM'
+    end
+    object qryKnabTxVALUTA_CODE: TStringField
+      FieldName = 'VALUTA_CODE'
+      Size = 3
+    end
+    object qryKnabTxCREDIT_DEBET: TStringField
+      FieldName = 'CREDIT_DEBET'
+      Required = True
+      Size = 2
+    end
+    object qryKnabTxBEDRAG: TFloatField
+      FieldName = 'BEDRAG'
+      Required = True
+    end
+    object qryKnabTxTEGEN_IBAN: TStringField
+      FieldName = 'TEGEN_IBAN'
+      Size = 50
+    end
+    object qryKnabTxTEGEN_NAAM: TStringField
+      FieldName = 'TEGEN_NAAM'
+      Size = 255
+    end
+    object qryKnabTxVALUTA_DATUM: TDateField
+      FieldName = 'VALUTA_DATUM'
+    end
+    object qryKnabTxBETAALWIJZE: TStringField
+      FieldName = 'BETAALWIJZE'
+      Size = 40
+    end
+    object qryKnabTxOMSCHRIJVING: TStringField
+      FieldName = 'OMSCHRIJVING'
+      Size = 255
+    end
+    object qryKnabTxTYPE_BETALING: TStringField
+      FieldName = 'TYPE_BETALING'
+      Size = 255
+    end
+    object qryKnabTxMACHTIGINGSKENMERK: TStringField
+      FieldName = 'MACHTIGINGSKENMERK'
+      Size = 255
+    end
+    object qryKnabTxINCASSANT_ID: TStringField
+      FieldName = 'INCASSANT_ID'
+      Size = 255
+    end
+    object qryKnabTxADRES: TStringField
+      FieldName = 'ADRES'
+      Size = 70
+    end
+    object qryKnabTxTX_REFERENTIE: TStringField
+      FieldName = 'TX_REFERENTIE'
+      Required = True
+    end
+    object qryKnabTxBOEK_DATUM: TDateField
+      FieldName = 'BOEK_DATUM'
+    end
+    object qryKnabTxMIKEL_TX_ID: TStringField
+      FieldName = 'MIKEL_TX_ID'
+      Required = True
+      Size = 120
+    end
+  end
+  object qryKnabInfo: TUniQuery
+    UpdatingTable = 'MK_KTX_XAF_INFO'
+    KeyFields = 'mikel_tx_id'
+    SQLInsert.Strings = (
+      'INSERT INTO MK_KTX_XAF_INFO'
+      '  (MIKEL_TX_ID, TX_TYPE, MK_GL_DATE, TX_NR)'
+      'VALUES'
+      '  (:MIKEL_TX_ID, :TX_TYPE, :MK_GL_DATE, :TX_NR)')
+    SQLDelete.Strings = (
+      'DELETE FROM MK_KTX_XAF_INFO'
+      'WHERE'
+      '  MIKEL_TX_ID = :Old_MIKEL_TX_ID')
+    SQLUpdate.Strings = (
+      'UPDATE MK_KTX_XAF_INFO'
+      'SET'
+      
+        '  MIKEL_TX_ID = :MIKEL_TX_ID, TX_TYPE = :TX_TYPE, MK_GL_DATE = :' +
+        'MK_GL_DATE, TX_NR = :TX_NR'
+      'WHERE'
+      '  MIKEL_TX_ID = :Old_MIKEL_TX_ID')
+    SQLLock.Strings = (
+      'SELECT NULL FROM MK_KTX_XAF_INFO'
+      'WHERE'
+      'MIKEL_TX_ID = :Old_MIKEL_TX_ID'
+      'FOR UPDATE WITH LOCK')
+    SQLRefresh.Strings = (
+      
+        'SELECT MIKEL_TX_ID, TX_TYPE, MK_GL_DATE, TX_NR FROM MK_KTX_XAF_I' +
+        'NFO'
+      'WHERE'
+      '  MIKEL_TX_ID = :MIKEL_TX_ID')
+    SQLRecCount.Strings = (
+      'SELECT COUNT(*) FROM ('
+      'SELECT 1 AS C  FROM MK_KTX_XAF_INFO'
+      ''
+      ') q')
+    Connection = dmFBZakelijk.connFBZakelijk
+    SQL.Strings = (
+      'select mikel_tx_id, tx_type, mk_gl_date, tx_nr'
+      'from mk_ktx_xaf_info')
+    Options.SetEmptyStrToNull = True
+    IndexFieldNames = 'MK_GL_DATE'
+    Left = 280
+    Top = 536
+    object qryKnabInfoMIKEL_TX_ID: TStringField
+      FieldName = 'MIKEL_TX_ID'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+      Size = 120
+    end
+    object qryKnabInfoTX_TYPE: TStringField
+      FieldName = 'TX_TYPE'
+      Required = True
+      Size = 2
+    end
+    object qryKnabInfoMK_GL_DATE: TDateField
+      FieldName = 'MK_GL_DATE'
+      Required = True
+    end
+    object qryKnabInfoTX_NR: TIntegerField
+      FieldName = 'TX_NR'
+    end
+  end
+  object qryKnabGL: TUniQuery
+    UpdatingTable = 'MK_KTX_GL_INFO'
+    KeyFields = 'mikel_tx_id;gl_code;btw_perc'
+    Connection = dmFBZakelijk.connFBZakelijk
+    SQL.Strings = (
+      'select mikel_tx_id, gl_code, btw_perc, gl_amount, tx_remark'
+      'from mk_ktx_gl_info')
+    IndexFieldNames = 'mikel_tx_id'
+    Left = 544
+    Top = 536
+    object qryKnabGLMIKEL_TX_ID: TStringField
+      FieldName = 'MIKEL_TX_ID'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+      Size = 120
+    end
+    object qryKnabGLGL_CODE: TStringField
+      FieldName = 'GL_CODE'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+    end
+    object qryKnabGLBTW_PERC: TFloatField
+      FieldName = 'BTW_PERC'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+    end
+    object qryKnabGLGL_AMOUNT: TFloatField
+      FieldName = 'GL_AMOUNT'
+      Required = True
+    end
+    object qryKnabGLTX_REMARK: TStringField
+      FieldName = 'TX_REMARK'
+      Size = 200
+    end
+  end
+  object qryOraKtx: TUniQuery
+    UpdatingTable = 'MK_KTX'
+    KeyFields = 'mikel_tx_id'
+    SQLInsert.Strings = (
+      'INSERT INTO MK_KTX'
+      
+        '  (IBAN, TX_DATUM, VALUTA_CODE, CREDIT_DEBET, BEDRAG, TEGEN_IBAN' +
+        ', TEGEN_NAAM, VALUTA_DATUM, BETAALWIJZE, OMSCHRIJVING, TYPE_BETA' +
+        'LING, MACHTIGINGSKENMERK, INCASSANT_ID, ADRES, TX_REFERENTIE, BO' +
+        'EK_DATUM, MIKEL_TX_ID)'
+      'VALUES'
+      
+        '  (:IBAN, :TX_DATUM, :VALUTA_CODE, :CREDIT_DEBET, :BEDRAG, :TEGE' +
+        'N_IBAN, :TEGEN_NAAM, :VALUTA_DATUM, :BETAALWIJZE, :OMSCHRIJVING,' +
+        ' :TYPE_BETALING, :MACHTIGINGSKENMERK, :INCASSANT_ID, :ADRES, :TX' +
+        '_REFERENTIE, :BOEK_DATUM, :MIKEL_TX_ID)')
+    SQLDelete.Strings = (
+      'DELETE FROM MK_KTX'
+      'WHERE'
+      '  MIKEL_TX_ID = :Old_MIKEL_TX_ID')
+    SQLUpdate.Strings = (
+      'UPDATE MK_KTX'
+      'SET'
+      
+        '  IBAN = :IBAN, TX_DATUM = :TX_DATUM, VALUTA_CODE = :VALUTA_CODE' +
+        ', CREDIT_DEBET = :CREDIT_DEBET, BEDRAG = :BEDRAG, TEGEN_IBAN = :' +
+        'TEGEN_IBAN, TEGEN_NAAM = :TEGEN_NAAM, VALUTA_DATUM = :VALUTA_DAT' +
+        'UM, BETAALWIJZE = :BETAALWIJZE, OMSCHRIJVING = :OMSCHRIJVING, TY' +
+        'PE_BETALING = :TYPE_BETALING, MACHTIGINGSKENMERK = :MACHTIGINGSK' +
+        'ENMERK, INCASSANT_ID = :INCASSANT_ID, ADRES = :ADRES, TX_REFEREN' +
+        'TIE = :TX_REFERENTIE, BOEK_DATUM = :BOEK_DATUM, MIKEL_TX_ID = :M' +
+        'IKEL_TX_ID'
+      'WHERE'
+      '  MIKEL_TX_ID = :Old_MIKEL_TX_ID')
+    SQLLock.Strings = (
+      
+        'SELECT IBAN, TX_DATUM, VALUTA_CODE, CREDIT_DEBET, BEDRAG, TEGEN_' +
+        'IBAN, TEGEN_NAAM, VALUTA_DATUM, BETAALWIJZE, OMSCHRIJVING, TYPE_' +
+        'BETALING, MACHTIGINGSKENMERK, INCASSANT_ID, ADRES, TX_REFERENTIE' +
+        ', BOEK_DATUM, MIKEL_TX_ID FROM MK_KTX'
+      'WHERE'
+      '  MIKEL_TX_ID = :Old_MIKEL_TX_ID'
+      'FOR UPDATE NOWAIT')
+    SQLRefresh.Strings = (
+      
+        'SELECT IBAN, TX_DATUM, VALUTA_CODE, CREDIT_DEBET, BEDRAG, TEGEN_' +
+        'IBAN, TEGEN_NAAM, VALUTA_DATUM, BETAALWIJZE, OMSCHRIJVING, TYPE_' +
+        'BETALING, MACHTIGINGSKENMERK, INCASSANT_ID, ADRES, TX_REFERENTIE' +
+        ', BOEK_DATUM, MIKEL_TX_ID FROM MK_KTX'
+      'WHERE'
+      '  MIKEL_TX_ID = :MIKEL_TX_ID')
+    SQLRecCount.Strings = (
+      'SELECT Count(*) FROM ('
+      'SELECT * FROM MK_KTX'
+      ''
+      ')')
+    Connection = dmFBZakelijk.connOraZakelijk
+    SQL.Strings = (
+      
+        'select iban, tx_datum, valuta_code, credit_debet, bedrag, tegen_' +
+        'iban'
+      
+        ', tegen_naam, valuta_datum, betaalwijze, omschrijving, type_beta' +
+        'ling'
+      
+        ', machtigingskenmerk, incassant_id, adres, tx_referentie, boek_d' +
+        'atum'
+      ', mikel_tx_id'
+      'from mk_ktx')
+    Options.SetEmptyStrToNull = True
+    IndexFieldNames = 'boek_datum'
+    Left = 136
+    Top = 520
+    object qryOraKtxIBAN: TStringField
+      FieldName = 'IBAN'
+      Required = True
+      Size = 255
+    end
+    object qryOraKtxTX_DATUM: TDateTimeField
+      FieldName = 'TX_DATUM'
+    end
+    object qryOraKtxVALUTA_CODE: TStringField
+      FieldName = 'VALUTA_CODE'
+      Size = 255
+    end
+    object qryOraKtxCREDIT_DEBET: TStringField
+      FieldName = 'CREDIT_DEBET'
+      Required = True
+      Size = 2
+    end
+    object qryOraKtxBEDRAG: TFloatField
+      FieldName = 'BEDRAG'
+      Required = True
+    end
+    object qryOraKtxTEGEN_IBAN: TStringField
+      FieldName = 'TEGEN_IBAN'
+      Size = 255
+    end
+    object qryOraKtxTEGEN_NAAM: TStringField
+      FieldName = 'TEGEN_NAAM'
+      Size = 255
+    end
+    object qryOraKtxVALUTA_DATUM: TDateTimeField
+      FieldName = 'VALUTA_DATUM'
+    end
+    object qryOraKtxBETAALWIJZE: TStringField
+      FieldName = 'BETAALWIJZE'
+      Size = 255
+    end
+    object qryOraKtxOMSCHRIJVING: TStringField
+      FieldName = 'OMSCHRIJVING'
+      Size = 255
+    end
+    object qryOraKtxTYPE_BETALING: TStringField
+      FieldName = 'TYPE_BETALING'
+      Size = 255
+    end
+    object qryOraKtxMACHTIGINGSKENMERK: TStringField
+      FieldName = 'MACHTIGINGSKENMERK'
+      Size = 255
+    end
+    object qryOraKtxINCASSANT_ID: TStringField
+      FieldName = 'INCASSANT_ID'
+      Size = 255
+    end
+    object qryOraKtxADRES: TStringField
+      FieldName = 'ADRES'
+      Size = 255
+    end
+    object qryOraKtxTX_REFERENTIE: TStringField
+      FieldName = 'TX_REFERENTIE'
+      Required = True
+      Size = 255
+    end
+    object qryOraKtxBOEK_DATUM: TDateTimeField
+      FieldName = 'BOEK_DATUM'
+    end
+    object qryOraKtxMIKEL_TX_ID: TStringField
+      FieldName = 'MIKEL_TX_ID'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+      Size = 255
+    end
+  end
+  object qryOraKtxInfo: TUniQuery
+    UpdatingTable = 'MK_KTX_XAF_INFO'
+    KeyFields = 'mikel_tx_id'
+    SQLInsert.Strings = (
+      'INSERT INTO MK_KTX_XAF_INFO'
+      '  (MIKEL_TX_ID, TX_TYPE, MK_GL_DATE, TX_NR)'
+      'VALUES'
+      '  (:MIKEL_TX_ID, :TX_TYPE, :MK_GL_DATE, :TX_NR)')
+    SQLDelete.Strings = (
+      'DELETE FROM MK_KTX_XAF_INFO'
+      'WHERE'
+      '  MIKEL_TX_ID = :Old_MIKEL_TX_ID')
+    SQLUpdate.Strings = (
+      'UPDATE MK_KTX_XAF_INFO'
+      'SET'
+      
+        '  MIKEL_TX_ID = :MIKEL_TX_ID, TX_TYPE = :TX_TYPE, MK_GL_DATE = :' +
+        'MK_GL_DATE, TX_NR = :TX_NR'
+      'WHERE'
+      '  MIKEL_TX_ID = :Old_MIKEL_TX_ID')
+    SQLLock.Strings = (
+      
+        'SELECT MIKEL_TX_ID, TX_TYPE, MK_GL_DATE, TX_NR FROM MK_KTX_XAF_I' +
+        'NFO'
+      'WHERE'
+      '  MIKEL_TX_ID = :Old_MIKEL_TX_ID'
+      'FOR UPDATE NOWAIT')
+    SQLRefresh.Strings = (
+      
+        'SELECT MIKEL_TX_ID, TX_TYPE, MK_GL_DATE, TX_NR FROM MK_KTX_XAF_I' +
+        'NFO'
+      'WHERE'
+      '  MIKEL_TX_ID = :MIKEL_TX_ID')
+    SQLRecCount.Strings = (
+      'SELECT Count(*) FROM ('
+      'SELECT * FROM MK_KTX_XAF_INFO'
+      ''
+      ')')
+    Connection = dmFBZakelijk.connOraZakelijk
+    SQL.Strings = (
+      'select mikel_tx_id, tx_type, mk_gl_date, tx_nr'
+      'from mk_ktx_xaf_info')
+    Options.SetEmptyStrToNull = True
+    IndexFieldNames = 'MK_GL_DATE'
+    Left = 392
+    Top = 536
+    object qryOraKtxInfoMIKEL_TX_ID: TStringField
+      FieldName = 'MIKEL_TX_ID'
+      Required = True
+      Size = 255
+    end
+    object qryOraKtxInfoTX_TYPE: TStringField
+      FieldName = 'TX_TYPE'
+      Required = True
+      Size = 2
+    end
+    object qryOraKtxInfoMK_GL_DATE: TDateTimeField
+      FieldName = 'MK_GL_DATE'
+      Required = True
+    end
+    object qryOraKtxInfoTX_NR: TIntegerField
+      FieldName = 'TX_NR'
+    end
+  end
+  object qryOraKtxGL: TUniQuery
+    UpdatingTable = 'MK_KTX_GL_INFO'
+    KeyFields = 'mikel_tx_id;gl_code;btw_perc'
+    SQLInsert.Strings = (
+      'INSERT INTO MK_KTX_GL_INFO'
+      '  (MIKEL_TX_ID, GL_CODE, BTW_PERC, GL_AMOUNT, TX_REMARK)'
+      'VALUES'
+      '  (:MIKEL_TX_ID, :GL_CODE, :BTW_PERC, :GL_AMOUNT, :TX_REMARK)')
+    SQLDelete.Strings = (
+      'DELETE FROM MK_KTX_GL_INFO'
+      'WHERE'
+      
+        '  MIKEL_TX_ID = :Old_MIKEL_TX_ID AND GL_CODE = :Old_GL_CODE AND ' +
+        'BTW_PERC = :Old_BTW_PERC')
+    SQLUpdate.Strings = (
+      'UPDATE MK_KTX_GL_INFO'
+      'SET'
+      
+        '  MIKEL_TX_ID = :MIKEL_TX_ID, GL_CODE = :GL_CODE, BTW_PERC = :BT' +
+        'W_PERC, GL_AMOUNT = :GL_AMOUNT, TX_REMARK = :TX_REMARK'
+      'WHERE'
+      
+        '  MIKEL_TX_ID = :Old_MIKEL_TX_ID AND GL_CODE = :Old_GL_CODE AND ' +
+        'BTW_PERC = :Old_BTW_PERC')
+    SQLLock.Strings = (
+      
+        'SELECT MIKEL_TX_ID, GL_CODE, BTW_PERC, GL_AMOUNT, TX_REMARK FROM' +
+        ' MK_KTX_GL_INFO'
+      'WHERE'
+      
+        '  MIKEL_TX_ID = :Old_MIKEL_TX_ID AND GL_CODE = :Old_GL_CODE AND ' +
+        'BTW_PERC = :Old_BTW_PERC'
+      'FOR UPDATE NOWAIT')
+    SQLRefresh.Strings = (
+      
+        'SELECT MIKEL_TX_ID, GL_CODE, BTW_PERC, GL_AMOUNT, TX_REMARK FROM' +
+        ' MK_KTX_GL_INFO'
+      'WHERE'
+      
+        '  MIKEL_TX_ID = :MIKEL_TX_ID AND GL_CODE = :GL_CODE AND BTW_PERC' +
+        ' = :BTW_PERC')
+    SQLRecCount.Strings = (
+      'SELECT Count(*) FROM ('
+      'SELECT * FROM MK_KTX_GL_INFO'
+      ''
+      ')')
+    Connection = dmFBZakelijk.connOraZakelijk
+    SQL.Strings = (
+      'select mikel_tx_id, gl_code, btw_perc, gl_amount, tx_remark'
+      'from mk_ktx_gl_info')
+    Options.SetEmptyStrToNull = True
+    IndexFieldNames = 'MIKEL_TX_ID'
+    Left = 656
+    Top = 536
+    object qryOraKtxGLMIKEL_TX_ID: TStringField
+      FieldName = 'MIKEL_TX_ID'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+      Size = 255
+    end
+    object qryOraKtxGLGL_CODE: TStringField
+      FieldName = 'GL_CODE'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+    end
+    object qryOraKtxGLBTW_PERC: TFloatField
+      FieldName = 'BTW_PERC'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+    end
+    object qryOraKtxGLGL_AMOUNT: TFloatField
+      FieldName = 'GL_AMOUNT'
+      Required = True
+    end
+    object qryOraKtxGLTX_REMARK: TStringField
+      FieldName = 'TX_REMARK'
+      Size = 200
+    end
+  end
+  object UniBatch: TCRBatchMove
+    Left = 656
+    Top = 184
   end
 end

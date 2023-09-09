@@ -197,6 +197,14 @@ object frmMain: TfrmMain
     ItemHeight = 15
     TabOrder = 15
   end
+  object Button1: TButton
+    Left = 336
+    Top = 448
+    Width = 113
+    Height = 41
+    Action = actAppendKtx
+    TabOrder = 16
+  end
   object alMain: TActionList
     Left = 256
     Top = 16
@@ -235,6 +243,10 @@ object frmMain: TfrmMain
     object actCopyXAF: TAction
       Caption = 'Copy XAF data'
       OnExecute = actCopyXAFExecute
+    end
+    object actAppendKtx: TAction
+      Caption = 'Append Knab Tx'
+      OnExecute = actAppendKtxExecute
     end
   end
   object bmLoader: TFDBatchMove

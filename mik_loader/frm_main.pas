@@ -64,6 +64,8 @@ type
     btnCopyXAF: TButton;
     actCopyXAF: TAction;
     lstLog: TListBox;
+    Button1: TButton;
+    actAppendKtx: TAction;
     procedure actConnectExecute(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure actLoadRaboExecute(Sender: TObject);
@@ -75,6 +77,7 @@ type
     procedure FormShow(Sender: TObject);
     procedure actShowOraCustomerExecute(Sender: TObject);
     procedure actCopyXAFExecute(Sender: TObject);
+    procedure actAppendKtxExecute(Sender: TObject);
   strict private
     FDataFacade: TDataFacade;
     procedure LoadDataFromFile(const dsname: string);
@@ -96,6 +99,13 @@ uses frm_table;
 {$R *.dfm}
 { ============================================================================ }
 {$REGION 'TfrmMain'}
+
+procedure TfrmMain.actAppendKtxExecute(Sender: TObject);
+begin
+  resetCounters;
+  FDataFacade.AppendKnabTx(bmLoader);
+  showCounters;
+end;
 
 procedure TfrmMain.actConnectExecute(Sender: TObject);
 begin

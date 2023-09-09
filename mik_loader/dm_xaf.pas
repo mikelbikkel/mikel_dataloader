@@ -21,7 +21,7 @@ interface
 
 uses
   System.SysUtils, System.Classes, Data.DB, Datasnap.DBClient, dm_fb_zakelijk,
-  MemDS, DBAccess, Uni;
+  MemDS, DBAccess, Uni, CRBatchMove;
 
 type
   TdmXAF = class(TDataModule)
@@ -205,6 +205,65 @@ type
     qryXafVatLineVAT_PERC: TFloatField;
     qryXafVatLineAMOUNT: TFloatField;
     qryXafVatLineAMOUNT_TYPE: TStringField;
+    qryKnabTx: TUniQuery;
+    qryKnabInfo: TUniQuery;
+    qryKnabGL: TUniQuery;
+    qryKnabTxIBAN: TStringField;
+    qryKnabTxTX_DATUM: TDateField;
+    qryKnabTxVALUTA_CODE: TStringField;
+    qryKnabTxCREDIT_DEBET: TStringField;
+    qryKnabTxBEDRAG: TFloatField;
+    qryKnabTxTEGEN_IBAN: TStringField;
+    qryKnabTxTEGEN_NAAM: TStringField;
+    qryKnabTxVALUTA_DATUM: TDateField;
+    qryKnabTxBETAALWIJZE: TStringField;
+    qryKnabTxOMSCHRIJVING: TStringField;
+    qryKnabTxTYPE_BETALING: TStringField;
+    qryKnabTxMACHTIGINGSKENMERK: TStringField;
+    qryKnabTxINCASSANT_ID: TStringField;
+    qryKnabTxADRES: TStringField;
+    qryKnabTxTX_REFERENTIE: TStringField;
+    qryKnabTxBOEK_DATUM: TDateField;
+    qryKnabTxMIKEL_TX_ID: TStringField;
+    qryKnabInfoMIKEL_TX_ID: TStringField;
+    qryKnabInfoTX_TYPE: TStringField;
+    qryKnabInfoMK_GL_DATE: TDateField;
+    qryKnabInfoTX_NR: TIntegerField;
+    qryKnabGLMIKEL_TX_ID: TStringField;
+    qryKnabGLGL_CODE: TStringField;
+    qryKnabGLBTW_PERC: TFloatField;
+    qryKnabGLGL_AMOUNT: TFloatField;
+    qryKnabGLTX_REMARK: TStringField;
+    qryOraKtx: TUniQuery;
+    qryOraKtxInfo: TUniQuery;
+    qryOraKtxGL: TUniQuery;
+    qryOraKtxIBAN: TStringField;
+    qryOraKtxTX_DATUM: TDateTimeField;
+    qryOraKtxVALUTA_CODE: TStringField;
+    qryOraKtxCREDIT_DEBET: TStringField;
+    qryOraKtxBEDRAG: TFloatField;
+    qryOraKtxTEGEN_IBAN: TStringField;
+    qryOraKtxTEGEN_NAAM: TStringField;
+    qryOraKtxVALUTA_DATUM: TDateTimeField;
+    qryOraKtxBETAALWIJZE: TStringField;
+    qryOraKtxOMSCHRIJVING: TStringField;
+    qryOraKtxTYPE_BETALING: TStringField;
+    qryOraKtxMACHTIGINGSKENMERK: TStringField;
+    qryOraKtxINCASSANT_ID: TStringField;
+    qryOraKtxADRES: TStringField;
+    qryOraKtxTX_REFERENTIE: TStringField;
+    qryOraKtxBOEK_DATUM: TDateTimeField;
+    qryOraKtxMIKEL_TX_ID: TStringField;
+    qryOraKtxInfoMIKEL_TX_ID: TStringField;
+    qryOraKtxInfoTX_TYPE: TStringField;
+    qryOraKtxInfoMK_GL_DATE: TDateTimeField;
+    qryOraKtxInfoTX_NR: TIntegerField;
+    qryOraKtxGLMIKEL_TX_ID: TStringField;
+    qryOraKtxGLGL_CODE: TStringField;
+    qryOraKtxGLBTW_PERC: TFloatField;
+    qryOraKtxGLGL_AMOUNT: TFloatField;
+    qryOraKtxGLTX_REMARK: TStringField;
+    UniBatch: TCRBatchMove;
   end;
 
 var
