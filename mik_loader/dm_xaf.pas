@@ -263,7 +263,6 @@ type
     qryOraKtxGLBTW_PERC: TFloatField;
     qryOraKtxGLGL_AMOUNT: TFloatField;
     qryOraKtxGLTX_REMARK: TStringField;
-    UniBatch: TCRBatchMove;
   end;
 
 var

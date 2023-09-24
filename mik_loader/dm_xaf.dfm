@@ -1966,8 +1966,4 @@ object dmXAF: TdmXAF
       Size = 200
     end
   end
-  object UniBatch: TCRBatchMove
-    Left = 656
-    Top = 184
-  end
 end

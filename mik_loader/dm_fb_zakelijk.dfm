@@ -44,7 +44,7 @@ object dmFBZakelijk: TdmFBZakelijk
         ', desc_3, reason_code'
       ', instr_bedrag, instr_valuta, koers'
       'from imp_rabo_ztx')
-    Debug = True
+    DMLRefresh = True
     Options.SetEmptyStrToNull = True
     IndexFieldNames = 'valuta_datum'
     Left = 56
@@ -296,7 +296,6 @@ object dmFBZakelijk: TdmFBZakelijk
     Connection = connFBZakelijk
     SQL.Strings = (
       'select log_id, log_ts, log_module, log_message from mikel_log')
-    Debug = True
     ReadOnly = True
     Options.SetEmptyStrToNull = True
     IndexFieldNames = 'LOG_TS DESC'

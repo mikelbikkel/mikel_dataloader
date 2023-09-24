@@ -74,7 +74,7 @@ implementation
 
 uses System.Classes, System.SysUtils, System.Generics.Collections,
   dm_xaf, dm_fb_zakelijk, CRBatchMove,
-  FireDac.Comp.BatchMove.DataSet, Uni, file_loader, batch_decorator;
+  FireDac.Comp.BatchMove.DataSet, Uni, file_loader, batch_decorator, mik_logger;
 
 type
 
@@ -261,39 +261,38 @@ var
 begin
   cnt := UCopyDataSet(dmXAF.qryOraInfo, dmXAF.qryXafInfo, tmReplace);
   TriggerXEvent('UCopyDataSet: OK. [' + IntToStr(cnt) + ']');
-  Exit;
+  exit;
 
-  cnt := CopyDataSet(bm, dmXAF.qryOraInfo, dmXAF.qryXafInfo, tmReplace);
+  cnt := UCopyDataSet(dmXAF.qryOraInfo, dmXAF.qryXafInfo, tmReplace);
   TriggerXEvent('Info: OK. [' + IntToStr(cnt) + ']');
 
-  cnt := CopyDataSet(bm, dmXAF.qryOraCustomer, dmXAF.qryXafCustomer, tmReplace);
+  cnt := UCopyDataSet(dmXAF.qryOraCustomer, dmXAF.qryXafCustomer, tmReplace);
   TriggerXEvent('Customer: OK. [' + IntToStr(cnt) + ']');
 
-  cnt := CopyDataSet(bm, dmXAF.qryOraVatCode, dmXAF.qryXafVatCode, tmReplace);
+  cnt := UCopyDataSet(dmXAF.qryOraVatCode, dmXAF.qryXafVatCode, tmReplace);
   TriggerXEvent('VatCode: OK. [' + IntToStr(cnt) + ']');
 
-  cnt := CopyDataSet(bm, dmXAF.qryOraPeriod, dmXAF.qryXafPeriod, tmReplace);
+  cnt := UCopyDataSet(dmXAF.qryOraPeriod, dmXAF.qryXafPeriod, tmReplace);
   TriggerXEvent('Period: OK. [' + IntToStr(cnt) + ']');
 
-  cnt := CopyDataSet(bm, dmXAF.qryOraAccount, dmXAF.qryXafAccount, tmReplace);
+  cnt := UCopyDataSet(dmXAF.qryOraAccount, dmXAF.qryXafAccount, tmReplace);
   TriggerXEvent('Account: OK. [' + IntToStr(cnt) + ']');
 
-  cnt := CopyDataSet(bm, dmXAF.qryOraOpBalance, dmXAF.qryXafOpBalance,
-    tmReplace);
+  cnt := UCopyDataSet(dmXAF.qryOraOpBalance, dmXAF.qryXafOpBalance, tmReplace);
   TriggerXEvent('Opening balance: OK. [' + IntToStr(cnt) + ']');
 
-  cnt := CopyDataSet(bm, dmXAF.qryOraOpLine, dmXAF.qryXafOpLine, tmReplace);
+  cnt := UCopyDataSet(dmXAF.qryOraOpLine, dmXAF.qryXafOpLine, tmReplace);
   TriggerXEvent('Opening balance line: OK. [' + IntToStr(cnt) + ']');
 
-  cnt := CopyDataSet(bm, dmXAF.qryOraTransaction, dmXAF.qryXafTransaction,
+  cnt := UCopyDataSet(dmXAF.qryOraTransaction, dmXAF.qryXafTransaction,
     tmReplace);
   TriggerXEvent('Transaction: OK. [' + IntToStr(cnt) + ']');
 
-  cnt := CopyDataSet(bm, dmXAF.qryOraTransactionLine,
-    dmXAF.qryXafTransactionLine, tmReplace);
+  cnt := UCopyDataSet(dmXAF.qryOraTransactionLine, dmXAF.qryXafTransactionLine,
+    tmReplace);
   TriggerXEvent('Transaction line: OK. [' + IntToStr(cnt) + ']');
 
-  cnt := CopyDataSet(bm, dmXAF.qryOraVatLine, dmXAF.qryXafVatLine, tmReplace);
+  cnt := UCopyDataSet(dmXAF.qryOraVatLine, dmXAF.qryXafVatLine, tmReplace);
   TriggerXEvent('VAT line: OK. [' + IntToStr(cnt) + ']');
 end;
 
@@ -358,7 +357,7 @@ begin
   if FQDecs.TryGetValue(name, res) then
   begin
     Result := res;
-    Exit;
+    exit;
   end;
 
   if name = 'AppLog' then
@@ -544,12 +543,15 @@ begin
 
     uds := dst as TCustomUniDataSet;
     bd := CreateBatchDecorator(uds, bTruncate);
+    var
+    s2 := (bd as TObject).ToString;
+    MikLogWriteLn(s2);
 
     dst.Active := true;
     bd.StartTransaction;
     bm.Execute;
     bd.Commit;
-    Result := bm.ChangedCount;
+    Result := bm.RecordCount;
   finally
     if Assigned(bm) then
       bm.Free;
