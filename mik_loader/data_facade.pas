@@ -19,7 +19,7 @@ unit data_facade;
 
 interface
 
-uses data.DB, FireDac.Comp.BatchMove;
+uses data.DB;
 
 type
   // tmAppend: insert if PK does not exist. Do nothing if PK exists.
@@ -58,13 +58,13 @@ type
     procedure procKnabZakelijk; virtual; abstract;
 
     procedure LoadDataSetFromFile(const dsname: string; const filename: String;
-      bm: TFDBatchMove; ds: TDataSet); virtual; abstract;
+      ds: TDataSet); virtual; abstract;
 
-    function CopyDataSet(bm: TFDBatchMove; src: TDataSet; dst: TDataSet;
-      tmMode: TTargetMode): integer; virtual; abstract;
+    function UCopyDataSet(src: TDataSet; dst: TDataSet; tmMode: TTargetMode)
+      : integer; virtual; abstract;
 
-    procedure CopyXaf(bm: TFDBatchMove); virtual; abstract;
-    procedure AppendKnabTx(bm: TFDBatchMove); virtual; abstract;
+    procedure CopyXaf; virtual; abstract;
+    procedure AppendKnabTx; virtual; abstract;
   end;
 
 function CreateDataFacade: TDataFacade;
@@ -73,8 +73,8 @@ function CreateDataFacade: TDataFacade;
 implementation
 
 uses System.Classes, System.SysUtils, System.Generics.Collections,
-  dm_xaf, dm_fb_zakelijk, CRBatchMove,
-  FireDac.Comp.BatchMove.DataSet, Uni, file_loader, batch_decorator, mik_logger;
+  CRBatchMove, Uni, dm_xaf, dm_fb_zakelijk, file_loader, batch_decorator,
+  mik_logger;
 
 type
 
@@ -89,10 +89,8 @@ type
     procedure Disconnect;
     function GetZBDataSet(const name: string): TDataSet; override;
     function GetZBQryDecorator(const name: string): IDDReadOnly; override;
-    procedure LoadRaboZakFromFile(const filename: String; bm: TFDBatchMove;
-      ds: TDataSet);
-    procedure LoadKnabZakFromFile(const filename: String; bm: TFDBatchMove;
-      ds: TDataSet);
+    procedure LoadRaboZakFromFile(const filename: String; ds: TDataSet);
+    procedure LoadKnabZakFromFile(const filename: String; ds: TDataSet);
 
   public
     constructor Create;
@@ -100,14 +98,12 @@ type
     procedure procRaboZakelijk; override;
     procedure procKnabZakelijk; override;
     procedure LoadDataSetFromFile(const dsname: string; const filename: String;
-      bm: TFDBatchMove; ds: TDataSet); override;
-    function CopyDataSet(bm: TFDBatchMove; src: TDataSet; dst: TDataSet;
-      tmMode: TTargetMode): integer; override;
-    function UCopyDataSet(src: TDataSet; dst: TDataSet;
-      tmMode: TTargetMode): integer;
+      ds: TDataSet); override;
+    function UCopyDataSet(src: TDataSet; dst: TDataSet; tmMode: TTargetMode)
+      : integer; override;
 
-    procedure CopyXaf(bm: TFDBatchMove); override;
-    procedure AppendKnabTx(bm: TFDBatchMove); override;
+    procedure CopyXaf; override;
+    procedure AppendKnabTx; override;
   end;
 
   TConfig = class
@@ -146,17 +142,17 @@ end;
 
 { ============================================================================ }
 
-procedure ZBData.AppendKnabTx(bm: TFDBatchMove);
+procedure ZBData.AppendKnabTx;
 var
   cnt: integer;
 begin
-  cnt := CopyDataSet(bm, dmXAF.qryOraKtx, dmXAF.qryKnabTx, tmAppend);
+  cnt := UCopyDataSet(dmXAF.qryOraKtx, dmXAF.qryKnabTx, tmAppend);
   TriggerXEvent('Knab tx - mk_ktx: OK. [' + IntToStr(cnt) + ']');
 
-  cnt := CopyDataSet(bm, dmXAF.qryOraKtxInfo, dmXAF.qryKnabInfo, tmAppend);
+  cnt := UCopyDataSet(dmXAF.qryOraKtxInfo, dmXAF.qryKnabInfo, tmAppend);
   TriggerXEvent('Knab info - mk_ktx_xaf_info: OK. [' + IntToStr(cnt) + ']');
 
-  cnt := CopyDataSet(bm, dmXAF.qryOraKtxGL, dmXAF.qryKnabGL, tmAppend);
+  cnt := UCopyDataSet(dmXAF.qryOraKtxGL, dmXAF.qryKnabGL, tmAppend);
   TriggerXEvent('Knab GL - mk_ktx_gl_info: OK. [' + IntToStr(cnt) + ']');
 end;
 
@@ -188,80 +184,12 @@ begin
   end;
 end;
 
-function ZBData.CopyDataSet(bm: TFDBatchMove; src: TDataSet; dst: TDataSet;
-  tmMode: TTargetMode): integer;
-var
-  rdr: TFDBatchMoveDataSetReader;
-  wtr: TFDBatchMoveDataSetWriter;
-  mi: TFDBatchMoveMappingItem;
-  fields: TStringList;
-  bd: IDDBatch;
-  uds: TCustomUniDataSet;
-  bTruncate: boolean;
-begin
-  if not(dst is TCustomUniDataSet) then
-    raise Exception.Create('dst must be a TCustomUniDataSet');
-
-  Result := -1;
-  bd := nil;
-  fields := TStringList.Create;
-  try
-    rdr := TFDBatchMoveDataSetReader.Create(bm);
-    rdr.DataSet := src;
-    src.Active := true;
-
-    wtr := TFDBatchMoveDataSetWriter.Create(bm);
-    wtr.Optimise := false;
-    wtr.DataSet := dst;
-
-    uds := dst as TCustomUniDataSet;
-    case tmMode of
-      tmReplace:
-        begin
-          bTruncate := true;
-          bm.Mode := dmAlwaysInsert;
-        end;
-      tmAppend:
-        begin
-          bTruncate := false;
-          bm.Mode := dmAppend;
-        end;
-    else
-      raise Exception.Create('unknown tmMode');
-    end;
-    bm.Options := [];
-    bm.CommitCount := 0;
-
-    bd := CreateBatchDecorator(uds, bTruncate);
-    dst.Active := true;
-
-    bm.Mappings.ClearAndResetID;
-    dst.GetFieldNames(fields);
-    for var i: integer := 0 to fields.Count - 1 do
-    begin
-      mi := bm.Mappings.Add;
-      mi.SourceFieldName := fields[i];
-      mi.DestinationFieldName := fields[i];
-    end;
-
-    bd.StartTransaction;
-    Result := bm.Execute;
-    bd.Commit;
-  finally
-    bd := nil;
-    src.Active := false;
-    dst.Active := false;
-    fields.Free;
-  end;
-end;
-
-procedure ZBData.CopyXaf(bm: TFDBatchMove);
+procedure ZBData.CopyXaf;
 var
   cnt: integer;
 begin
   cnt := UCopyDataSet(dmXAF.qryOraInfo, dmXAF.qryXafInfo, tmReplace);
   TriggerXEvent('UCopyDataSet: OK. [' + IntToStr(cnt) + ']');
-  exit;
 
   cnt := UCopyDataSet(dmXAF.qryOraInfo, dmXAF.qryXafInfo, tmReplace);
   TriggerXEvent('Info: OK. [' + IntToStr(cnt) + ']');
@@ -382,16 +310,15 @@ begin
 end;
 
 procedure ZBData.LoadDataSetFromFile(const dsname, filename: String;
-  bm: TFDBatchMove; ds: TDataSet);
+  ds: TDataSet);
 begin
   if dsname = 'RaboImp' then
-    LoadRaboZakFromFile(filename, bm, ds)
+    LoadRaboZakFromFile(filename, ds)
   else if dsname = 'KnabImp' then
-    LoadKnabZakFromFile(filename, bm, ds)
+    LoadKnabZakFromFile(filename, ds)
 end;
 
-procedure ZBData.LoadKnabZakFromFile(const filename: String; bm: TFDBatchMove;
-  ds: TDataSet);
+procedure ZBData.LoadKnabZakFromFile(const filename: String; ds: TDataSet);
 var
   info: TLoadInfo;
   ldr: TFileLoader;
@@ -400,7 +327,7 @@ begin
   ldr := nil;
   try
     info := TLoadInfo.Create;
-    ldr := TFileLoader.Create(bm, ds, true, tmReplace);
+    ldr := TFileLoader.Create(ds, true, tfReplace);
     info.filename := filename;
     info.Separator := ';';
     info.DateFormat := 'dd-mm-yyyy';
@@ -434,8 +361,7 @@ begin
 
 end;
 
-procedure ZBData.LoadRaboZakFromFile(const filename: String; bm: TFDBatchMove;
-  ds: TDataSet);
+procedure ZBData.LoadRaboZakFromFile(const filename: String; ds: TDataSet);
 var
   info: TLoadInfo;
   ldr: TFileLoader;
@@ -444,7 +370,7 @@ begin
   ldr := nil;
   try
     info := TLoadInfo.Create;
-    ldr := TFileLoader.Create(bm, ds, true, tmReplace);
+    ldr := TFileLoader.Create(ds, true, tfReplace);
     info.filename := filename;
 
     { File format: CSV, Rabo zakelijk. }

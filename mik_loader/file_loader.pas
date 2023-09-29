@@ -20,9 +20,11 @@ unit file_loader;
 interface
 
 uses FireDAC.Stan.Intf, FireDAC.Comp.BatchMove, FireDAC.Comp.BatchMove.Text,
-  FireDAC.Comp.BatchMove.Dataset, Data.DB, data_facade;
+  FireDAC.Comp.BatchMove.Dataset, Data.DB;
 
 type
+
+  TFileLoadMode = (tfAppend, tfReplace);
 
   { TODO: Add list of fields to load-info. Then pass as param to the ctor. }
   TLoadInfo = class
@@ -69,8 +71,9 @@ type
     FDsAddFields: Boolean;
     FTruncate: Boolean;
   public
-    constructor Create(bm: TFDBatchMove; ds: TDataSet; DsAddFields: Boolean;
-      tm: TTargetMode);
+    constructor Create(ds: TDataSet; const DsAddFields: Boolean;
+      const tm: TFileLoadMode);
+    destructor Destroy; override;
     procedure SetFileInfo(const info: TLoadInfo);
     procedure AddField(const name: string; const ftype: SFieldType;
       const fsize: integer = 0);
@@ -97,23 +100,22 @@ end;
 
 { TFileLoader }
 
-constructor TFileLoader.Create(bm: TFDBatchMove; ds: TDataSet;
-  DsAddFields: Boolean; tm: TTargetMode);
+constructor TFileLoader.Create(ds: TDataSet; const DsAddFields: Boolean;
+  const tm: TFileLoadMode);
 begin
-  bm.Mappings.ClearAndResetID;
+  FDataMover := TFDBatchMove.Create(nil);
   if DsAddFields then
     ds.FieldDefs.ClearAndResetID;
 
   FDsAddFields := DsAddFields;
-  FDataMover := bm;
 
   case tm of
-    tmReplace:
+    tfReplace:
       begin
         FTruncate := true;
         FDataMover.Mode := dmAlwaysInsert;
       end;
-    tmAppend:
+    tfAppend:
       begin
         FTruncate := false;
         FDataMover.Mode := dmAppend;
@@ -129,6 +131,16 @@ begin
   FWDataset.Dataset := ds; // Destination dataset
   FWDataset.Dataset.Active := false;
   FWDataset.Optimise := false; // Do not Optimise if dataset is attached to UI
+end;
+
+destructor TFileLoader.Destroy;
+begin
+  if Assigned(FDataMover) then
+  begin
+    FDataMover.Free;
+    FDataMover := nil;
+  end;
+  inherited;
 end;
 
 procedure TFileLoader.LoadFile;

@@ -249,12 +249,6 @@ object frmMain: TfrmMain
       OnExecute = actAppendKtxExecute
     end
   end
-  object bmLoader: TFDBatchMove
-    Mappings = <>
-    LogFileName = 'Data.log'
-    Left = 16
-    Top = 16
-  end
   object vtFileData: TVirtualTable
     Left = 96
     Top = 16

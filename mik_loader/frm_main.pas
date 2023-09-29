@@ -37,7 +37,6 @@ type
     btnLoadKnab: TButton;
     btnLoadRabo: TButton;
     lblConnected: TLabel;
-    bmLoader: TFDBatchMove;
     vtFileData: TVirtualTable;
     dsFileData: TUniDataSource;
     grdFileData: TDBGrid;
@@ -103,7 +102,7 @@ uses frm_table;
 procedure TfrmMain.actAppendKtxExecute(Sender: TObject);
 begin
   resetCounters;
-  FDataFacade.AppendKnabTx(bmLoader);
+  FDataFacade.AppendKnabTx;
   showCounters;
 end;
 
@@ -118,7 +117,7 @@ var
   dest: TDataSet;
 begin
   resetCounters;
-  FDataFacade.CopyXaf(bmLoader);
+  FDataFacade.CopyXaf;
 
   dest := FDataFacade.ZBDataSet['XafCustomer'];
   dest.Active := true;
@@ -215,7 +214,7 @@ begin
   ds.Active := false;
   dsFileData.DataSet := ds;
 
-  FDataFacade.LoadDataSetFromFile(dsname, dlgOpen.filename, bmLoader, ds);
+  FDataFacade.LoadDataSetFromFile(dsname, dlgOpen.filename, ds);
   ds.Active := true;
   showCounters;
 end;
@@ -230,10 +229,10 @@ end;
 
 procedure TfrmMain.showCounters;
 begin
-  edtRead.Text := IntToStr(bmLoader.ReadCount);
-  edtWritten.Text := IntToStr(bmLoader.WriteCount);
-  edtInsert.Text := IntToStr(bmLoader.InsertCount);
-  edtErrors.Text := IntToStr(bmLoader.ErrorCount);
+  edtRead.Text := 'NA'; // IntToStr(bmLoader.ReadCount);
+  edtWritten.Text := 'NA'; // IntToStr(bmLoader.WriteCount);
+  edtInsert.Text := 'NA'; // IntToStr(bmLoader.InsertCount);
+  edtErrors.Text := 'NA'; // IntToStr(bmLoader.ErrorCount);
 end;
 
 procedure TfrmMain.XafMessage(msg: string);
