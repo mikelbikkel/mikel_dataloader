@@ -1506,7 +1506,7 @@ object dmXAF: TdmXAF
       
         ', machtigingskenmerk, incassant_id, adres, tx_referentie, boek_d' +
         'atum'
-      ', mikel_tx_id'
+      ', mikel_tx_id, create_date'
       'from mk_ktx')
     Options.SetEmptyStrToNull = True
     IndexFieldNames = 'boek_datum'
@@ -1619,7 +1619,7 @@ object dmXAF: TdmXAF
       ') q')
     Connection = dmFBZakelijk.connFBZakelijk
     SQL.Strings = (
-      'select mikel_tx_id, tx_type, mk_gl_date, tx_nr'
+      'select mikel_tx_id, tx_type, mk_gl_date, tx_nr, create_date'
       'from mk_ktx_xaf_info')
     Options.SetEmptyStrToNull = True
     IndexFieldNames = 'MK_GL_DATE'
@@ -1649,7 +1649,9 @@ object dmXAF: TdmXAF
     KeyFields = 'mikel_tx_id;gl_code;btw_perc'
     Connection = dmFBZakelijk.connFBZakelijk
     SQL.Strings = (
-      'select mikel_tx_id, gl_code, btw_perc, gl_amount, tx_remark'
+      
+        'select mikel_tx_id, gl_code, btw_perc, gl_amount, tx_remark, cre' +
+        'ate_date'
       'from mk_ktx_gl_info')
     IndexFieldNames = 'mikel_tx_id'
     Left = 544
@@ -1746,8 +1748,9 @@ object dmXAF: TdmXAF
       
         ', machtigingskenmerk, incassant_id, adres, tx_referentie, boek_d' +
         'atum'
-      ', mikel_tx_id'
-      'from mk_ktx')
+      ', mikel_tx_id, create_date'
+      'from mk_ktx'
+      '')
     Options.SetEmptyStrToNull = True
     IndexFieldNames = 'boek_datum'
     Left = 136
@@ -1863,7 +1866,7 @@ object dmXAF: TdmXAF
       ')')
     Connection = dmFBZakelijk.connOraZakelijk
     SQL.Strings = (
-      'select mikel_tx_id, tx_type, mk_gl_date, tx_nr'
+      'select mikel_tx_id, tx_type, mk_gl_date, tx_nr, create_date'
       'from mk_ktx_xaf_info')
     Options.SetEmptyStrToNull = True
     IndexFieldNames = 'MK_GL_DATE'
@@ -1935,7 +1938,9 @@ object dmXAF: TdmXAF
       ')')
     Connection = dmFBZakelijk.connOraZakelijk
     SQL.Strings = (
-      'select mikel_tx_id, gl_code, btw_perc, gl_amount, tx_remark'
+      
+        'select mikel_tx_id, gl_code, btw_perc, gl_amount, tx_remark, cre' +
+        'ate_date'
       'from mk_ktx_gl_info')
     Options.SetEmptyStrToNull = True
     IndexFieldNames = 'MIKEL_TX_ID'
