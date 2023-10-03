@@ -263,6 +263,12 @@ type
     qryOraKtxGLBTW_PERC: TFloatField;
     qryOraKtxGLGL_AMOUNT: TFloatField;
     qryOraKtxGLTX_REMARK: TStringField;
+    qryKnabTxCREATE_DATE: TDateTimeField;
+    qryOraKtxCREATE_DATE: TSQLTimeStampField;
+    qryKnabInfoCREATE_DATE: TDateTimeField;
+    qryOraKtxInfoCREATE_DATE: TSQLTimeStampField;
+    qryKnabGLCREATE_DATE: TDateTimeField;
+    qryOraKtxGLCREATE_DATE: TSQLTimeStampField;
   end;
 
 var

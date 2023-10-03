@@ -1452,13 +1452,13 @@ object dmXAF: TdmXAF
         '  (IBAN, TX_DATUM, VALUTA_CODE, CREDIT_DEBET, BEDRAG, TEGEN_IBAN' +
         ', TEGEN_NAAM, VALUTA_DATUM, BETAALWIJZE, OMSCHRIJVING, TYPE_BETA' +
         'LING, MACHTIGINGSKENMERK, INCASSANT_ID, ADRES, TX_REFERENTIE, BO' +
-        'EK_DATUM, MIKEL_TX_ID)'
+        'EK_DATUM, MIKEL_TX_ID, CREATE_DATE)'
       'VALUES'
       
         '  (:IBAN, :TX_DATUM, :VALUTA_CODE, :CREDIT_DEBET, :BEDRAG, :TEGE' +
         'N_IBAN, :TEGEN_NAAM, :VALUTA_DATUM, :BETAALWIJZE, :OMSCHRIJVING,' +
         ' :TYPE_BETALING, :MACHTIGINGSKENMERK, :INCASSANT_ID, :ADRES, :TX' +
-        '_REFERENTIE, :BOEK_DATUM, :MIKEL_TX_ID)')
+        '_REFERENTIE, :BOEK_DATUM, :MIKEL_TX_ID, :CREATE_DATE)')
     SQLDelete.Strings = (
       'DELETE FROM MK_KTX'
       'WHERE'
@@ -1474,7 +1474,7 @@ object dmXAF: TdmXAF
         'PE_BETALING = :TYPE_BETALING, MACHTIGINGSKENMERK = :MACHTIGINGSK' +
         'ENMERK, INCASSANT_ID = :INCASSANT_ID, ADRES = :ADRES, TX_REFEREN' +
         'TIE = :TX_REFERENTIE, BOEK_DATUM = :BOEK_DATUM, MIKEL_TX_ID = :M' +
-        'IKEL_TX_ID'
+        'IKEL_TX_ID, CREATE_DATE = :CREATE_DATE'
       'WHERE'
       '  MIKEL_TX_ID = :Old_MIKEL_TX_ID')
     SQLLock.Strings = (
@@ -1487,7 +1487,7 @@ object dmXAF: TdmXAF
         'SELECT IBAN, TX_DATUM, VALUTA_CODE, CREDIT_DEBET, BEDRAG, TEGEN_' +
         'IBAN, TEGEN_NAAM, VALUTA_DATUM, BETAALWIJZE, OMSCHRIJVING, TYPE_' +
         'BETALING, MACHTIGINGSKENMERK, INCASSANT_ID, ADRES, TX_REFERENTIE' +
-        ', BOEK_DATUM, MIKEL_TX_ID FROM MK_KTX'
+        ', BOEK_DATUM, MIKEL_TX_ID, CREATE_DATE FROM MK_KTX'
       'WHERE'
       '  MIKEL_TX_ID = :MIKEL_TX_ID')
     SQLRecCount.Strings = (
@@ -1580,15 +1580,19 @@ object dmXAF: TdmXAF
       Required = True
       Size = 120
     end
+    object qryKnabTxCREATE_DATE: TDateTimeField
+      FieldName = 'CREATE_DATE'
+      Required = True
+    end
   end
   object qryKnabInfo: TUniQuery
     UpdatingTable = 'MK_KTX_XAF_INFO'
     KeyFields = 'mikel_tx_id'
     SQLInsert.Strings = (
       'INSERT INTO MK_KTX_XAF_INFO'
-      '  (MIKEL_TX_ID, TX_TYPE, MK_GL_DATE, TX_NR)'
+      '  (MIKEL_TX_ID, TX_TYPE, MK_GL_DATE, TX_NR, CREATE_DATE)'
       'VALUES'
-      '  (:MIKEL_TX_ID, :TX_TYPE, :MK_GL_DATE, :TX_NR)')
+      '  (:MIKEL_TX_ID, :TX_TYPE, :MK_GL_DATE, :TX_NR, :CREATE_DATE)')
     SQLDelete.Strings = (
       'DELETE FROM MK_KTX_XAF_INFO'
       'WHERE'
@@ -1598,7 +1602,7 @@ object dmXAF: TdmXAF
       'SET'
       
         '  MIKEL_TX_ID = :MIKEL_TX_ID, TX_TYPE = :TX_TYPE, MK_GL_DATE = :' +
-        'MK_GL_DATE, TX_NR = :TX_NR'
+        'MK_GL_DATE, TX_NR = :TX_NR, CREATE_DATE = :CREATE_DATE'
       'WHERE'
       '  MIKEL_TX_ID = :Old_MIKEL_TX_ID')
     SQLLock.Strings = (
@@ -1608,8 +1612,8 @@ object dmXAF: TdmXAF
       'FOR UPDATE WITH LOCK')
     SQLRefresh.Strings = (
       
-        'SELECT MIKEL_TX_ID, TX_TYPE, MK_GL_DATE, TX_NR FROM MK_KTX_XAF_I' +
-        'NFO'
+        'SELECT MIKEL_TX_ID, TX_TYPE, MK_GL_DATE, TX_NR, CREATE_DATE FROM' +
+        ' MK_KTX_XAF_INFO'
       'WHERE'
       '  MIKEL_TX_ID = :MIKEL_TX_ID')
     SQLRecCount.Strings = (
@@ -1643,10 +1647,60 @@ object dmXAF: TdmXAF
     object qryKnabInfoTX_NR: TIntegerField
       FieldName = 'TX_NR'
     end
+    object qryKnabInfoCREATE_DATE: TDateTimeField
+      FieldName = 'CREATE_DATE'
+      Required = True
+    end
   end
   object qryKnabGL: TUniQuery
     UpdatingTable = 'MK_KTX_GL_INFO'
     KeyFields = 'mikel_tx_id;gl_code;btw_perc'
+    SQLInsert.Strings = (
+      'INSERT INTO MK_KTX_GL_INFO'
+      
+        '  (MIKEL_TX_ID, GL_CODE, BTW_PERC, GL_AMOUNT, TX_REMARK, CREATE_' +
+        'DATE)'
+      'VALUES'
+      
+        '  (:MIKEL_TX_ID, :GL_CODE, :BTW_PERC, :GL_AMOUNT, :TX_REMARK, :C' +
+        'REATE_DATE)')
+    SQLDelete.Strings = (
+      'DELETE FROM MK_KTX_GL_INFO'
+      'WHERE'
+      
+        '  MIKEL_TX_ID = :Old_MIKEL_TX_ID AND GL_CODE = :Old_GL_CODE AND ' +
+        'BTW_PERC = :Old_BTW_PERC')
+    SQLUpdate.Strings = (
+      'UPDATE MK_KTX_GL_INFO'
+      'SET'
+      
+        '  MIKEL_TX_ID = :MIKEL_TX_ID, GL_CODE = :GL_CODE, BTW_PERC = :BT' +
+        'W_PERC, GL_AMOUNT = :GL_AMOUNT, TX_REMARK = :TX_REMARK, CREATE_D' +
+        'ATE = :CREATE_DATE'
+      'WHERE'
+      
+        '  MIKEL_TX_ID = :Old_MIKEL_TX_ID AND GL_CODE = :Old_GL_CODE AND ' +
+        'BTW_PERC = :Old_BTW_PERC')
+    SQLLock.Strings = (
+      'SELECT NULL FROM MK_KTX_GL_INFO'
+      'WHERE'
+      
+        'MIKEL_TX_ID = :Old_MIKEL_TX_ID AND GL_CODE = :Old_GL_CODE AND BT' +
+        'W_PERC = :Old_BTW_PERC'
+      'FOR UPDATE WITH LOCK')
+    SQLRefresh.Strings = (
+      
+        'SELECT MIKEL_TX_ID, GL_CODE, BTW_PERC, GL_AMOUNT, TX_REMARK, CRE' +
+        'ATE_DATE FROM MK_KTX_GL_INFO'
+      'WHERE'
+      
+        '  MIKEL_TX_ID = :MIKEL_TX_ID AND GL_CODE = :GL_CODE AND BTW_PERC' +
+        ' = :BTW_PERC')
+    SQLRecCount.Strings = (
+      'SELECT COUNT(*) FROM ('
+      'SELECT 1 AS C  FROM MK_KTX_GL_INFO'
+      ''
+      ') q')
     Connection = dmFBZakelijk.connFBZakelijk
     SQL.Strings = (
       
@@ -1680,6 +1734,10 @@ object dmXAF: TdmXAF
       FieldName = 'TX_REMARK'
       Size = 200
     end
+    object qryKnabGLCREATE_DATE: TDateTimeField
+      FieldName = 'CREATE_DATE'
+      Required = True
+    end
   end
   object qryOraKtx: TUniQuery
     UpdatingTable = 'MK_KTX'
@@ -1690,13 +1748,13 @@ object dmXAF: TdmXAF
         '  (IBAN, TX_DATUM, VALUTA_CODE, CREDIT_DEBET, BEDRAG, TEGEN_IBAN' +
         ', TEGEN_NAAM, VALUTA_DATUM, BETAALWIJZE, OMSCHRIJVING, TYPE_BETA' +
         'LING, MACHTIGINGSKENMERK, INCASSANT_ID, ADRES, TX_REFERENTIE, BO' +
-        'EK_DATUM, MIKEL_TX_ID)'
+        'EK_DATUM, MIKEL_TX_ID, CREATE_DATE)'
       'VALUES'
       
         '  (:IBAN, :TX_DATUM, :VALUTA_CODE, :CREDIT_DEBET, :BEDRAG, :TEGE' +
         'N_IBAN, :TEGEN_NAAM, :VALUTA_DATUM, :BETAALWIJZE, :OMSCHRIJVING,' +
         ' :TYPE_BETALING, :MACHTIGINGSKENMERK, :INCASSANT_ID, :ADRES, :TX' +
-        '_REFERENTIE, :BOEK_DATUM, :MIKEL_TX_ID)')
+        '_REFERENTIE, :BOEK_DATUM, :MIKEL_TX_ID, :CREATE_DATE)')
     SQLDelete.Strings = (
       'DELETE FROM MK_KTX'
       'WHERE'
@@ -1712,7 +1770,7 @@ object dmXAF: TdmXAF
         'PE_BETALING = :TYPE_BETALING, MACHTIGINGSKENMERK = :MACHTIGINGSK' +
         'ENMERK, INCASSANT_ID = :INCASSANT_ID, ADRES = :ADRES, TX_REFEREN' +
         'TIE = :TX_REFERENTIE, BOEK_DATUM = :BOEK_DATUM, MIKEL_TX_ID = :M' +
-        'IKEL_TX_ID'
+        'IKEL_TX_ID, CREATE_DATE = :CREATE_DATE'
       'WHERE'
       '  MIKEL_TX_ID = :Old_MIKEL_TX_ID')
     SQLLock.Strings = (
@@ -1720,7 +1778,7 @@ object dmXAF: TdmXAF
         'SELECT IBAN, TX_DATUM, VALUTA_CODE, CREDIT_DEBET, BEDRAG, TEGEN_' +
         'IBAN, TEGEN_NAAM, VALUTA_DATUM, BETAALWIJZE, OMSCHRIJVING, TYPE_' +
         'BETALING, MACHTIGINGSKENMERK, INCASSANT_ID, ADRES, TX_REFERENTIE' +
-        ', BOEK_DATUM, MIKEL_TX_ID FROM MK_KTX'
+        ', BOEK_DATUM, MIKEL_TX_ID, CREATE_DATE FROM MK_KTX'
       'WHERE'
       '  MIKEL_TX_ID = :Old_MIKEL_TX_ID'
       'FOR UPDATE NOWAIT')
@@ -1729,7 +1787,7 @@ object dmXAF: TdmXAF
         'SELECT IBAN, TX_DATUM, VALUTA_CODE, CREDIT_DEBET, BEDRAG, TEGEN_' +
         'IBAN, TEGEN_NAAM, VALUTA_DATUM, BETAALWIJZE, OMSCHRIJVING, TYPE_' +
         'BETALING, MACHTIGINGSKENMERK, INCASSANT_ID, ADRES, TX_REFERENTIE' +
-        ', BOEK_DATUM, MIKEL_TX_ID FROM MK_KTX'
+        ', BOEK_DATUM, MIKEL_TX_ID, CREATE_DATE FROM MK_KTX'
       'WHERE'
       '  MIKEL_TX_ID = :MIKEL_TX_ID')
     SQLRecCount.Strings = (
@@ -1825,15 +1883,19 @@ object dmXAF: TdmXAF
       Required = True
       Size = 255
     end
+    object qryOraKtxCREATE_DATE: TSQLTimeStampField
+      FieldName = 'CREATE_DATE'
+      Required = True
+    end
   end
   object qryOraKtxInfo: TUniQuery
     UpdatingTable = 'MK_KTX_XAF_INFO'
     KeyFields = 'mikel_tx_id'
     SQLInsert.Strings = (
       'INSERT INTO MK_KTX_XAF_INFO'
-      '  (MIKEL_TX_ID, TX_TYPE, MK_GL_DATE, TX_NR)'
+      '  (MIKEL_TX_ID, TX_TYPE, MK_GL_DATE, TX_NR, CREATE_DATE)'
       'VALUES'
-      '  (:MIKEL_TX_ID, :TX_TYPE, :MK_GL_DATE, :TX_NR)')
+      '  (:MIKEL_TX_ID, :TX_TYPE, :MK_GL_DATE, :TX_NR, :CREATE_DATE)')
     SQLDelete.Strings = (
       'DELETE FROM MK_KTX_XAF_INFO'
       'WHERE'
@@ -1843,20 +1905,20 @@ object dmXAF: TdmXAF
       'SET'
       
         '  MIKEL_TX_ID = :MIKEL_TX_ID, TX_TYPE = :TX_TYPE, MK_GL_DATE = :' +
-        'MK_GL_DATE, TX_NR = :TX_NR'
+        'MK_GL_DATE, TX_NR = :TX_NR, CREATE_DATE = :CREATE_DATE'
       'WHERE'
       '  MIKEL_TX_ID = :Old_MIKEL_TX_ID')
     SQLLock.Strings = (
       
-        'SELECT MIKEL_TX_ID, TX_TYPE, MK_GL_DATE, TX_NR FROM MK_KTX_XAF_I' +
-        'NFO'
+        'SELECT MIKEL_TX_ID, TX_TYPE, MK_GL_DATE, TX_NR, CREATE_DATE FROM' +
+        ' MK_KTX_XAF_INFO'
       'WHERE'
       '  MIKEL_TX_ID = :Old_MIKEL_TX_ID'
       'FOR UPDATE NOWAIT')
     SQLRefresh.Strings = (
       
-        'SELECT MIKEL_TX_ID, TX_TYPE, MK_GL_DATE, TX_NR FROM MK_KTX_XAF_I' +
-        'NFO'
+        'SELECT MIKEL_TX_ID, TX_TYPE, MK_GL_DATE, TX_NR, CREATE_DATE FROM' +
+        ' MK_KTX_XAF_INFO'
       'WHERE'
       '  MIKEL_TX_ID = :MIKEL_TX_ID')
     SQLRecCount.Strings = (
@@ -1889,15 +1951,23 @@ object dmXAF: TdmXAF
     object qryOraKtxInfoTX_NR: TIntegerField
       FieldName = 'TX_NR'
     end
+    object qryOraKtxInfoCREATE_DATE: TSQLTimeStampField
+      FieldName = 'CREATE_DATE'
+      Required = True
+    end
   end
   object qryOraKtxGL: TUniQuery
     UpdatingTable = 'MK_KTX_GL_INFO'
     KeyFields = 'mikel_tx_id;gl_code;btw_perc'
     SQLInsert.Strings = (
       'INSERT INTO MK_KTX_GL_INFO'
-      '  (MIKEL_TX_ID, GL_CODE, BTW_PERC, GL_AMOUNT, TX_REMARK)'
+      
+        '  (MIKEL_TX_ID, GL_CODE, BTW_PERC, GL_AMOUNT, TX_REMARK, CREATE_' +
+        'DATE)'
       'VALUES'
-      '  (:MIKEL_TX_ID, :GL_CODE, :BTW_PERC, :GL_AMOUNT, :TX_REMARK)')
+      
+        '  (:MIKEL_TX_ID, :GL_CODE, :BTW_PERC, :GL_AMOUNT, :TX_REMARK, :C' +
+        'REATE_DATE)')
     SQLDelete.Strings = (
       'DELETE FROM MK_KTX_GL_INFO'
       'WHERE'
@@ -1909,15 +1979,16 @@ object dmXAF: TdmXAF
       'SET'
       
         '  MIKEL_TX_ID = :MIKEL_TX_ID, GL_CODE = :GL_CODE, BTW_PERC = :BT' +
-        'W_PERC, GL_AMOUNT = :GL_AMOUNT, TX_REMARK = :TX_REMARK'
+        'W_PERC, GL_AMOUNT = :GL_AMOUNT, TX_REMARK = :TX_REMARK, CREATE_D' +
+        'ATE = :CREATE_DATE'
       'WHERE'
       
         '  MIKEL_TX_ID = :Old_MIKEL_TX_ID AND GL_CODE = :Old_GL_CODE AND ' +
         'BTW_PERC = :Old_BTW_PERC')
     SQLLock.Strings = (
       
-        'SELECT MIKEL_TX_ID, GL_CODE, BTW_PERC, GL_AMOUNT, TX_REMARK FROM' +
-        ' MK_KTX_GL_INFO'
+        'SELECT MIKEL_TX_ID, GL_CODE, BTW_PERC, GL_AMOUNT, TX_REMARK, CRE' +
+        'ATE_DATE FROM MK_KTX_GL_INFO'
       'WHERE'
       
         '  MIKEL_TX_ID = :Old_MIKEL_TX_ID AND GL_CODE = :Old_GL_CODE AND ' +
@@ -1925,8 +1996,8 @@ object dmXAF: TdmXAF
       'FOR UPDATE NOWAIT')
     SQLRefresh.Strings = (
       
-        'SELECT MIKEL_TX_ID, GL_CODE, BTW_PERC, GL_AMOUNT, TX_REMARK FROM' +
-        ' MK_KTX_GL_INFO'
+        'SELECT MIKEL_TX_ID, GL_CODE, BTW_PERC, GL_AMOUNT, TX_REMARK, CRE' +
+        'ATE_DATE FROM MK_KTX_GL_INFO'
       'WHERE'
       
         '  MIKEL_TX_ID = :MIKEL_TX_ID AND GL_CODE = :GL_CODE AND BTW_PERC' +
@@ -1969,6 +2040,10 @@ object dmXAF: TdmXAF
     object qryOraKtxGLTX_REMARK: TStringField
       FieldName = 'TX_REMARK'
       Size = 200
+    end
+    object qryOraKtxGLCREATE_DATE: TSQLTimeStampField
+      FieldName = 'CREATE_DATE'
+      Required = True
     end
   end
 end
