@@ -365,6 +365,6 @@ object dmFBZakelijk: TdmFBZakelijk
     LoginPrompt = False
     Left = 144
     Top = 120
-    EncryptedPassword = 'ADFFBEFFB9FFBBFFBFFF91FFC8FFCDFFBDFF93FF9EFF'
+    EncryptedPassword = 'ADFFBEFFB9FFBBFFBEFF91FFC8FFCDFFBDFF93FF9EFF'
   end
 end

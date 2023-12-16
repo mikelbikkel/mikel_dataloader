@@ -26,7 +26,8 @@ uses
   dm_xaf in 'dm_xaf.pas' {dmXAF: TDataModule},
   data_facade in 'data_facade.pas',
   batch_decorator in 'batch_decorator.pas',
-  mik_logger in 'mik_logger.pas';
+  mik_logger in 'mik_logger.pas',
+  data_luw in 'data_luw.pas';
 
 {$R *.res}
 

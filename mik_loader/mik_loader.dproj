@@ -126,6 +126,7 @@
         <DCCReference Include="data_facade.pas"/>
         <DCCReference Include="batch_decorator.pas"/>
         <DCCReference Include="mik_logger.pas"/>
+        <DCCReference Include="data_luw.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

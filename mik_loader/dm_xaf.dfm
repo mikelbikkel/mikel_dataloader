@@ -1,6 +1,6 @@
 object dmXAF: TdmXAF
   Height = 649
-  Width = 770
+  Width = 931
   PixelsPerInch = 120
   object qryXafCustomer: TUniQuery
     UpdatingTable = 'mk_xaf_customer'
@@ -2042,6 +2042,227 @@ object dmXAF: TdmXAF
       Size = 200
     end
     object qryOraKtxGLCREATE_DATE: TSQLTimeStampField
+      FieldName = 'CREATE_DATE'
+      Required = True
+    end
+  end
+  object qryOraRZtx: TUniQuery
+    UpdatingTable = 'MK_RABO_ZTX'
+    KeyFields = 'iban;valuta_code;seqno'
+    Connection = dmFBZakelijk.connOraZakelijk
+    SQL.Strings = (
+      
+        'select iban, valuta_code, bic, seqno, boek_Datum, valuta_datum, ' +
+        'bedrag, saldo_na_boeking, tegen_iban, tegen_naam'
+      
+        '     , ultimate_naam, init_naam, tegen_bic, tx_type_code, batch_' +
+        'id, tx_ref, mandate_ref, collector_id,  payment_ref'
+      
+        '     , desc_1, desc_2, desc_3, reason_code, instr_bedrag, instr_' +
+        'valuta, koers, create_date'
+      'from mk_rabo_ztx;')
+    ReadOnly = True
+    Options.SetEmptyStrToNull = True
+    IndexFieldNames = 'iban;valuta_code;seqno'
+    Left = 816
+    Top = 184
+    object qryOraRZtxIBAN: TStringField
+      FieldName = 'IBAN'
+      Required = True
+      Size = 50
+    end
+    object qryOraRZtxVALUTA_CODE: TStringField
+      FieldName = 'VALUTA_CODE'
+      Required = True
+      Size = 4
+    end
+    object qryOraRZtxBIC: TStringField
+      FieldName = 'BIC'
+      Size = 11
+    end
+    object qryOraRZtxSEQNO: TStringField
+      FieldName = 'SEQNO'
+      Required = True
+      Size = 18
+    end
+    object qryOraRZtxBOEK_DATUM: TDateTimeField
+      FieldName = 'BOEK_DATUM'
+    end
+    object qryOraRZtxVALUTA_DATUM: TDateTimeField
+      FieldName = 'VALUTA_DATUM'
+    end
+    object qryOraRZtxBEDRAG: TFloatField
+      FieldName = 'BEDRAG'
+      Required = True
+    end
+    object qryOraRZtxSALDO_NA_BOEKING: TFloatField
+      FieldName = 'SALDO_NA_BOEKING'
+    end
+    object qryOraRZtxTEGEN_IBAN: TStringField
+      FieldName = 'TEGEN_IBAN'
+      Size = 50
+    end
+    object qryOraRZtxTEGEN_NAAM: TStringField
+      FieldName = 'TEGEN_NAAM'
+      Size = 70
+    end
+    object qryOraRZtxULTIMATE_NAAM: TStringField
+      FieldName = 'ULTIMATE_NAAM'
+      Size = 70
+    end
+    object qryOraRZtxINIT_NAAM: TStringField
+      FieldName = 'INIT_NAAM'
+      Size = 70
+    end
+    object qryOraRZtxTEGEN_BIC: TStringField
+      FieldName = 'TEGEN_BIC'
+      Size = 15
+    end
+    object qryOraRZtxTX_TYPE_CODE: TStringField
+      FieldName = 'TX_TYPE_CODE'
+      Size = 4
+    end
+    object qryOraRZtxBATCH_ID: TStringField
+      FieldName = 'BATCH_ID'
+      Size = 35
+    end
+    object qryOraRZtxTX_REF: TStringField
+      FieldName = 'TX_REF'
+      Size = 35
+    end
+    object qryOraRZtxMANDATE_REF: TStringField
+      FieldName = 'MANDATE_REF'
+      Size = 35
+    end
+    object qryOraRZtxCOLLECTOR_ID: TStringField
+      FieldName = 'COLLECTOR_ID'
+      Size = 35
+    end
+    object qryOraRZtxPAYMENT_REF: TStringField
+      FieldName = 'PAYMENT_REF'
+      Size = 35
+    end
+    object qryOraRZtxDESC_1: TStringField
+      FieldName = 'DESC_1'
+      Size = 140
+    end
+    object qryOraRZtxDESC_2: TStringField
+      FieldName = 'DESC_2'
+      Size = 140
+    end
+    object qryOraRZtxDESC_3: TStringField
+      FieldName = 'DESC_3'
+      Size = 140
+    end
+    object qryOraRZtxREASON_CODE: TStringField
+      FieldName = 'REASON_CODE'
+      Size = 75
+    end
+    object qryOraRZtxINSTR_BEDRAG: TFloatField
+      FieldName = 'INSTR_BEDRAG'
+    end
+    object qryOraRZtxINSTR_VALUTA: TStringField
+      FieldName = 'INSTR_VALUTA'
+      Size = 4
+    end
+    object qryOraRZtxKOERS: TFloatField
+      FieldName = 'KOERS'
+    end
+    object qryOraRZtxCREATE_DATE: TSQLTimeStampField
+      FieldName = 'CREATE_DATE'
+      Required = True
+    end
+  end
+  object qryOraRZinfo: TUniQuery
+    UpdatingTable = 'MK_RABO_ZTX_XAF_INFO'
+    KeyFields = 'iban;valuta_code;seqno'
+    Connection = dmFBZakelijk.connOraZakelijk
+    SQL.Strings = (
+      
+        'select iban, valuta_code, seqno, tx_type, mk_gl_date, tx_nr, cre' +
+        'ate_date'
+      'from    mk_rabo_ztx_xaf_info')
+    ReadOnly = True
+    Options.SetEmptyStrToNull = True
+    IndexFieldNames = 'iban;valuta_code;seqno'
+    Left = 816
+    Top = 296
+    object qryOraRZinfoIBAN: TStringField
+      FieldName = 'IBAN'
+      Required = True
+      Size = 50
+    end
+    object qryOraRZinfoVALUTA_CODE: TStringField
+      FieldName = 'VALUTA_CODE'
+      Required = True
+      Size = 4
+    end
+    object qryOraRZinfoSEQNO: TStringField
+      FieldName = 'SEQNO'
+      Required = True
+      Size = 18
+    end
+    object qryOraRZinfoTX_TYPE: TStringField
+      FieldName = 'TX_TYPE'
+      Required = True
+      Size = 2
+    end
+    object qryOraRZinfoMK_GL_DATE: TDateTimeField
+      FieldName = 'MK_GL_DATE'
+      Required = True
+    end
+    object qryOraRZinfoTX_NR: TIntegerField
+      FieldName = 'TX_NR'
+    end
+    object qryOraRZinfoCREATE_DATE: TSQLTimeStampField
+      FieldName = 'CREATE_DATE'
+      Required = True
+    end
+  end
+  object qryOraRZGL: TUniQuery
+    UpdatingTable = 'MK_RABO_ZTX_GL_INFO'
+    Connection = dmFBZakelijk.connOraZakelijk
+    SQL.Strings = (
+      
+        'select iban, valuta_code, seqno, gl_code, btw_perc, gl_amount, t' +
+        'x_remark, create_date'
+      'from    mk_rabo_ztx_gl_info')
+    ReadOnly = True
+    Options.SetEmptyStrToNull = True
+    Left = 816
+    Top = 392
+    object qryOraRZGLIBAN: TStringField
+      FieldName = 'IBAN'
+      Required = True
+      Size = 50
+    end
+    object qryOraRZGLVALUTA_CODE: TStringField
+      FieldName = 'VALUTA_CODE'
+      Required = True
+      Size = 4
+    end
+    object qryOraRZGLSEQNO: TStringField
+      FieldName = 'SEQNO'
+      Required = True
+      Size = 18
+    end
+    object qryOraRZGLGL_CODE: TStringField
+      FieldName = 'GL_CODE'
+      Required = True
+    end
+    object qryOraRZGLBTW_PERC: TFloatField
+      FieldName = 'BTW_PERC'
+      Required = True
+    end
+    object qryOraRZGLGL_AMOUNT: TFloatField
+      FieldName = 'GL_AMOUNT'
+      Required = True
+    end
+    object qryOraRZGLTX_REMARK: TStringField
+      FieldName = 'TX_REMARK'
+      Size = 200
+    end
+    object qryOraRZGLCREATE_DATE: TSQLTimeStampField
       FieldName = 'CREATE_DATE'
       Required = True
     end

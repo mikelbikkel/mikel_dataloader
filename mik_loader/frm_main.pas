@@ -64,7 +64,10 @@ type
     actCopyXAF: TAction;
     lstLog: TListBox;
     Button1: TButton;
-    actAppendKtx: TAction;
+    actCopyKtx: TAction;
+    rgKnabCopyMode: TRadioGroup;
+    Button2: TButton;
+    actCopyRZ: TAction;
     procedure actConnectExecute(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure actLoadRaboExecute(Sender: TObject);
@@ -76,7 +79,8 @@ type
     procedure FormShow(Sender: TObject);
     procedure actShowOraCustomerExecute(Sender: TObject);
     procedure actCopyXAFExecute(Sender: TObject);
-    procedure actAppendKtxExecute(Sender: TObject);
+    procedure actCopyKtxExecute(Sender: TObject);
+    procedure actCopyRZExecute(Sender: TObject);
   strict private
     FDataFacade: TDataFacade;
     procedure LoadDataFromFile(const dsname: string);
@@ -99,11 +103,31 @@ uses frm_table;
 { ============================================================================ }
 {$REGION 'TfrmMain'}
 
-procedure TfrmMain.actAppendKtxExecute(Sender: TObject);
+procedure TfrmMain.actCopyKtxExecute(Sender: TObject);
+var
+  cm: TTargetMode;
 begin
+  case rgKnabCopyMode.ItemIndex of
+    0:
+      begin { Replace all }
+        cm := tmReplace;
+      end;
+    1:
+      begin { Append new }
+        cm := tmAppend;
+      end;
+  else
+    Exit;
+  end;
+
   resetCounters;
-  FDataFacade.AppendKnabTx;
+  FDataFacade.CopyKnabTx(cm);
   showCounters;
+end;
+
+procedure TfrmMain.actCopyRZExecute(Sender: TObject);
+begin
+  FDataFacade.CopyRaboTx;
 end;
 
 procedure TfrmMain.actConnectExecute(Sender: TObject);

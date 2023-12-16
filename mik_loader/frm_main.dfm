@@ -2,7 +2,7 @@ object frmMain: TfrmMain
   Left = 0
   Top = 0
   Caption = 'Mikel Loader'
-  ClientHeight = 534
+  ClientHeight = 596
   ClientWidth = 837
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -199,11 +199,31 @@ object frmMain: TfrmMain
   end
   object Button1: TButton
     Left = 336
-    Top = 448
-    Width = 113
+    Top = 464
+    Width = 132
     Height = 41
-    Action = actAppendKtx
+    Action = actCopyKtx
     TabOrder = 16
+  end
+  object rgKnabCopyMode: TRadioGroup
+    Left = 488
+    Top = 464
+    Width = 137
+    Height = 73
+    Caption = 'Knab Copy modus'
+    ItemIndex = 0
+    Items.Strings = (
+      'Replace all'
+      'Append new')
+    TabOrder = 17
+  end
+  object Button2: TButton
+    Left = 672
+    Top = 496
+    Width = 73
+    Height = 41
+    Action = actCopyRZ
+    TabOrder = 18
   end
   object alMain: TActionList
     Left = 256
@@ -244,9 +264,13 @@ object frmMain: TfrmMain
       Caption = 'Copy XAF data'
       OnExecute = actCopyXAFExecute
     end
-    object actAppendKtx: TAction
-      Caption = 'Append Knab Tx'
-      OnExecute = actAppendKtxExecute
+    object actCopyKtx: TAction
+      Caption = 'Copy Knab transactions'
+      OnExecute = actCopyKtxExecute
+    end
+    object actCopyRZ: TAction
+      Caption = 'Copy RZ'
+      OnExecute = actCopyRZExecute
     end
   end
   object vtFileData: TVirtualTable

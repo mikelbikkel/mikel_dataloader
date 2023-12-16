@@ -64,7 +64,8 @@ type
       : integer; virtual; abstract;
 
     procedure CopyXaf; virtual; abstract;
-    procedure AppendKnabTx; virtual; abstract;
+    procedure CopyKnabTx(tm: TTargetMode); virtual; abstract;
+    procedure CopyRaboTx; virtual; abstract;
   end;
 
 function CreateDataFacade: TDataFacade;
@@ -74,7 +75,7 @@ implementation
 
 uses System.Classes, System.SysUtils, System.Generics.Collections,
   CRBatchMove, Uni, dm_xaf, dm_fb_zakelijk, file_loader, batch_decorator,
-  mik_logger;
+  mik_logger, data_luw;
 
 type
 
@@ -91,7 +92,8 @@ type
     function GetZBQryDecorator(const name: string): IDDReadOnly; override;
     procedure LoadRaboZakFromFile(const filename: String; ds: TDataSet);
     procedure LoadKnabZakFromFile(const filename: String; ds: TDataSet);
-
+    function CreateMove(src: TDataSet; dst: TDataSet; tmMode: TTargetMode)
+      : TCRBatchMove;
   public
     constructor Create;
     destructor Destroy; override;
@@ -103,7 +105,8 @@ type
       : integer; override;
 
     procedure CopyXaf; override;
-    procedure AppendKnabTx; override;
+    procedure CopyKnabTx(tm: TTargetMode); override;
+    procedure CopyRaboTx; override;
   end;
 
   TConfig = class
@@ -142,18 +145,36 @@ end;
 
 { ============================================================================ }
 
-procedure ZBData.AppendKnabTx;
+procedure ZBData.CopyKnabTx(tm: TTargetMode);
 var
   cnt: integer;
 begin
-  cnt := UCopyDataSet(dmXAF.qryOraKtx, dmXAF.qryKnabTx, tmAppend);
+  cnt := UCopyDataSet(dmXAF.qryOraKtx, dmXAF.qryKnabTx, tm);
   TriggerXEvent('Knab tx - mk_ktx: OK. [' + IntToStr(cnt) + ']');
 
-  cnt := UCopyDataSet(dmXAF.qryOraKtxInfo, dmXAF.qryKnabInfo, tmAppend);
+  cnt := UCopyDataSet(dmXAF.qryOraKtxInfo, dmXAF.qryKnabInfo, tm);
   TriggerXEvent('Knab info - mk_ktx_xaf_info: OK. [' + IntToStr(cnt) + ']');
 
-  cnt := UCopyDataSet(dmXAF.qryOraKtxGL, dmXAF.qryKnabGL, tmAppend);
+  cnt := UCopyDataSet(dmXAF.qryOraKtxGL, dmXAF.qryKnabGL, tm);
   TriggerXEvent('Knab GL - mk_ktx_gl_info: OK. [' + IntToStr(cnt) + ']');
+end;
+
+procedure ZBData.CopyRaboTx;
+var
+  luw: ILUW;
+  s: string;
+  sp: TUniStoredProc;
+begin
+  luw := CreateLUW(dmFBZakelijk.connFBZakelijk);
+  sp := TUniStoredProc.Create(nil);
+  sp.StoredProcName := 'mk_pkg_rabo.delete_rabo_ztx';
+  luw.StartTransaction;
+  luw.Add(sp);
+  sp.ExecProc;
+  luw.Rollback;
+  s := (luw as TObject).ToString;
+  TriggerXEvent('LUW: ' + s);
+
 end;
 
 procedure ZBData.Connect;
@@ -229,6 +250,55 @@ begin
   FQDecs := TDictionary<string, IDDReadOnly>.Create;
 end;
 
+function ZBData.CreateMove(src: TDataSet; dst: TDataSet; tmMode: TTargetMode)
+  : TCRBatchMove;
+var
+  bm: TCRBatchMove;
+  fields: TStringList;
+  s: string;
+begin
+  if not(dst is TCustomUniDataSet) then
+    raise Exception.Create('dst must be a TCustomUniDataSet');
+
+  bm := nil;
+  fields := nil;
+  s := EmptyStr;
+  try
+    bm := TCRBatchMove.Create(nil);
+    case tmMode of
+      tmReplace:
+        begin
+          bm.AbortOnKeyViol := true;
+          bm.Mode := bmAppend;
+        end;
+      tmAppend:
+        begin
+          bm.AbortOnKeyViol := false;
+          bm.Mode := bmAppend;
+        end;
+    else
+      raise Exception.Create('unknown tmMode');
+    end;
+    bm.FieldMappingMode := mmFieldName;
+    bm.Source := src;
+    bm.Destination := dst;
+
+    fields := TStringList.Create;
+    dst.GetFieldNames(fields);
+    for var i: integer := 0 to fields.Count - 1 do
+    begin
+      s := fields[i] + '=' + fields[i];
+      bm.Mappings.Add(s);
+    end;
+
+    Result := bm;
+  finally
+    if Assigned(fields) then
+      fields.Free;
+  end;
+
+end;
+
 destructor ZBData.Destroy;
 begin
   Disconnect;
@@ -285,7 +355,7 @@ begin
   if FQDecs.TryGetValue(name, res) then
   begin
     Result := res;
-    exit;
+    Exit;
   end;
 
   if name = 'AppLog' then
@@ -477,7 +547,7 @@ begin
     bd.StartTransaction;
     bm.Execute;
     bd.Commit;
-    Result := bm.RecordCount;
+    Result := bm.MovedCount;
   finally
     if Assigned(bm) then
       bm.Free;
