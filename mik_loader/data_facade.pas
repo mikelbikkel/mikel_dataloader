@@ -164,17 +164,66 @@ var
   luw: ILUW;
   s: string;
   sp: TUniStoredProc;
+  bmTx: TCRBatchMove;
+  bmInfo: TCRBatchMove;
+  bmGL: TCRBatchMove;
+  src: array of TDataSet;
+  dst: array of TDataSet;
+  bm: array of TCRBatchMove;
 begin
-  luw := CreateLUW(dmFBZakelijk.connFBZakelijk);
-  sp := TUniStoredProc.Create(nil);
-  sp.StoredProcName := 'mk_pkg_rabo.delete_rabo_ztx';
-  luw.StartTransaction;
-  luw.Add(sp);
-  sp.ExecProc;
-  luw.Rollback;
-  s := (luw as TObject).ToString;
-  TriggerXEvent('LUW: ' + s);
+  src := [dmXAF.qryOraRZtx, dmXAF.qryOraRZinfo, dmXAF.qryOraRZGL];
+  dst := [dmXAF.qryFBRZtx, dmXAF.qryFBRZinfo, dmXAF.qryFBRZGL];
+  SetLength(bm, Length(src));
 
+  bmTx := nil;
+  sp := nil;
+
+  try
+    luw := CreateLUW(dmFBZakelijk.connFBZakelijk);
+    sp := TUniStoredProc.Create(nil);
+    sp.Connection := dmFBZakelijk.connFBZakelijk;
+    sp.StoredProcName := 'mk_pkg_rabo.delete_rabo_ztx';
+    luw.Add(sp);
+
+    // TODO: use arrays
+    bmTx := CreateMove(dmXAF.qryOraRZtx, dmXAF.qryFBRZtx, tmReplace);
+    luw.Add(dmXAF.qryFBRZtx);
+    bmInfo := CreateMove(dmXAF.qryOraRZinfo, dmXAF.qryFBRZinfo, tmReplace);
+    luw.Add(dmXAF.qryFBRZinfo);
+    bmGL := CreateMove(dmXAF.qryOraRZGL, dmXAF.qryFBRZGL, tmReplace);
+    luw.Add(dmXAF.qryFBRZGL);
+
+    luw.StartTransaction;
+    try
+      sp.ExecProc;
+      // TODO: use arrays
+      bmTx.Execute;
+      bmInfo.Execute;
+      bmGL.Execute;
+
+      luw.Commit;
+      // TODO: use arrays
+      TriggerXEvent('rabo_ztx:     ' + IntToStr(bmTx.MovedCount) + '.');
+      TriggerXEvent('rabo_ztx_xaf: ' + IntToStr(bmInfo.MovedCount) + '.');
+      TriggerXEvent('rabo_ztx_gl:  ' + IntToStr(bmGL.MovedCount) + '.');
+    except
+      luw.Rollback;
+      TriggerXEvent('rabo_ztx: exception.');
+    end;
+
+    s := (luw as TObject).ToString;
+    TriggerXEvent('LUW: ' + s);
+  finally
+    if Assigned(sp) then
+      sp.Free;
+    // TODO: use arrays
+    if Assigned(bmTx) then
+      bmTx.Free;
+    if Assigned(bmInfo) then
+      bmInfo.Free;
+    if Assigned(bmGL) then
+      bmGL.Free;
+  end;
 end;
 
 procedure ZBData.Connect;

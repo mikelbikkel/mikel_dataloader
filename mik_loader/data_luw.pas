@@ -55,6 +55,11 @@ type
 
 function CreateLUW(conn: TUniConnection): ILUW;
 begin
+  if not Assigned(conn) then
+    Exit(nil);
+  if not('InterBase' = conn.ProviderName) then
+    Exit(nil);
+
   Result := TMikLUW.Create(conn);
 end;
 
@@ -94,9 +99,16 @@ end;
 
 procedure TMikLUW.Add(ds: TCustomUniDataSet);
 begin
-  if FStatus <> txsActive then
+  if FStatus <> txsNew then
     Exit;
-  ds.Connection := FtxR.DefaultConnection;
+
+  if not Assigned(ds) then
+    Exit;
+  if not Assigned(ds.Connection) then
+    Exit;
+  if not('InterBase' = ds.Connection.ProviderName) then
+    Exit;
+
   if (ds is TUniStoredProc) then
     ds.Transaction := FtxU
   else

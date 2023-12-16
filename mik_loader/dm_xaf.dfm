@@ -2049,6 +2049,75 @@ object dmXAF: TdmXAF
   object qryOraRZtx: TUniQuery
     UpdatingTable = 'MK_RABO_ZTX'
     KeyFields = 'iban;valuta_code;seqno'
+    SQLInsert.Strings = (
+      'INSERT INTO MK_RABO_ZTX'
+      
+        '  (IBAN, VALUTA_CODE, BIC, SEQNO, BOEK_DATUM, VALUTA_DATUM, BEDR' +
+        'AG, SALDO_NA_BOEKING, TEGEN_IBAN, TEGEN_NAAM, ULTIMATE_NAAM, INI' +
+        'T_NAAM, TEGEN_BIC, TX_TYPE_CODE, BATCH_ID, TX_REF, MANDATE_REF, ' +
+        'COLLECTOR_ID, PAYMENT_REF, DESC_1, DESC_2, DESC_3, REASON_CODE, ' +
+        'INSTR_BEDRAG, INSTR_VALUTA, KOERS, CREATE_DATE)'
+      'VALUES'
+      
+        '  (:IBAN, :VALUTA_CODE, :BIC, :SEQNO, :BOEK_DATUM, :VALUTA_DATUM' +
+        ', :BEDRAG, :SALDO_NA_BOEKING, :TEGEN_IBAN, :TEGEN_NAAM, :ULTIMAT' +
+        'E_NAAM, :INIT_NAAM, :TEGEN_BIC, :TX_TYPE_CODE, :BATCH_ID, :TX_RE' +
+        'F, :MANDATE_REF, :COLLECTOR_ID, :PAYMENT_REF, :DESC_1, :DESC_2, ' +
+        ':DESC_3, :REASON_CODE, :INSTR_BEDRAG, :INSTR_VALUTA, :KOERS, :CR' +
+        'EATE_DATE)')
+    SQLDelete.Strings = (
+      'DELETE FROM MK_RABO_ZTX'
+      'WHERE'
+      
+        '  IBAN = :Old_IBAN AND VALUTA_CODE = :Old_VALUTA_CODE AND SEQNO ' +
+        '= :Old_SEQNO')
+    SQLUpdate.Strings = (
+      'UPDATE MK_RABO_ZTX'
+      'SET'
+      
+        '  IBAN = :IBAN, VALUTA_CODE = :VALUTA_CODE, BIC = :BIC, SEQNO = ' +
+        ':SEQNO, BOEK_DATUM = :BOEK_DATUM, VALUTA_DATUM = :VALUTA_DATUM, ' +
+        'BEDRAG = :BEDRAG, SALDO_NA_BOEKING = :SALDO_NA_BOEKING, TEGEN_IB' +
+        'AN = :TEGEN_IBAN, TEGEN_NAAM = :TEGEN_NAAM, ULTIMATE_NAAM = :ULT' +
+        'IMATE_NAAM, INIT_NAAM = :INIT_NAAM, TEGEN_BIC = :TEGEN_BIC, TX_T' +
+        'YPE_CODE = :TX_TYPE_CODE, BATCH_ID = :BATCH_ID, TX_REF = :TX_REF' +
+        ', MANDATE_REF = :MANDATE_REF, COLLECTOR_ID = :COLLECTOR_ID, PAYM' +
+        'ENT_REF = :PAYMENT_REF, DESC_1 = :DESC_1, DESC_2 = :DESC_2, DESC' +
+        '_3 = :DESC_3, REASON_CODE = :REASON_CODE, INSTR_BEDRAG = :INSTR_' +
+        'BEDRAG, INSTR_VALUTA = :INSTR_VALUTA, KOERS = :KOERS, CREATE_DAT' +
+        'E = :CREATE_DATE'
+      'WHERE'
+      
+        '  IBAN = :Old_IBAN AND VALUTA_CODE = :Old_VALUTA_CODE AND SEQNO ' +
+        '= :Old_SEQNO')
+    SQLLock.Strings = (
+      
+        'SELECT IBAN, VALUTA_CODE, BIC, SEQNO, BOEK_DATUM, VALUTA_DATUM, ' +
+        'BEDRAG, SALDO_NA_BOEKING, TEGEN_IBAN, TEGEN_NAAM, ULTIMATE_NAAM,' +
+        ' INIT_NAAM, TEGEN_BIC, TX_TYPE_CODE, BATCH_ID, TX_REF, MANDATE_R' +
+        'EF, COLLECTOR_ID, PAYMENT_REF, DESC_1, DESC_2, DESC_3, REASON_CO' +
+        'DE, INSTR_BEDRAG, INSTR_VALUTA, KOERS, CREATE_DATE FROM MK_RABO_' +
+        'ZTX'
+      'WHERE'
+      
+        '  IBAN = :Old_IBAN AND VALUTA_CODE = :Old_VALUTA_CODE AND SEQNO ' +
+        '= :Old_SEQNO'
+      'FOR UPDATE NOWAIT')
+    SQLRefresh.Strings = (
+      
+        'SELECT IBAN, VALUTA_CODE, BIC, SEQNO, BOEK_DATUM, VALUTA_DATUM, ' +
+        'BEDRAG, SALDO_NA_BOEKING, TEGEN_IBAN, TEGEN_NAAM, ULTIMATE_NAAM,' +
+        ' INIT_NAAM, TEGEN_BIC, TX_TYPE_CODE, BATCH_ID, TX_REF, MANDATE_R' +
+        'EF, COLLECTOR_ID, PAYMENT_REF, DESC_1, DESC_2, DESC_3, REASON_CO' +
+        'DE, INSTR_BEDRAG, INSTR_VALUTA, KOERS, CREATE_DATE FROM MK_RABO_' +
+        'ZTX'
+      'WHERE'
+      '  IBAN = :IBAN AND VALUTA_CODE = :VALUTA_CODE AND SEQNO = :SEQNO')
+    SQLRecCount.Strings = (
+      'SELECT Count(*) FROM ('
+      'SELECT * FROM MK_RABO_ZTX'
+      ''
+      ')')
     Connection = dmFBZakelijk.connOraZakelijk
     SQL.Strings = (
       
@@ -2065,7 +2134,7 @@ object dmXAF: TdmXAF
     Options.SetEmptyStrToNull = True
     IndexFieldNames = 'iban;valuta_code;seqno'
     Left = 816
-    Top = 184
+    Top = 176
     object qryOraRZtxIBAN: TStringField
       FieldName = 'IBAN'
       Required = True
@@ -2221,6 +2290,7 @@ object dmXAF: TdmXAF
   end
   object qryOraRZGL: TUniQuery
     UpdatingTable = 'MK_RABO_ZTX_GL_INFO'
+    KeyFields = 'iban;valuta_code;seqno;gl_code;btw_perc'
     Connection = dmFBZakelijk.connOraZakelijk
     SQL.Strings = (
       
@@ -2229,6 +2299,7 @@ object dmXAF: TdmXAF
       'from    mk_rabo_ztx_gl_info')
     ReadOnly = True
     Options.SetEmptyStrToNull = True
+    IndexFieldNames = 'iban;valuta_code;seqno;gl_code;btw_perc'
     Left = 816
     Top = 392
     object qryOraRZGLIBAN: TStringField
@@ -2263,6 +2334,289 @@ object dmXAF: TdmXAF
       Size = 200
     end
     object qryOraRZGLCREATE_DATE: TSQLTimeStampField
+      FieldName = 'CREATE_DATE'
+      Required = True
+    end
+  end
+  object qryFBRZtx: TUniQuery
+    UpdatingTable = 'MK_RABO_ZTX'
+    KeyFields = 'iban;valuta_code;seqno'
+    SQLInsert.Strings = (
+      'INSERT INTO MK_RABO_ZTX'
+      
+        '  (IBAN, VALUTA_CODE, BIC, SEQNO, BOEK_DATUM, VALUTA_DATUM, BEDR' +
+        'AG, SALDO_NA_BOEKING, TEGEN_IBAN, TEGEN_NAAM, ULTIMATE_NAAM, INI' +
+        'T_NAAM, TEGEN_BIC, TX_TYPE_CODE, BATCH_ID, TX_REF, MANDATE_REF, ' +
+        'COLLECTOR_ID, PAYMENT_REF, DESC_1, DESC_2, DESC_3, REASON_CODE, ' +
+        'INSTR_BEDRAG, INSTR_VALUTA, KOERS, CREATE_DATE)'
+      'VALUES'
+      
+        '  (:IBAN, :VALUTA_CODE, :BIC, :SEQNO, :BOEK_DATUM, :VALUTA_DATUM' +
+        ', :BEDRAG, :SALDO_NA_BOEKING, :TEGEN_IBAN, :TEGEN_NAAM, :ULTIMAT' +
+        'E_NAAM, :INIT_NAAM, :TEGEN_BIC, :TX_TYPE_CODE, :BATCH_ID, :TX_RE' +
+        'F, :MANDATE_REF, :COLLECTOR_ID, :PAYMENT_REF, :DESC_1, :DESC_2, ' +
+        ':DESC_3, :REASON_CODE, :INSTR_BEDRAG, :INSTR_VALUTA, :KOERS, :CR' +
+        'EATE_DATE)')
+    SQLDelete.Strings = (
+      'DELETE FROM MK_RABO_ZTX'
+      'WHERE'
+      
+        '  IBAN = :Old_IBAN AND VALUTA_CODE = :Old_VALUTA_CODE AND SEQNO ' +
+        '= :Old_SEQNO')
+    SQLUpdate.Strings = (
+      'UPDATE MK_RABO_ZTX'
+      'SET'
+      
+        '  IBAN = :IBAN, VALUTA_CODE = :VALUTA_CODE, BIC = :BIC, SEQNO = ' +
+        ':SEQNO, BOEK_DATUM = :BOEK_DATUM, VALUTA_DATUM = :VALUTA_DATUM, ' +
+        'BEDRAG = :BEDRAG, SALDO_NA_BOEKING = :SALDO_NA_BOEKING, TEGEN_IB' +
+        'AN = :TEGEN_IBAN, TEGEN_NAAM = :TEGEN_NAAM, ULTIMATE_NAAM = :ULT' +
+        'IMATE_NAAM, INIT_NAAM = :INIT_NAAM, TEGEN_BIC = :TEGEN_BIC, TX_T' +
+        'YPE_CODE = :TX_TYPE_CODE, BATCH_ID = :BATCH_ID, TX_REF = :TX_REF' +
+        ', MANDATE_REF = :MANDATE_REF, COLLECTOR_ID = :COLLECTOR_ID, PAYM' +
+        'ENT_REF = :PAYMENT_REF, DESC_1 = :DESC_1, DESC_2 = :DESC_2, DESC' +
+        '_3 = :DESC_3, REASON_CODE = :REASON_CODE, INSTR_BEDRAG = :INSTR_' +
+        'BEDRAG, INSTR_VALUTA = :INSTR_VALUTA, KOERS = :KOERS, CREATE_DAT' +
+        'E = :CREATE_DATE'
+      'WHERE'
+      
+        '  IBAN = :Old_IBAN AND VALUTA_CODE = :Old_VALUTA_CODE AND SEQNO ' +
+        '= :Old_SEQNO')
+    SQLLock.Strings = (
+      'SELECT NULL FROM MK_RABO_ZTX'
+      'WHERE'
+      
+        'IBAN = :Old_IBAN AND VALUTA_CODE = :Old_VALUTA_CODE AND SEQNO = ' +
+        ':Old_SEQNO'
+      'FOR UPDATE WITH LOCK')
+    SQLRefresh.Strings = (
+      
+        'SELECT IBAN, VALUTA_CODE, BIC, SEQNO, BOEK_DATUM, VALUTA_DATUM, ' +
+        'BEDRAG, SALDO_NA_BOEKING, TEGEN_IBAN, TEGEN_NAAM, ULTIMATE_NAAM,' +
+        ' INIT_NAAM, TEGEN_BIC, TX_TYPE_CODE, BATCH_ID, TX_REF, MANDATE_R' +
+        'EF, COLLECTOR_ID, PAYMENT_REF, DESC_1, DESC_2, DESC_3, REASON_CO' +
+        'DE, INSTR_BEDRAG, INSTR_VALUTA, KOERS, CREATE_DATE FROM MK_RABO_' +
+        'ZTX'
+      'WHERE'
+      '  IBAN = :IBAN AND VALUTA_CODE = :VALUTA_CODE AND SEQNO = :SEQNO')
+    SQLRecCount.Strings = (
+      'SELECT COUNT(*) FROM ('
+      'SELECT 1 AS C  FROM MK_RABO_ZTX'
+      ''
+      ') q')
+    Connection = dmFBZakelijk.connFBZakelijk
+    SQL.Strings = (
+      
+        'select iban, valuta_code, bic, seqno, boek_Datum, valuta_datum, ' +
+        'bedrag, saldo_na_boeking, tegen_iban, tegen_naam'
+      
+        '     , ultimate_naam, init_naam, tegen_bic, tx_type_code, batch_' +
+        'id, tx_ref, mandate_ref, collector_id,  payment_ref'
+      
+        '     , desc_1, desc_2, desc_3, reason_code, instr_bedrag, instr_' +
+        'valuta, koers, create_date'
+      'from mk_rabo_ztx;')
+    Options.SetEmptyStrToNull = True
+    IndexFieldNames = 'iban;valuta_code;seqno'
+    Left = 712
+    Top = 176
+    object qryFBRZtxIBAN: TStringField
+      FieldName = 'IBAN'
+      Required = True
+      Size = 50
+    end
+    object qryFBRZtxVALUTA_CODE: TStringField
+      FieldName = 'VALUTA_CODE'
+      Required = True
+      Size = 4
+    end
+    object qryFBRZtxBIC: TStringField
+      FieldName = 'BIC'
+      Size = 11
+    end
+    object qryFBRZtxSEQNO: TStringField
+      FieldName = 'SEQNO'
+      Required = True
+      Size = 18
+    end
+    object qryFBRZtxBOEK_DATUM: TDateField
+      FieldName = 'BOEK_DATUM'
+    end
+    object qryFBRZtxVALUTA_DATUM: TDateField
+      FieldName = 'VALUTA_DATUM'
+    end
+    object qryFBRZtxBEDRAG: TFloatField
+      FieldName = 'BEDRAG'
+      Required = True
+    end
+    object qryFBRZtxSALDO_NA_BOEKING: TFloatField
+      FieldName = 'SALDO_NA_BOEKING'
+    end
+    object qryFBRZtxTEGEN_IBAN: TStringField
+      FieldName = 'TEGEN_IBAN'
+      Size = 50
+    end
+    object qryFBRZtxTEGEN_NAAM: TStringField
+      FieldName = 'TEGEN_NAAM'
+      Size = 70
+    end
+    object qryFBRZtxULTIMATE_NAAM: TStringField
+      FieldName = 'ULTIMATE_NAAM'
+      Size = 70
+    end
+    object qryFBRZtxINIT_NAAM: TStringField
+      FieldName = 'INIT_NAAM'
+      Size = 70
+    end
+    object qryFBRZtxTEGEN_BIC: TStringField
+      FieldName = 'TEGEN_BIC'
+      Size = 15
+    end
+    object qryFBRZtxTX_TYPE_CODE: TStringField
+      FieldName = 'TX_TYPE_CODE'
+      Size = 4
+    end
+    object qryFBRZtxBATCH_ID: TStringField
+      FieldName = 'BATCH_ID'
+      Size = 35
+    end
+    object qryFBRZtxTX_REF: TStringField
+      FieldName = 'TX_REF'
+      Size = 35
+    end
+    object qryFBRZtxMANDATE_REF: TStringField
+      FieldName = 'MANDATE_REF'
+      Size = 35
+    end
+    object qryFBRZtxCOLLECTOR_ID: TStringField
+      FieldName = 'COLLECTOR_ID'
+      Size = 35
+    end
+    object qryFBRZtxPAYMENT_REF: TStringField
+      FieldName = 'PAYMENT_REF'
+      Size = 35
+    end
+    object qryFBRZtxDESC_1: TStringField
+      FieldName = 'DESC_1'
+      Size = 140
+    end
+    object qryFBRZtxDESC_2: TStringField
+      FieldName = 'DESC_2'
+      Size = 140
+    end
+    object qryFBRZtxDESC_3: TStringField
+      FieldName = 'DESC_3'
+      Size = 140
+    end
+    object qryFBRZtxREASON_CODE: TStringField
+      FieldName = 'REASON_CODE'
+      Size = 75
+    end
+    object qryFBRZtxINSTR_BEDRAG: TFloatField
+      FieldName = 'INSTR_BEDRAG'
+    end
+    object qryFBRZtxINSTR_VALUTA: TStringField
+      FieldName = 'INSTR_VALUTA'
+      Size = 4
+    end
+    object qryFBRZtxKOERS: TFloatField
+      FieldName = 'KOERS'
+    end
+    object qryFBRZtxCREATE_DATE: TDateTimeField
+      FieldName = 'CREATE_DATE'
+      Required = True
+    end
+  end
+  object qryFBRZinfo: TUniQuery
+    UpdatingTable = 'mk_rabo_ztx_xaf_info'
+    KeyFields = 'iban;valuta_code;seqno'
+    Connection = dmFBZakelijk.connFBZakelijk
+    SQL.Strings = (
+      
+        'select iban, valuta_code, seqno, tx_type, mk_gl_date, tx_nr, cre' +
+        'ate_date'
+      'from    mk_rabo_ztx_xaf_info')
+    Options.SetEmptyStrToNull = True
+    IndexFieldNames = 'iban;valuta_code;seqno'
+    Left = 720
+    Top = 296
+    object qryFBRZinfoIBAN: TStringField
+      FieldName = 'IBAN'
+      Required = True
+      Size = 50
+    end
+    object qryFBRZinfoVALUTA_CODE: TStringField
+      FieldName = 'VALUTA_CODE'
+      Required = True
+      Size = 4
+    end
+    object qryFBRZinfoSEQNO: TStringField
+      FieldName = 'SEQNO'
+      Required = True
+      Size = 18
+    end
+    object qryFBRZinfoTX_TYPE: TStringField
+      FieldName = 'TX_TYPE'
+      Required = True
+      Size = 2
+    end
+    object qryFBRZinfoMK_GL_DATE: TDateField
+      FieldName = 'MK_GL_DATE'
+      Required = True
+    end
+    object qryFBRZinfoTX_NR: TIntegerField
+      FieldName = 'TX_NR'
+    end
+    object qryFBRZinfoCREATE_DATE: TDateTimeField
+      FieldName = 'CREATE_DATE'
+      Required = True
+    end
+  end
+  object qryFBRZGL: TUniQuery
+    UpdatingTable = 'MK_RABO_ZTX_GL_INFO'
+    KeyFields = 'iban;valuta_code;seqno;gl_code;btw_perc'
+    Connection = dmFBZakelijk.connFBZakelijk
+    SQL.Strings = (
+      
+        'select iban, valuta_code, seqno, gl_code, btw_perc, gl_amount, t' +
+        'x_remark, create_date'
+      'from    mk_rabo_ztx_gl_info')
+    Options.SetEmptyStrToNull = True
+    IndexFieldNames = 'iban;valuta_code;seqno;gl_code;btw_perc'
+    Left = 712
+    Top = 392
+    object qryFBRZGLIBAN: TStringField
+      FieldName = 'IBAN'
+      Required = True
+      Size = 50
+    end
+    object qryFBRZGLVALUTA_CODE: TStringField
+      FieldName = 'VALUTA_CODE'
+      Required = True
+      Size = 4
+    end
+    object qryFBRZGLSEQNO: TStringField
+      FieldName = 'SEQNO'
+      Required = True
+      Size = 18
+    end
+    object qryFBRZGLGL_CODE: TStringField
+      FieldName = 'GL_CODE'
+      Required = True
+    end
+    object qryFBRZGLBTW_PERC: TFloatField
+      FieldName = 'BTW_PERC'
+      Required = True
+    end
+    object qryFBRZGLGL_AMOUNT: TFloatField
+      FieldName = 'GL_AMOUNT'
+      Required = True
+    end
+    object qryFBRZGLTX_REMARK: TStringField
+      FieldName = 'TX_REMARK'
+      Size = 200
+    end
+    object qryFBRZGLCREATE_DATE: TDateTimeField
       FieldName = 'CREATE_DATE'
       Required = True
     end
