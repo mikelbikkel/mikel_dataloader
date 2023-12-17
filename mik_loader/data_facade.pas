@@ -164,18 +164,14 @@ var
   luw: ILUW;
   s: string;
   sp: TUniStoredProc;
-  bmTx: TCRBatchMove;
-  bmInfo: TCRBatchMove;
-  bmGL: TCRBatchMove;
-  src: array of TDataSet;
-  dst: array of TDataSet;
+  src: array of TCustomUniDataSet;
+  dst: array of TCustomUniDataSet;
   bm: array of TCRBatchMove;
 begin
   src := [dmXAF.qryOraRZtx, dmXAF.qryOraRZinfo, dmXAF.qryOraRZGL];
   dst := [dmXAF.qryFBRZtx, dmXAF.qryFBRZinfo, dmXAF.qryFBRZGL];
   SetLength(bm, Length(src));
 
-  bmTx := nil;
   sp := nil;
 
   try
@@ -185,44 +181,32 @@ begin
     sp.StoredProcName := 'mk_pkg_rabo.delete_rabo_ztx';
     luw.Add(sp);
 
-    // TODO: use arrays
-    bmTx := CreateMove(dmXAF.qryOraRZtx, dmXAF.qryFBRZtx, tmReplace);
-    luw.Add(dmXAF.qryFBRZtx);
-    bmInfo := CreateMove(dmXAF.qryOraRZinfo, dmXAF.qryFBRZinfo, tmReplace);
-    luw.Add(dmXAF.qryFBRZinfo);
-    bmGL := CreateMove(dmXAF.qryOraRZGL, dmXAF.qryFBRZGL, tmReplace);
-    luw.Add(dmXAF.qryFBRZGL);
+    for var i: integer := Low(src) to High(src) do
+    begin
+      bm[i] := CreateMove(src[i], dst[i], tmReplace);
+      luw.Add(dst[i]);
+    end;
 
     luw.StartTransaction;
     try
       sp.ExecProc;
-      // TODO: use arrays
-      bmTx.Execute;
-      bmInfo.Execute;
-      bmGL.Execute;
+      for var i: integer := Low(src) to High(src) do
+        bm[i].Execute;
 
       luw.Commit;
-      // TODO: use arrays
-      TriggerXEvent('rabo_ztx:     ' + IntToStr(bmTx.MovedCount) + '.');
-      TriggerXEvent('rabo_ztx_xaf: ' + IntToStr(bmInfo.MovedCount) + '.');
-      TriggerXEvent('rabo_ztx_gl:  ' + IntToStr(bmGL.MovedCount) + '.');
+      for var i: integer := Low(src) to High(src) do
+        TriggerXEvent(bm[i].Destination.name + ': ' +
+          IntToStr(bm[i].MovedCount) + '.');
     except
       luw.Rollback;
       TriggerXEvent('rabo_ztx: exception.');
     end;
 
-    s := (luw as TObject).ToString;
-    TriggerXEvent('LUW: ' + s);
+    // s := (luw as TObject).ToString;
   finally
-    if Assigned(sp) then
-      sp.Free;
-    // TODO: use arrays
-    if Assigned(bmTx) then
-      bmTx.Free;
-    if Assigned(bmInfo) then
-      bmInfo.Free;
-    if Assigned(bmGL) then
-      bmGL.Free;
+    for var i: integer := Low(src) to High(src) do
+      if Assigned(bm[i]) then
+        bm[i].Free;
   end;
 end;
 
