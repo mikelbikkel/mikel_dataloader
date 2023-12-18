@@ -147,16 +147,53 @@ end;
 
 procedure ZBData.CopyKnabTx(tm: TTargetMode);
 var
-  cnt: integer;
+  luw: ILUW;
+  s: string;
+  sp: TUniStoredProc;
+  src: array of TCustomUniDataSet;
+  dst: array of TCustomUniDataSet;
+  bm: array of TCRBatchMove;
 begin
-  cnt := UCopyDataSet(dmXAF.qryOraKtx, dmXAF.qryKnabTx, tm);
-  TriggerXEvent('Knab tx - mk_ktx: OK. [' + IntToStr(cnt) + ']');
+  src := [dmXAF.qryOraKtx, dmXAF.qryOraKtxInfo, dmXAF.qryOraKtxGL];
+  dst := [dmXAF.qryKnabTx, dmXAF.qryKnabInfo, dmXAF.qryKnabGL];
+  SetLength(bm, Length(src));
 
-  cnt := UCopyDataSet(dmXAF.qryOraKtxInfo, dmXAF.qryKnabInfo, tm);
-  TriggerXEvent('Knab info - mk_ktx_xaf_info: OK. [' + IntToStr(cnt) + ']');
+  sp := nil;
 
-  cnt := UCopyDataSet(dmXAF.qryOraKtxGL, dmXAF.qryKnabGL, tm);
-  TriggerXEvent('Knab GL - mk_ktx_gl_info: OK. [' + IntToStr(cnt) + ']');
+  try
+    luw := CreateLUW(dmFBZakelijk.connFBZakelijk);
+    luw.StartTransaction;
+
+    try
+      sp := TUniStoredProc.Create(nil);
+      sp.Connection := dmFBZakelijk.connFBZakelijk;
+      sp.StoredProcName := 'mk_pkg_knab.delete_knab_ztx';
+      luw.AddStoredProc(sp);
+
+      for var i: integer := Low(src) to High(src) do
+      begin
+        bm[i] := CreateMove(src[i], dst[i], tmReplace);
+        luw.AddBatchMove(bm[i]);
+        TriggerXEvent(bm[i].Destination.name + ': ' +
+          IntToStr(bm[i].MovedCount) + '.');
+      end;
+
+      luw.Commit;
+    except
+      luw.Rollback;
+      TriggerXEvent('knab_ztx: exception.');
+    end;
+
+    // s := (luw as TObject).ToString;
+  finally
+    if Assigned(sp) then
+      sp.Free;
+
+    for var i: integer := Low(src) to High(src) do
+      if Assigned(bm[i]) then
+        bm[i].Free;
+  end;
+
 end;
 
 procedure ZBData.CopyRaboTx;
@@ -188,12 +225,11 @@ begin
       begin
         bm[i] := CreateMove(src[i], dst[i], tmReplace);
         luw.AddBatchMove(bm[i]);
+        TriggerXEvent(bm[i].Destination.name + ': ' +
+          IntToStr(bm[i].MovedCount) + '.');
       end;
 
       luw.Commit;
-      for var i: integer := Low(src) to High(src) do
-        TriggerXEvent(bm[i].Destination.name + ': ' +
-          IntToStr(bm[i].MovedCount) + '.');
     except
       luw.Rollback;
       TriggerXEvent('rabo_ztx: exception.');
@@ -240,42 +276,56 @@ end;
 
 procedure ZBData.CopyXaf;
 var
-  cnt: integer;
+  luw: ILUW;
+  s: string;
+  sp: TUniStoredProc;
+  src: array of TCustomUniDataSet;
+  dst: array of TCustomUniDataSet;
+  bm: array of TCRBatchMove;
 begin
-  cnt := UCopyDataSet(dmXAF.qryOraInfo, dmXAF.qryXafInfo, tmReplace);
-  TriggerXEvent('UCopyDataSet: OK. [' + IntToStr(cnt) + ']');
+  src := [dmXAF.qryOraInfo, dmXAF.qryOraCustomer, dmXAF.qryOraVatCode,
+    dmXAF.qryOraPeriod, dmXAF.qryOraAccount, dmXAF.qryOraTxTotal,
+    dmXAF.qryOraOpBalance, dmXAF.qryOraOpLine, dmXAF.qryOraTransaction,
+    dmXAF.qryOraTransactionLine, dmXAF.qryOraVatLine];
+  dst := [dmXAF.qryXafInfo, dmXAF.qryXafCustomer, dmXAF.qryXafVatCode,
+    dmXAF.qryXafPeriod, dmXAF.qryXafAccount, dmXAF.qryXafTxTotal,
+    dmXAF.qryXafOpBalance, dmXAF.qryXafOpLine, dmXAF.qryXafTransaction,
+    dmXAF.qryXafTransactionLine, dmXAF.qryXafVatLine];
+  SetLength(bm, Length(src));
 
-  cnt := UCopyDataSet(dmXAF.qryOraInfo, dmXAF.qryXafInfo, tmReplace);
-  TriggerXEvent('Info: OK. [' + IntToStr(cnt) + ']');
+  sp := nil;
 
-  cnt := UCopyDataSet(dmXAF.qryOraCustomer, dmXAF.qryXafCustomer, tmReplace);
-  TriggerXEvent('Customer: OK. [' + IntToStr(cnt) + ']');
+  try
+    luw := CreateLUW(dmFBZakelijk.connFBZakelijk);
+    luw.StartTransaction;
 
-  cnt := UCopyDataSet(dmXAF.qryOraVatCode, dmXAF.qryXafVatCode, tmReplace);
-  TriggerXEvent('VatCode: OK. [' + IntToStr(cnt) + ']');
+    try
+      sp := TUniStoredProc.Create(nil);
+      sp.Connection := dmFBZakelijk.connFBZakelijk;
+      sp.StoredProcName := 'mk_pkg_xaf.delete_xaf';
+      luw.AddStoredProc(sp);
 
-  cnt := UCopyDataSet(dmXAF.qryOraPeriod, dmXAF.qryXafPeriod, tmReplace);
-  TriggerXEvent('Period: OK. [' + IntToStr(cnt) + ']');
+      for var i: integer := Low(src) to High(src) do
+      begin
+        bm[i] := CreateMove(src[i], dst[i], tmReplace);
+        luw.AddBatchMove(bm[i]);
+        TriggerXEvent(bm[i].Destination.name + ': ' +
+          IntToStr(bm[i].MovedCount) + '.');
+      end;
 
-  cnt := UCopyDataSet(dmXAF.qryOraAccount, dmXAF.qryXafAccount, tmReplace);
-  TriggerXEvent('Account: OK. [' + IntToStr(cnt) + ']');
+      luw.Commit;
+    except
+      luw.Rollback;
+      TriggerXEvent('xaf: exception.');
+    end;
+  finally
+    if Assigned(sp) then
+      sp.Free;
 
-  cnt := UCopyDataSet(dmXAF.qryOraOpBalance, dmXAF.qryXafOpBalance, tmReplace);
-  TriggerXEvent('Opening balance: OK. [' + IntToStr(cnt) + ']');
-
-  cnt := UCopyDataSet(dmXAF.qryOraOpLine, dmXAF.qryXafOpLine, tmReplace);
-  TriggerXEvent('Opening balance line: OK. [' + IntToStr(cnt) + ']');
-
-  cnt := UCopyDataSet(dmXAF.qryOraTransaction, dmXAF.qryXafTransaction,
-    tmReplace);
-  TriggerXEvent('Transaction: OK. [' + IntToStr(cnt) + ']');
-
-  cnt := UCopyDataSet(dmXAF.qryOraTransactionLine, dmXAF.qryXafTransactionLine,
-    tmReplace);
-  TriggerXEvent('Transaction line: OK. [' + IntToStr(cnt) + ']');
-
-  cnt := UCopyDataSet(dmXAF.qryOraVatLine, dmXAF.qryXafVatLine, tmReplace);
-  TriggerXEvent('VAT line: OK. [' + IntToStr(cnt) + ']');
+    for var i: integer := Low(src) to High(src) do
+      if Assigned(bm[i]) then
+        bm[i].Free;
+  end;
 end;
 
 constructor ZBData.Create;

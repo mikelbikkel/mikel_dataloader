@@ -262,6 +262,7 @@ end;
 procedure TfrmMain.XafMessage(msg: string);
 begin
   lstLog.Items.Append(msg);
+  lstLog.Refresh;
 end;
 
 {$ENDREGION}

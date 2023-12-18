@@ -359,6 +359,16 @@ type
     qryFBRZtxCREATE_DATE: TDateTimeField;
     qryFBRZGLCREATE_DATE: TDateTimeField;
     qryFBRZinfoCREATE_DATE: TDateTimeField;
+    qryOraTxTotal: TUniQuery;
+    qryXafTxTotal: TUniQuery;
+    qryXafTxTotalAUDIT_ID: TStringField;
+    qryXafTxTotalLINECOUNT: TIntegerField;
+    qryXafTxTotalTOTAL_DEBIT: TFloatField;
+    qryXafTxTotalTOTAL_CREDIT: TFloatField;
+    qryOraTxTotalAUDIT_ID: TStringField;
+    qryOraTxTotalLINECOUNT: TFloatField;
+    qryOraTxTotalTOTAL_DEBIT: TFloatField;
+    qryOraTxTotalTOTAL_CREDIT: TFloatField;
   end;
 
 var

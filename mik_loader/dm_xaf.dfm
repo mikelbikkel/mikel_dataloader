@@ -776,8 +776,8 @@ object dmXAF: TdmXAF
       'from mk_xaf_opening_balance')
     Options.SetEmptyStrToNull = True
     IndexFieldNames = 'audit_id'
-    Left = 432
-    Top = 80
+    Left = 392
+    Top = 104
     object qryXafOpBalanceAUDIT_ID: TStringField
       FieldName = 'AUDIT_ID'
       Required = True
@@ -850,8 +850,8 @@ object dmXAF: TdmXAF
       'from mk_xaf_opening_line')
     Options.SetEmptyStrToNull = True
     IndexFieldNames = 'audit_id;obline_nr'
-    Left = 432
-    Top = 160
+    Left = 392
+    Top = 184
     object qryXafOpLineAUDIT_ID: TStringField
       FieldName = 'AUDIT_ID'
       Required = True
@@ -933,8 +933,8 @@ object dmXAF: TdmXAF
       'from mk_xaf_transaction')
     Options.ReturnParams = True
     IndexFieldNames = 'tx_nr'
-    Left = 432
-    Top = 256
+    Left = 392
+    Top = 280
     object qryXafTransactionAUDIT_ID: TStringField
       FieldName = 'AUDIT_ID'
       Size = 50
@@ -1039,8 +1039,8 @@ object dmXAF: TdmXAF
       'from mk_xaf_transaction_line')
     Options.SetEmptyStrToNull = True
     IndexFieldNames = 'txline_nr'
-    Left = 432
-    Top = 344
+    Left = 392
+    Top = 368
     object qryXafTransactionLineAUDIT_ID: TStringField
       FieldName = 'AUDIT_ID'
       Size = 50
@@ -1149,8 +1149,8 @@ object dmXAF: TdmXAF
       'from mk_xaf_vat_line')
     Options.SetEmptyStrToNull = True
     IndexFieldNames = 'txline_nr'
-    Left = 424
-    Top = 424
+    Left = 384
+    Top = 448
     object qryXafVatLineAUDIT_ID: TStringField
       FieldName = 'AUDIT_ID'
       Size = 50
@@ -1200,8 +1200,8 @@ object dmXAF: TdmXAF
       'from mk_xml_opening_balance')
     Options.SetEmptyStrToNull = True
     IndexFieldNames = 'audit_id'
-    Left = 560
-    Top = 80
+    Left = 520
+    Top = 104
     object qryOraOpBalanceAUDIT_ID: TStringField
       FieldName = 'AUDIT_ID'
       Required = True
@@ -1234,8 +1234,8 @@ object dmXAF: TdmXAF
       'from mk_xml_opening_line')
     Options.SetEmptyStrToNull = True
     IndexFieldNames = 'audit_id;obline_nr'
-    Left = 536
-    Top = 160
+    Left = 496
+    Top = 184
     object qryOraOpLineAUDIT_ID: TStringField
       FieldName = 'AUDIT_ID'
       Required = True
@@ -1284,8 +1284,8 @@ object dmXAF: TdmXAF
       'from mk_xml_transaction')
     Options.SetEmptyStrToNull = True
     IndexFieldNames = 'audit_id;tx_nr'
-    Left = 568
-    Top = 256
+    Left = 528
+    Top = 280
     object qryOraTransactionAUDIT_ID: TStringField
       FieldName = 'AUDIT_ID'
       Required = True
@@ -1344,8 +1344,8 @@ object dmXAF: TdmXAF
       'from mk_xml_transaction_line')
     Options.SetEmptyStrToNull = True
     IndexFieldNames = 'audit_id;txline_nr'
-    Left = 592
-    Top = 344
+    Left = 552
+    Top = 368
     object qryOraTransactionLineAUDIT_ID: TStringField
       FieldName = 'AUDIT_ID'
       Required = True
@@ -1414,8 +1414,8 @@ object dmXAF: TdmXAF
       'from mk_xml_vat_line')
     Options.SetEmptyStrToNull = True
     IndexFieldNames = 'audit_id;txline_nr'
-    Left = 544
-    Top = 424
+    Left = 504
+    Top = 448
     object qryOraVatLineAUDIT_ID: TStringField
       FieldName = 'AUDIT_ID'
       Required = True
@@ -2619,6 +2619,123 @@ object dmXAF: TdmXAF
     object qryFBRZGLCREATE_DATE: TDateTimeField
       FieldName = 'CREATE_DATE'
       Required = True
+    end
+  end
+  object qryOraTxTotal: TUniQuery
+    KeyFields = 'audit_id'
+    SQLInsert.Strings = (
+      'INSERT INTO MK_XML_TX_TOTAL'
+      '  (AUDIT_ID, LINECOUNT, TOTAL_DEBIT, TOTAL_CREDIT)'
+      'VALUES'
+      '  (:AUDIT_ID, :LINECOUNT, :TOTAL_DEBIT, :TOTAL_CREDIT)')
+    SQLDelete.Strings = (
+      'DELETE FROM MK_XML_TX_TOTAL'
+      'WHERE'
+      '  AUDIT_ID = :Old_AUDIT_ID')
+    SQLUpdate.Strings = (
+      'UPDATE MK_XML_TX_TOTAL'
+      'SET'
+      
+        '  AUDIT_ID = :AUDIT_ID, LINECOUNT = :LINECOUNT, TOTAL_DEBIT = :T' +
+        'OTAL_DEBIT, TOTAL_CREDIT = :TOTAL_CREDIT'
+      'WHERE'
+      '  AUDIT_ID = :Old_AUDIT_ID')
+    SQLLock.Strings = (
+      
+        'SELECT AUDIT_ID, LINECOUNT, TOTAL_DEBIT, TOTAL_CREDIT FROM MK_XM' +
+        'L_TX_TOTAL'
+      'WHERE'
+      '  AUDIT_ID = :Old_AUDIT_ID'
+      'FOR UPDATE NOWAIT')
+    SQLRefresh.Strings = (
+      
+        'SELECT AUDIT_ID, LINECOUNT, TOTAL_DEBIT, TOTAL_CREDIT FROM MK_XM' +
+        'L_TX_TOTAL'
+      'WHERE'
+      '  AUDIT_ID = :AUDIT_ID')
+    SQLRecCount.Strings = (
+      'SELECT Count(*) FROM ('
+      'SELECT * FROM MK_XML_TX_TOTAL'
+      ''
+      ')')
+    Connection = dmFBZakelijk.connOraZakelijk
+    SQL.Strings = (
+      'select audit_id, linecount, total_debit, total_credit'
+      'from mk_xml_tx_total')
+    Options.SetEmptyStrToNull = True
+    IndexFieldNames = 'audit_id'
+    Left = 520
+    Top = 16
+    object qryOraTxTotalAUDIT_ID: TStringField
+      FieldName = 'AUDIT_ID'
+      Required = True
+      Size = 50
+    end
+    object qryOraTxTotalLINECOUNT: TFloatField
+      FieldName = 'LINECOUNT'
+    end
+    object qryOraTxTotalTOTAL_DEBIT: TFloatField
+      FieldName = 'TOTAL_DEBIT'
+    end
+    object qryOraTxTotalTOTAL_CREDIT: TFloatField
+      FieldName = 'TOTAL_CREDIT'
+    end
+  end
+  object qryXafTxTotal: TUniQuery
+    KeyFields = 'audit_id'
+    SQLInsert.Strings = (
+      'INSERT INTO MK_XAF_TX_TOTAL'
+      '  (AUDIT_ID, LINECOUNT, TOTAL_DEBIT)'
+      'VALUES'
+      '  (:AUDIT_ID, :LINECOUNT, :TOTAL_CREDIT)')
+    SQLDelete.Strings = (
+      'DELETE FROM MK_XAF_TX_TOTAL'
+      'WHERE'
+      '  AUDIT_ID = :Old_AUDIT_ID')
+    SQLUpdate.Strings = (
+      'UPDATE MK_XAF_TX_TOTAL'
+      'SET'
+      
+        '  AUDIT_ID = :AUDIT_ID, LINECOUNT = :LINECOUNT, TOTAL_DEBIT = :T' +
+        'OTAL_CREDIT'
+      'WHERE'
+      '  AUDIT_ID = :Old_AUDIT_ID')
+    SQLLock.Strings = (
+      'SELECT NULL FROM MK_XAF_TX_TOTAL'
+      'WHERE'
+      'AUDIT_ID = :Old_AUDIT_ID'
+      'FOR UPDATE WITH LOCK')
+    SQLRefresh.Strings = (
+      'SELECT AUDIT_ID, LINECOUNT, TOTAL_DEBIT FROM MK_XAF_TX_TOTAL'
+      'WHERE'
+      '  AUDIT_ID = :AUDIT_ID')
+    SQLRecCount.Strings = (
+      'SELECT COUNT(*) FROM ('
+      'SELECT 1 AS C  FROM MK_XAF_TX_TOTAL'
+      ''
+      ') q')
+    Connection = dmFBZakelijk.connFBZakelijk
+    SQL.Strings = (
+      
+        'select audit_id, linecount, total_debit, total_credit from mk_xa' +
+        'f_tx_total')
+    Options.SetEmptyStrToNull = True
+    IndexFieldNames = 'audit_id'
+    Left = 392
+    Top = 24
+    object qryXafTxTotalAUDIT_ID: TStringField
+      FieldName = 'AUDIT_ID'
+      Required = True
+      Size = 50
+    end
+    object qryXafTxTotalLINECOUNT: TIntegerField
+      FieldName = 'LINECOUNT'
+    end
+    object qryXafTxTotalTOTAL_DEBIT: TFloatField
+      FieldName = 'TOTAL_DEBIT'
+    end
+    object qryXafTxTotalTOTAL_CREDIT: TFloatField
+      FieldName = 'TOTAL_CREDIT'
     end
   end
 end
