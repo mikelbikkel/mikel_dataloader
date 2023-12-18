@@ -176,22 +176,19 @@ begin
 
   try
     luw := CreateLUW(dmFBZakelijk.connFBZakelijk);
-    sp := TUniStoredProc.Create(nil);
-    sp.Connection := dmFBZakelijk.connFBZakelijk;
-    sp.StoredProcName := 'mk_pkg_rabo.delete_rabo_ztx';
-    luw.Add(sp);
-
-    for var i: integer := Low(src) to High(src) do
-    begin
-      bm[i] := CreateMove(src[i], dst[i], tmReplace);
-      luw.Add(dst[i]);
-    end;
-
     luw.StartTransaction;
+
     try
-      sp.ExecProc;
+      sp := TUniStoredProc.Create(nil);
+      sp.Connection := dmFBZakelijk.connFBZakelijk;
+      sp.StoredProcName := 'mk_pkg_rabo.delete_rabo_ztx';
+      luw.AddStoredProc(sp);
+
       for var i: integer := Low(src) to High(src) do
-        bm[i].Execute;
+      begin
+        bm[i] := CreateMove(src[i], dst[i], tmReplace);
+        luw.AddBatchMove(bm[i]);
+      end;
 
       luw.Commit;
       for var i: integer := Low(src) to High(src) do
@@ -204,6 +201,9 @@ begin
 
     // s := (luw as TObject).ToString;
   finally
+    if Assigned(sp) then
+      sp.Free;
+
     for var i: integer := Low(src) to High(src) do
       if Assigned(bm[i]) then
         bm[i].Free;

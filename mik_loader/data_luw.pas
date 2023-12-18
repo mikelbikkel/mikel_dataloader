@@ -19,12 +19,17 @@ unit data_luw;
 
 interface
 
-uses Uni;
+uses Uni, CRBatchMove;
 
+{
+  DD: create = start transaction.
+  Add = execute statement.
+}
 type
   ILUW = interface
     procedure StartTransaction;
-    procedure Add(ds: TCustomUniDataSet);
+    procedure AddStoredProc(sp: TUniStoredProc);
+    procedure AddBatchMove(bm: TCRBatchMove);
     procedure Commit;
     procedure Rollback;
   end;
@@ -48,7 +53,8 @@ type
     constructor Create(conn: TUniConnection);
     destructor Destroy; override;
     procedure StartTransaction;
-    procedure Add(ds: TCustomUniDataSet);
+    procedure AddStoredProc(sp: TUniStoredProc);
+    procedure AddBatchMove(bm: TCRBatchMove);
     procedure Commit;
     procedure Rollback;
   end;
@@ -97,24 +103,39 @@ begin
   FtxU.StartTransaction;
 end;
 
-procedure TMikLUW.Add(ds: TCustomUniDataSet);
+procedure TMikLUW.AddBatchMove(bm: TCRBatchMove);
+var
+  dst: TCustomUniDataSet;
 begin
-  if FStatus <> txsNew then
+  if FStatus <> txsActive then
+    Exit;
+  if not Assigned(bm) then
+    Exit;
+  if not(bm.Destination is TCustomUniDataSet) then
     Exit;
 
-  if not Assigned(ds) then
-    Exit;
-  if not Assigned(ds.Connection) then
-    Exit;
-  if not('InterBase' = ds.Connection.ProviderName) then
+  dst := bm.Destination as TCustomUniDataSet;
+  dst.Transaction := FtxR;
+  dst.UpdateTransaction := FtxU;
+  bm.Execute;
+end;
+
+procedure TMikLUW.AddStoredProc(sp: TUniStoredProc);
+begin
+  if FStatus <> txsActive then
     Exit;
 
-  if (ds is TUniStoredProc) then
-    ds.Transaction := FtxU
-  else
-    ds.Transaction := FtxR;
+  if not Assigned(sp) then
+    Exit;
+  if not Assigned(sp.Connection) then
+    Exit;
+  // check if dsame conn as in ctor.
+  if not('InterBase' = sp.Connection.ProviderName) then
+    Exit;
 
-  ds.UpdateTransaction := FtxU;
+  sp.Transaction := FtxU;
+  sp.UpdateTransaction := FtxU;
+  sp.ExecProc;
 end;
 
 procedure TMikLUW.Commit;
