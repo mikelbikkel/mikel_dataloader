@@ -60,9 +60,6 @@ type
     procedure LoadDataSetFromFile(const dsname: string; const filename: String;
       ds: TDataSet); virtual; abstract;
 
-    function UCopyDataSet(src: TDataSet; dst: TDataSet; tmMode: TTargetMode)
-      : integer; virtual; abstract;
-
     procedure CopyXaf; virtual; abstract;
     procedure CopyKnabTx(tm: TTargetMode); virtual; abstract;
     procedure CopyRaboTx; virtual; abstract;
@@ -94,6 +91,7 @@ type
     procedure LoadKnabZakFromFile(const filename: String; ds: TDataSet);
     function CreateMove(src: TDataSet; dst: TDataSet; tmMode: TTargetMode)
       : TCRBatchMove;
+    procedure ExecuteProc(p: string);
   public
     constructor Create;
     destructor Destroy; override;
@@ -101,8 +99,6 @@ type
     procedure procKnabZakelijk; override;
     procedure LoadDataSetFromFile(const dsname: string; const filename: String;
       ds: TDataSet); override;
-    function UCopyDataSet(src: TDataSet; dst: TDataSet; tmMode: TTargetMode)
-      : integer; override;
 
     procedure CopyXaf; override;
     procedure CopyKnabTx(tm: TTargetMode); override;
@@ -572,82 +568,38 @@ begin
     Disconnect;
 end;
 
-function ZBData.UCopyDataSet(src, dst: TDataSet; tmMode: TTargetMode): integer;
+procedure ZBData.ExecuteProc(p: string);
 var
-  bm: TCRBatchMove;
-  fields: TStringList;
-  s: string;
-  uds: TCustomUniDataSet;
-  bd: IDDBatch;
-  bTruncate: boolean;
+  luw: ILUW;
+  sp: TUniStoredProc;
 begin
-  if not(dst is TCustomUniDataSet) then
-    raise Exception.Create('dst must be a TCustomUniDataSet');
-
-  bm := nil;
-  fields := nil;
-  s := EmptyStr;
-  uds := nil;
-  bd := nil;
-  bTruncate := false;
+  sp := nil;
   try
-    bm := TCRBatchMove.Create(nil);
-    case tmMode of
-      tmReplace:
-        begin
-          bTruncate := true;
-          bm.AbortOnKeyViol := true;
-          bm.Mode := bmAppend;
-        end;
-      tmAppend:
-        begin
-          bTruncate := false;
-          bm.AbortOnKeyViol := false;
-          bm.Mode := bmAppend;
-        end;
-    else
-      raise Exception.Create('unknown tmMode');
+    luw := CreateLUW(dmFBZakelijk.connFBZakelijk);
+    luw.StartTransaction;
+    try
+      sp := TUniStoredProc.Create(nil);
+      sp.Connection := dmFBZakelijk.connFBZakelijk;
+      sp.StoredProcName := p;
+      luw.AddStoredProc(sp);
+      luw.Commit;
+    except
+      luw.Rollback;
     end;
-    bm.FieldMappingMode := mmFieldName;
-    bm.Source := src;
-    bm.Destination := dst;
-
-    fields := TStringList.Create;
-    dst.GetFieldNames(fields);
-    for var i: integer := 0 to fields.Count - 1 do
-    begin
-      s := fields[i] + '=' + fields[i];
-      bm.Mappings.Add(s);
-    end;
-
-    uds := dst as TCustomUniDataSet;
-    bd := CreateBatchDecorator(uds, bTruncate);
-    var
-    s2 := (bd as TObject).ToString;
-    MikLogWriteLn(s2);
-
-    dst.Active := true;
-    bd.StartTransaction;
-    bm.Execute;
-    bd.Commit;
-    Result := bm.MovedCount;
   finally
-    if Assigned(bm) then
-      bm.Free;
-    bd := nil;
-    if Assigned(fields) then
-      fields.Free;
+    if Assigned(sp) then
+      sp.Free;
   end;
 end;
 
 procedure ZBData.procRaboZakelijk;
 begin
-  dmFBZakelijk.execLoadRaboZak.ExecProc;
+  ExecuteProc('MK_PKG_RABO.IMPORT_RABO_ZTX');
 end;
 
 procedure ZBData.procKnabZakelijk;
 begin
-  dmFBZakelijk.execLoadKnabZak.ExecProc;
+  ExecuteProc('MK_PKG_KNAB.IMPORT_KNAB_ZTX');
 end;
 
 { ============================================================================ }

@@ -81,9 +81,7 @@ type
     qryLogLOG_TS: TDateTimeField;
     qryLogLOG_MODULE: TStringField;
     qryLogLOG_MESSAGE: TStringField;
-    execLoadRaboZak: TUniStoredProc;
     uniMonitor: TUniSQLMonitor;
-    execLoadKnabZak: TUniStoredProc;
     provOra: TOracleUniProvider;
     connOraZakelijk: TUniConnection;
     procedure connFBZakelijkLogin(Connection: TCustomDAConnection;

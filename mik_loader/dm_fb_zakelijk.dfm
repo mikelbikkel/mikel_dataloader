@@ -325,28 +325,10 @@ object dmFBZakelijk: TdmFBZakelijk
       Size = 200
     end
   end
-  object execLoadRaboZak: TUniStoredProc
-    StoredProcName = 'MK_PKG_RABO.IMPORT_RABO_ZTX'
-    SQL.Strings = (
-      'EXECUTE PROCEDURE MK_PKG_RABO.IMPORT_RABO_ZTX')
-    Connection = connFBZakelijk
-    Left = 480
-    Top = 368
-    CommandStoredProcName = 'MK_PKG_RABO.IMPORT_RABO_ZTX'
-  end
   object uniMonitor: TUniSQLMonitor
     Options = [moDBMonitor]
     Left = 336
     Top = 352
-  end
-  object execLoadKnabZak: TUniStoredProc
-    StoredProcName = 'MK_PKG_KNAB.IMPORT_KNAB_ZTX'
-    SQL.Strings = (
-      'EXECUTE PROCEDURE MK_PKG_KNAB.IMPORT_KNAB_ZTX')
-    Connection = connFBZakelijk
-    Left = 528
-    Top = 296
-    CommandStoredProcName = 'MK_PKG_KNAB.IMPORT_KNAB_ZTX'
   end
   object provOra: TOracleUniProvider
     Left = 48
